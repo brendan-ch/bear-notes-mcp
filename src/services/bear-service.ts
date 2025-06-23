@@ -2396,107 +2396,30 @@ export class BearService {
 
 
 
+
+
   /**
-   * Trigger Bear to reparse a note by opening it in edit mode via x-callback-url
-   * This uses Bear's API to simulate opening the note for editing, which should trigger parsing
+   * Most effective method to trigger Bear's hashtag parsing
+   * Uses Bear's API to update the note with its own content, forcing a reparse
    */
-  private async triggerBearParseViaAPI(noteId: number): Promise<void> {
+  private async triggerBearParseEffectively(noteUUID: string, noteContent: string): Promise<void> {
     try {
-      // Get the note's unique identifier for the API call
-      const note = await this.database.queryOne<{ ZUNIQUEIDENTIFIER: string }>(`
-        SELECT ZUNIQUEIDENTIFIER FROM ZSFNOTE WHERE Z_PK = ?
-      `, [noteId]);
-      
-      if (!note?.ZUNIQUEIDENTIFIER) {
-        throw new Error('Could not find note identifier for Bear API call');
-      }
-      
-      // Use Bear's x-callback-url API to open the note in edit mode
-      // This should trigger Bear's hashtag parsing
       const { exec } = await import('child_process');
       const { promisify } = await import('util');
       const execAsync = promisify(exec);
       
-      // Simple approach: just open the note, which should trigger parsing
-      const bearURL = `bear://x-callback-url/open-note?id=${note.ZUNIQUEIDENTIFIER}&show_window=no`;
+      // Use Bear's API to replace the note content with itself
+      // This forces Bear to reparse all hashtags in the content
+      const encodedContent = encodeURIComponent(noteContent);
+      const bearURL = `bear://x-callback-url/add-text?id=${noteUUID}&mode=replace&text=${encodedContent}&show_window=no`;
       
       await execAsync(`open "${bearURL}"`);
       
-      // Wait a moment for Bear to process
-      await new Promise(resolve => setTimeout(resolve, 300));
+      // Wait for Bear to process the update and reparse hashtags
+      await new Promise(resolve => setTimeout(resolve, 1000));
       
     } catch (error) {
-      throw new Error(`Failed to trigger Bear parsing via API: ${error instanceof Error ? error.message : 'Unknown error'}`);
-    }
-  }
-
-  /**
-   * Trigger Bear parsing using AppleScript to simulate a keystroke
-   * This is a more aggressive approach that actually simulates typing in Bear
-   */
-  private async triggerBearParseViaAppleScript(noteId: number): Promise<void> {
-    try {
-      // Get the note's unique identifier for the API call
-      const note = await this.database.queryOne<{ ZUNIQUEIDENTIFIER: string }>(`
-        SELECT ZUNIQUEIDENTIFIER FROM ZSFNOTE WHERE Z_PK = ?
-      `, [noteId]);
-      
-      if (!note?.ZUNIQUEIDENTIFIER) {
-        // Could not find note identifier for AppleScript
-        return;
-      }
-      
-      const { exec } = await import('child_process');
-      const { promisify } = await import('util');
-      const execAsync = promisify(exec);
-      
-      // AppleScript to open Bear, open the note, and simulate a keystroke
-      const appleScript = `
-        tell application "Bear"
-          activate
-        end tell
-        
-        delay 0.5
-        
-        do shell script "open 'bear://x-callback-url/open-note?id=${note.ZUNIQUEIDENTIFIER}&edit=yes'"
-        
-        delay 1
-        
-        tell application "System Events"
-          tell process "Bear"
-            -- Add a space and immediately delete it to trigger parsing
-            keystroke " "
-            delay 0.1
-            key code 51 -- Delete key
-          end tell
-        end tell
-      `;
-      
-      await execAsync(`osascript -e '${appleScript.replace(/'/g, "\\'")}'`);
-      
-    } catch (error) {
-      // Silent error handling to avoid JSON-RPC interference
-    }
-  }
-
-  /**
-   * Comprehensive method to trigger Bear's hashtag parsing using multiple approaches
-   * Tries different methods in order of likelihood to succeed
-   */
-  private async triggerBearHashtagParsing(noteId: number): Promise<void> {
-    try {
-      // Approach 1: x-callback-url with edit=yes (most promising)
-      await this.triggerBearParseViaAPI(noteId);
-      
-      // Approach 2: Database content simulation (our previous attempt)
-      await this.triggerBearReparse(noteId);
-      
-      // Approach 3: AppleScript keystroke simulation (most aggressive)
-      // Only try this if the user hasn't disabled it
-      await this.triggerBearParseViaAppleScript(noteId);
-      
-    } catch (error) {
-      // Silent error handling to avoid JSON-RPC interference
+      throw new Error(`Failed to trigger effective Bear parsing: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   }
 
@@ -2524,23 +2447,24 @@ export class BearService {
       let params: any[];
       
       if (noteId) {
-        query = 'SELECT Z_PK, ZUNIQUEIDENTIFIER FROM ZSFNOTE WHERE ZUNIQUEIDENTIFIER = ? AND ZTRASHED = 0';
+        query = 'SELECT Z_PK, ZUNIQUEIDENTIFIER, ZTEXT FROM ZSFNOTE WHERE ZUNIQUEIDENTIFIER = ? AND ZTRASHED = 0';
         params = [noteId];
       } else {
-        query = 'SELECT Z_PK, ZUNIQUEIDENTIFIER FROM ZSFNOTE WHERE ZTITLE = ? AND ZTRASHED = 0';
+        query = 'SELECT Z_PK, ZUNIQUEIDENTIFIER, ZTEXT FROM ZSFNOTE WHERE ZTITLE = ? AND ZTRASHED = 0';
         params = [noteTitle];
       }
       
-      const note = await this.database.queryOne<{ Z_PK: number; ZUNIQUEIDENTIFIER: string }>(query, params);
+      const note = await this.database.queryOne<{ Z_PK: number; ZUNIQUEIDENTIFIER: string; ZTEXT: string }>(query, params);
       
       if (!note) {
         throw new Error(`Note not found: ${noteId || noteTitle}`);
       }
       
-      // Use Bear's API to open the note in edit mode, which triggers parsing
-      await this.triggerBearParseViaAPI(note.Z_PK);
+      // Most effective approach: Use Bear's API to "update" the note with its own content
+      // This forces Bear to reparse all hashtags in the content
+      await this.triggerBearParseEffectively(note.ZUNIQUEIDENTIFIER, note.ZTEXT);
       
-      return `Hashtag parsing triggered for note: ${noteId || noteTitle}. Bear should update the sidebar shortly.`;
+      return `Hashtag parsing triggered for note: ${noteId || noteTitle}. Bear should update the sidebar within a few seconds.`;
       
     } catch (error) {
       throw new Error(`Failed to trigger hashtag parsing: ${error instanceof Error ? error.message : 'Unknown error'}`);
@@ -2628,9 +2552,8 @@ export class BearService {
         ZTITLE: string;
       }>(query, params);
       
-      await this.database.disconnect();
-      
       if (notes.length === 0) {
+        await this.database.disconnect();
         return 'No notes found matching the criteria';
       }
       
@@ -2638,8 +2561,15 @@ export class BearService {
       let successCount = 0;
       for (const note of notes) {
         try {
-          await this.triggerBearHashtagParsing(note.Z_PK);
-          successCount++;
+          // Get the full note content for effective parsing trigger
+          const fullNote = await this.database.queryOne<{ ZTEXT: string }>(`
+            SELECT ZTEXT FROM ZSFNOTE WHERE Z_PK = ?
+          `, [note.Z_PK]);
+          
+          if (fullNote?.ZTEXT) {
+            await this.triggerBearParseEffectively(note.ZUNIQUEIDENTIFIER, fullNote.ZTEXT);
+            successCount++;
+          }
           
           // Small delay between notes to avoid overwhelming Bear
           await new Promise(resolve => setTimeout(resolve, 200));
@@ -2647,6 +2577,8 @@ export class BearService {
           // Silent error handling to avoid JSON-RPC interference
         }
       }
+      
+      await this.database.disconnect();
       
       return `Triggered hashtag parsing for ${successCount}/${notes.length} notes. Check Bear's sidebar in a few seconds.`;
       

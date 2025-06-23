@@ -88,18 +88,21 @@ class BearMCPServer {
                         return await this.analyzeNoteMetadata(args);
                     case 'get_notes_with_metadata':
                         return await this.getNotesWithMetadata(args);
+                    // WRITE OPERATIONS DISABLED - iCloud sync conflicts
                     case 'create_note':
-                        return await this.createNote(args);
                     case 'update_note':
-                        return await this.updateNote(args);
                     case 'duplicate_note':
-                        return await this.duplicateNote(args);
                     case 'archive_note':
-                        return await this.archiveNote(args);
                     case 'trigger_hashtag_parsing':
-                        return await this.triggerHashtagParsing(args);
                     case 'batch_trigger_hashtag_parsing':
-                        return await this.batchTriggerHashtagParsing(args);
+                        return {
+                            content: [
+                                {
+                                    type: 'text',
+                                    text: `❌ Write operation '${name}' is currently DISABLED to prevent iCloud sync conflicts.\n\nThis server is now READ-ONLY for safety. Write operations can cause:\n- iCloud sync failures\n- Data corruption\n- Note conflicts\n\nUse Bear's native interface for creating/editing notes.`,
+                                },
+                            ],
+                        };
                     default:
                         throw new Error(`Unknown tool: ${name}`);
                 }
@@ -625,163 +628,11 @@ class BearMCPServer {
                     },
                 },
             },
-            {
-                name: 'create_note',
-                description: 'Create a new note with title, content, and tags',
-                inputSchema: {
-                    type: 'object',
-                    properties: {
-                        title: {
-                            type: 'string',
-                            description: 'Title of the new note',
-                        },
-                        content: {
-                            type: 'string',
-                            description: 'Content/body of the note (optional)',
-                        },
-                        tags: {
-                            type: 'array',
-                            items: { type: 'string' },
-                            description: 'Array of tag names to apply to the note. Tags are automatically sanitized: lowercase only, no spaces/hyphens/underscores (use forward slashes for nested tags like "work/project")',
-                        },
-                        isArchived: {
-                            type: 'boolean',
-                            description: 'Whether the note should be archived',
-                        },
-                        isPinned: {
-                            type: 'boolean',
-                            description: 'Whether the note should be pinned',
-                        },
-                    },
-                    required: ['title'],
-                },
-            },
-            {
-                name: 'update_note',
-                description: 'Update an existing note',
-                inputSchema: {
-                    type: 'object',
-                    properties: {
-                        noteId: {
-                            type: 'number',
-                            description: 'ID of the note to update',
-                        },
-                        title: {
-                            type: 'string',
-                            description: 'New title for the note',
-                        },
-                        content: {
-                            type: 'string',
-                            description: 'New content for the note',
-                        },
-                        tags: {
-                            type: 'array',
-                            items: { type: 'string' },
-                            description: 'New array of tag names (replaces existing tags). Tags are automatically sanitized: lowercase only, no spaces/hyphens/underscores (use forward slashes for nested tags like "work/project")',
-                        },
-                        isArchived: {
-                            type: 'boolean',
-                            description: 'Whether the note should be archived',
-                        },
-                        isPinned: {
-                            type: 'boolean',
-                            description: 'Whether the note should be pinned',
-                        },
-                        expectedModificationDate: {
-                            type: 'string',
-                            description: 'Expected modification date for conflict detection (ISO string)',
-                        },
-                    },
-                    required: ['noteId'],
-                },
-            },
-            {
-                name: 'duplicate_note',
-                description: 'Create a duplicate of an existing note',
-                inputSchema: {
-                    type: 'object',
-                    properties: {
-                        noteId: {
-                            type: 'number',
-                            description: 'ID of the note to duplicate',
-                        },
-                        titleSuffix: {
-                            type: 'string',
-                            description: 'Suffix to add to the duplicated note title (default: " (Copy)")',
-                        },
-                        copyTags: {
-                            type: 'boolean',
-                            description: 'Whether to copy tags from the original note (default: true)',
-                        },
-                    },
-                    required: ['noteId'],
-                },
-            },
-            {
-                name: 'archive_note',
-                description: 'Archive or unarchive a note',
-                inputSchema: {
-                    type: 'object',
-                    properties: {
-                        noteId: {
-                            type: 'number',
-                            description: 'ID of the note to archive/unarchive',
-                        },
-                        archived: {
-                            type: 'boolean',
-                            description: 'True to archive, false to unarchive',
-                        },
-                    },
-                    required: ['noteId', 'archived'],
-                },
-            },
-            {
-                name: 'trigger_hashtag_parsing',
-                description: 'Trigger Bear to reparse hashtags in a note (workaround for sidebar display)',
-                inputSchema: {
-                    type: 'object',
-                    properties: {
-                        note_id: {
-                            type: 'string',
-                            description: 'Note ID to trigger parsing for'
-                        },
-                        note_title: {
-                            type: 'string',
-                            description: 'Note title to trigger parsing for (alternative to note_id)'
-                        }
-                    },
-                    oneOf: [
-                        { required: ["note_id"] },
-                        { required: ["note_title"] }
-                    ]
-                }
-            },
-            {
-                name: 'batch_trigger_hashtag_parsing',
-                description: 'Trigger hashtag parsing for multiple notes (useful for fixing sidebar display)',
-                inputSchema: {
-                    type: 'object',
-                    properties: {
-                        tag_filter: {
-                            type: 'string',
-                            description: 'Only process notes with this tag'
-                        },
-                        title_pattern: {
-                            type: 'string',
-                            description: 'Only process notes with titles matching this pattern'
-                        },
-                        limit: {
-                            type: 'number',
-                            description: 'Maximum number of notes to process (default: 10)',
-                            default: 10
-                        },
-                        created_after: {
-                            type: 'string',
-                            description: 'Only process notes created after this date (ISO format)'
-                        }
-                    }
-                }
-            },
+            // WRITE OPERATIONS DISABLED - iCloud sync conflicts
+            // The following tools are temporarily disabled to prevent iCloud sync issues:
+            // - create_note, update_note, duplicate_note, archive_note
+            // - trigger_hashtag_parsing, batch_trigger_hashtag_parsing
+            // This server is now READ-ONLY for safety.
         ];
     }
     async getDatabaseStats() {

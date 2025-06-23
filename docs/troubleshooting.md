@@ -2,6 +2,20 @@
 
 Solutions for common issues with the Bear MCP Server.
 
+## 🚨 **IMPORTANT: READ-ONLY MODE**
+
+**⚠️ This server is currently in READ-ONLY mode to prevent iCloud sync conflicts.**
+
+All write operations are disabled for safety:
+- `create_note` - ❌ Disabled
+- `update_note` - ❌ Disabled  
+- `duplicate_note` - ❌ Disabled
+- `archive_note` - ❌ Disabled
+- `trigger_hashtag_parsing` - ❌ Disabled
+- `batch_trigger_hashtag_parsing` - ❌ Disabled
+
+**Use Bear's native interface for creating and editing notes.**
+
 ## 🚨 Common Issues
 
 ### Installation Problems

@@ -448,20 +448,10 @@ export declare class BearService {
      */
     private sanitizeTagName;
     /**
-     * Trigger Bear to reparse a note by opening it in edit mode via x-callback-url
-     * This uses Bear's API to simulate opening the note for editing, which should trigger parsing
+     * Most effective method to trigger Bear's hashtag parsing
+     * Uses Bear's API to update the note with its own content, forcing a reparse
      */
-    private triggerBearParseViaAPI;
-    /**
-     * Trigger Bear parsing using AppleScript to simulate a keystroke
-     * This is a more aggressive approach that actually simulates typing in Bear
-     */
-    private triggerBearParseViaAppleScript;
-    /**
-     * Comprehensive method to trigger Bear's hashtag parsing using multiple approaches
-     * Tries different methods in order of likelihood to succeed
-     */
-    private triggerBearHashtagParsing;
+    private triggerBearParseEffectively;
     /**
      * Public method to trigger hashtag parsing for a specific note
      * Can be called by MCP tools to help users fix sidebar display issues

@@ -25,18 +25,22 @@ export class BearDatabase {
      */
     async isBearRunning() {
         try {
-            const { stdout } = await execAsync('ps aux | grep -i bear | grep -v grep');
-            // Look for Bear processes (excluding this script)
-            const bearProcesses = stdout
-                .split('\n')
-                .filter(line => line.includes('Bear') && !line.includes('node') && !line.includes('bear-mcp-server'))
-                .filter(line => line.trim().length > 0);
-            return bearProcesses.length > 0;
+            // Use AppleScript to check if Bear is running - more reliable on macOS
+            const { stdout } = await execAsync('osascript -e \'tell application "System Events" to get name of every process whose name is "Bear"\'');
+            // If AppleScript returns "Bear", the app is running
+            const isRunning = stdout.trim().includes('Bear');
+            return isRunning;
         }
         catch (error) {
-            // If ps command fails, assume Bear might be running (safer approach)
-            // Could not check Bear process status, assuming it might be running
-            return true;
+            // If AppleScript fails, fall back to process check
+            try {
+                const { stdout } = await execAsync('pgrep -x "Bear"');
+                return stdout.trim().length > 0;
+            }
+            catch (fallbackError) {
+                // If both methods fail, assume Bear might be running (safer approach)
+                return false; // Changed: if we can't detect it, assume it's not running rather than blocking everything
+            }
         }
     }
     /**
@@ -78,9 +82,9 @@ export class BearDatabase {
      * Perform comprehensive safety checks before database operations
      */
     async performSafetyChecks(requireWriteAccess = false) {
-        // Check if Bear is running
-        if (await this.isBearRunning()) {
-            throw new BearSafetyError('Bear app is currently running. Please close Bear before performing database operations to prevent corruption.');
+        // Only check if Bear is running for write operations
+        if (requireWriteAccess && await this.isBearRunning()) {
+            throw new BearSafetyError('Bear app is currently running. Please close Bear before performing write operations to prevent corruption.');
         }
         // Verify database access
         await this.verifyDatabaseAccess();

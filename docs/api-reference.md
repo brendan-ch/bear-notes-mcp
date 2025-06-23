@@ -1,6 +1,12 @@
 # API Reference
 
-Complete reference for all 30 Bear MCP Server tools.
+Complete reference for all Bear MCP Server tools.
+
+## 🚨 **IMPORTANT: READ-ONLY MODE**
+
+**⚠️ Write operations are currently DISABLED to prevent iCloud sync conflicts.**
+
+This server is now **READ-ONLY** for safety. All write operations return an error message directing users to use Bear's native interface.
 
 ## 📖 Read Operations (26 tools)
 
@@ -465,11 +471,15 @@ Analyze tag usage trends over time.
 "Show me how my tag usage has changed over time"
 ```
 
-## ✏️ Write Operations (4 tools)
+## ✏️ Write Operations - ❌ DISABLED
 
-### Note Management
+**⚠️ All write operations are currently disabled to prevent iCloud sync conflicts.**
 
-#### `create_note`
+These operations now return error messages directing users to Bear's native interface:
+
+### Note Management - DISABLED
+
+#### `create_note` - ❌ DISABLED
 Create a new note with content and tags.
 
 **Parameters:**
