@@ -6,11 +6,11 @@ A Model Context Protocol (MCP) server that provides Claude with comprehensive ac
 
 ## ⚠️ **Disclaimer**
 
-This tool directly accesses Bear's database. While comprehensive safety measures are implemented:
-- Always maintain regular Bear backups
-- Test with database copies when experimenting  
+This tool uses a hybrid approach: direct database reads + Bear API writes. While comprehensive safety measures are implemented:
+- Read operations access Bear's database directly (read-only, safe)
+- Write operations use Bear's official API (sync-safe)
 - The tool is not affiliated with Bear's developers
-- Use at your own risk for production databases
+- Always maintain regular Bear backups as good practice
 
   
 
@@ -69,11 +69,11 @@ Edit `~/Library/Application Support/Claude/claude_desktop_config.json`:
 > **How it works**: Uses Bear's x-callback-url API for writes, database for reads!
 
 ### 🛡️ **Safety Features**
-- **Bear Process Detection**: Prevents database corruption
-- **Automatic Backups**: Every write operation creates a backup
-- **Read-Only Mode**: Safe exploration without changes
+- **Hybrid Architecture**: Database reads + API writes for maximum safety
+- **iCloud Sync Safe**: All write operations use Bear's API
 - **Conflict Detection**: Prevents overwriting concurrent changes
-- **Title Consistency**: Titles are handled through content to match Bear's behavior exactly
+- **Tag Validation**: Automatic tag sanitization with warnings
+- **Error Handling**: Robust error management for all operations
 
 ## 📊 **Capabilities Overview**
 
@@ -93,15 +93,8 @@ The server automatically finds your Bear database at:
 ~/Library/Group Containers/9K33E3U3T4.net.shinyfrog.bear/Application Data/database.sqlite
 ```
 
-### Backup Location
-Automatic backups are stored at:
-```
-~/Documents/Bear MCP Backups/
-```
-
 ### Environment Variables
-- `BEAR_DB_PATH`: Override default database location
-- `BEAR_BACKUP_DIR`: Override default backup directory
+- `BEAR_DB_PATH`: Override default database location (for reads)
 - `NODE_ENV`: Set to 'development' for debug logging
 
 ## 📚 **Usage Examples**
@@ -134,15 +127,16 @@ Automatic backups are stored at:
 
 ## 🛡️ **Safety & Best Practices**
 
-### ⚠️ **Critical Safety Rules**
-1. **Always quit Bear before write operations** - The server detects and prevents this
-2. **Backups are automatic** - Every write creates a timestamped backup
-3. **Test with copies first** - Use database copies for experimentation
-4. **Keep Bear updated** - Ensure schema compatibility
+### ⚠️ **Safety Guidelines**
+1. **Bear can run during operations** - Write operations use Bear's API safely
+2. **Automatic tag validation** - Tags are sanitized with warnings
+3. **iCloud sync compatible** - No conflicts or sync issues
+4. **Keep Bear updated** - Ensure API compatibility
 
 ### 💡 **Best Practices**
-- Use read operations freely - they're completely safe
-- Let the server handle tag creation automatically
+- **Read operations** are instant - direct database access
+- **Write operations** work with Bear running or closed
+- **Tag warnings** show when tags are auto-corrected
 - Use specific search terms for better results
 - Archive notes instead of deleting when possible
 
@@ -313,10 +307,6 @@ The **iCloud sync challenge has been solved!** 🎉 Now we're focused on making 
 
 ### Common Issues
 
-**"Bear is currently running" error:**
-- Quit Bear completely before write operations
-- Check Activity Monitor for Bear processes
-
 **"Database not found" error:**
 - Verify Bear is installed and has been opened at least once
 - Check database path: `~/Library/Group Containers/9K33E3U3T4.net.shinyfrog.bear/Application Data/`
@@ -325,8 +315,13 @@ The **iCloud sync challenge has been solved!** 🎉 Now we're focused on making 
 - Ensure Claude Desktop has necessary file system permissions
 - Check that the database file is readable
 
+**Write operations not working:**
+- Ensure Bear app is installed and has been opened at least once
+- Check that Bear's x-callback-url functionality is enabled
+- Try opening Bear manually to verify it's working
+
 **Slow performance:**
-- Large databases (10,000+ notes) may take longer
+- Large databases (10,000+ notes) may take longer for reads
 - Use specific search terms instead of broad queries
 - Consider using pagination with `limit` parameters
 
@@ -334,15 +329,16 @@ The **iCloud sync challenge has been solved!** 🎉 Now we're focused on making 
 1. Check the [troubleshooting guide](docs/troubleshooting.md)
 2. Review [common usage patterns](docs/examples.md)  
 3. Enable debug logging with `NODE_ENV=development`
-4. Check backup directory for automatic backups
+4. Test Bear's API directly: `open "bear://x-callback-url/create?title=Test"`
 
 ## 📈 **Performance**
 
-- **Typical response time**: Under 2 seconds for most operations
+- **Read operations**: Instant (direct database access)
+- **Write operations**: 1-2 seconds (Bear API processing)
 - **Large databases**: Tested with 10,000+ notes
 - **Memory usage**: ~50MB typical, ~100MB for complex operations
 - **Concurrent operations**: Read operations can run simultaneously
-- **Write operations**: Queued for safety
+- **API operations**: Processed through Bear's URL scheme
 
 ## 📄 **License**
 

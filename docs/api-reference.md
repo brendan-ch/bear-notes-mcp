@@ -2,11 +2,11 @@
 
 Complete reference for all Bear MCP Server tools.
 
-## 🚨 **IMPORTANT: READ-ONLY MODE**
+## 🔄 **HYBRID SYNC-SAFE MODE**
 
-**⚠️ Write operations are currently DISABLED to prevent iCloud sync conflicts.**
+**✅ All operations now work safely with the hybrid sync-safe architecture!**
 
-This server is now **READ-ONLY** for safety. All write operations return an error message directing users to use Bear's native interface.
+The server uses a **hybrid approach**: direct database reads for speed + Bear's x-callback-url API for sync-safe writes.
 
 ## 📖 Read Operations (26 tools)
 
@@ -471,15 +471,15 @@ Analyze tag usage trends over time.
 "Show me how my tag usage has changed over time"
 ```
 
-## ✏️ Write Operations - ❌ DISABLED
+## ✏️ Write Operations - ✅ ACTIVE (Sync-Safe)
 
-**⚠️ All write operations are currently disabled to prevent iCloud sync conflicts.**
+**✅ All write operations now work safely using Bear's x-callback-url API.**
 
-These operations now return error messages directing users to Bear's native interface:
+These operations use Bear's API for sync-safe writes while maintaining full functionality:
 
-### Note Management - DISABLED
+### Note Management - SYNC-SAFE VIA BEAR API
 
-#### `create_note` - ❌ DISABLED
+#### `create_note` - ✅ ACTIVE
 Create a new note with content and tags.
 
 **Parameters:**

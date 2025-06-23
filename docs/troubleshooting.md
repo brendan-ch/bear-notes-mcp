@@ -2,19 +2,21 @@
 
 Solutions for common issues with the Bear MCP Server.
 
-## 🚨 **IMPORTANT: READ-ONLY MODE**
+## 🔄 **HYBRID SYNC-SAFE MODE**
 
-**⚠️ This server is currently in READ-ONLY mode to prevent iCloud sync conflicts.**
+**✅ All operations now work safely with iCloud sync!**
 
-All write operations are disabled for safety:
-- `create_note` - ❌ Disabled
-- `update_note` - ❌ Disabled  
-- `duplicate_note` - ❌ Disabled
-- `archive_note` - ❌ Disabled
-- `trigger_hashtag_parsing` - ❌ Disabled
-- `batch_trigger_hashtag_parsing` - ❌ Disabled
+The server uses a hybrid approach:
+- **Read operations**: Direct database access (fast)
+- **Write operations**: Bear's x-callback-url API (sync-safe)
 
-**Use Bear's native interface for creating and editing notes.**
+All 32 tools are now active:
+- `create_note` - ✅ Active (Bear API)
+- `update_note` - ✅ Active (Bear API)
+- `duplicate_note` - ✅ Active (Bear API)
+- `archive_note` - ✅ Active (Bear API)
+- `trigger_hashtag_parsing` - ✅ Active (Bear API)
+- `batch_trigger_hashtag_parsing` - ✅ Active (Bear API)
 
 ## 🚨 Common Issues
 
@@ -265,26 +267,22 @@ export BEAR_DB_PATH="/path/to/your/database.sqlite"
 #### ❌ "Bear is currently running" warnings
 **Symptoms**: Write operations blocked with Bear running message
 
-**Cause**: Bear app is open (this is intentional safety feature)
+**Cause**: This error should no longer occur with the hybrid approach
 
 **Solution**:
-This is **expected behavior** for safety:
-1. **For read operations**: Continue normally (Bear can be running)
-2. **For write operations**: 
-   - Quit Bear completely
-   - Perform write operations
-   - Reopen Bear
+With the new hybrid architecture:
+1. **Read operations**: Work instantly (direct database access)
+2. **Write operations**: Work with Bear running or closed (uses Bear API)
 
-**To quit Bear properly**:
+**If you still see this error**:
+- You may be running an older version of the server
+- Restart Claude Desktop to pick up the latest version
+- Verify the server version shows "sync-safe Bear API" in tool descriptions
+
+**To verify Bear API is working**:
 ```bash
-# Quit Bear gracefully
-osascript -e 'tell application "Bear" to quit'
-
-# Force quit if needed
-pkill -f "Bear"
-
-# Verify no Bear processes
-ps aux | grep -i bear | grep -v grep
+# Test Bear's API directly
+open "bear://x-callback-url/create?title=API%20Test&text=Testing%20Bear%20API"
 ```
 
 ---
@@ -470,28 +468,26 @@ lsof -p $(pgrep -f "node.*Bear")
 
 ## 🆘 Recovery Procedures
 
-### Restore from Backup
-If write operations cause issues:
+### Bear Data Recovery
+Since write operations now use Bear's API (sync-safe), data corruption is extremely unlikely:
 
-1. **Find latest backup**:
-   ```bash
-   ls -lt ~/Documents/Bear\ MCP\ Backups/
-   ```
+1. **Check Bear's built-in backup**:
+   - Bear automatically syncs to iCloud
+   - Check Bear → File → Import/Export for backup options
 
-2. **Stop Bear and server**:
+2. **If Bear API issues occur**:
    ```bash
-   pkill -f "Bear"
-   pkill -f "node dist/index.js"
-   ```
-
-3. **Restore database**:
-   ```bash
-   cp ~/Documents/Bear\ MCP\ Backups/backup_YYYYMMDD_HHMMSS.sqlite ~/Library/Group\ Containers/9K33E3U3T4.net.shinyfrog.bear/Application\ Data/database.sqlite
-   ```
-
-4. **Restart Bear**:
-   ```bash
+   # Test Bear API directly
+   open "bear://x-callback-url/create?title=Recovery%20Test"
+   
+   # Restart Bear if needed
+   osascript -e 'tell application "Bear" to quit'
    open -a Bear
+   ```
+
+3. **Database integrity check**:
+   ```bash
+   sqlite3 ~/Library/Group\ Containers/9K33E3U3T4.net.shinyfrog.bear/Application\ Data/database.sqlite "PRAGMA integrity_check;"
    ```
 
 ### Reset Configuration
