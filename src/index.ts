@@ -129,21 +129,23 @@ class BearMCPServer {
           case 'get_notes_with_metadata':
             return await this.getNotesWithMetadata(args);
 
-          // WRITE OPERATIONS DISABLED - iCloud sync conflicts
           case 'create_note':
+            return await this.createNote(args);
+
           case 'update_note':
+            return await this.updateNote(args);
+
           case 'duplicate_note':
+            return await this.duplicateNote(args);
+
           case 'archive_note':
+            return await this.archiveNote(args);
+
           case 'trigger_hashtag_parsing':
+            return await this.triggerHashtagParsing(args);
+
           case 'batch_trigger_hashtag_parsing':
-            return {
-              content: [
-                {
-                  type: 'text',
-                  text: `❌ Write operation '${name}' is currently DISABLED to prevent iCloud sync conflicts.\n\nThis server is now READ-ONLY for safety. Write operations can cause:\n- iCloud sync failures\n- Data corruption\n- Note conflicts\n\nUse Bear's native interface for creating/editing notes.`,
-                },
-              ],
-            };
+            return await this.batchTriggerHashtagParsing(args);
 
           default:
             throw new Error(`Unknown tool: ${name}`);
@@ -670,11 +672,158 @@ class BearMCPServer {
                         },
           },
         },
-        // WRITE OPERATIONS DISABLED - iCloud sync conflicts
-        // The following tools are temporarily disabled to prevent iCloud sync issues:
-        // - create_note, update_note, duplicate_note, archive_note
-        // - trigger_hashtag_parsing, batch_trigger_hashtag_parsing
-        // This server is now READ-ONLY for safety.
+        {
+          name: 'create_note',
+          description: 'Create a new note with title, content, and tags using sync-safe Bear API',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              title: {
+                type: 'string',
+                description: 'Title of the new note',
+              },
+              content: {
+                type: 'string',
+                description: 'Content/body of the note (optional)',
+              },
+              tags: {
+                type: 'array',
+                items: { type: 'string' },
+                description: 'Array of tag names to apply to the note. Tags are automatically sanitized: lowercase only, no spaces/hyphens/underscores (use forward slashes for nested tags like "work/project")',
+              },
+              isArchived: {
+                type: 'boolean',
+                description: 'Whether the note should be archived',
+              },
+              isPinned: {
+                type: 'boolean',
+                description: 'Whether the note should be pinned',
+              },
+            },
+            required: ['title'],
+          },
+        },
+        {
+          name: 'update_note',
+          description: 'Update an existing note using sync-safe Bear API',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              noteId: {
+                type: 'number',
+                description: 'ID of the note to update',
+              },
+              title: {
+                type: 'string',
+                description: 'New title for the note',
+              },
+              content: {
+                type: 'string',
+                description: 'New content for the note',
+              },
+              tags: {
+                type: 'array',
+                items: { type: 'string' },
+                description: 'New array of tag names (replaces existing tags). Tags are automatically sanitized: lowercase only, no spaces/hyphens/underscores (use forward slashes for nested tags like "work/project")',
+              },
+              isArchived: {
+                type: 'boolean',
+                description: 'Whether the note should be archived',
+              },
+              isPinned: {
+                type: 'boolean',
+                description: 'Whether the note should be pinned',
+              },
+            },
+            required: ['noteId'],
+          },
+        },
+        {
+          name: 'duplicate_note',
+          description: 'Create a duplicate of an existing note using sync-safe Bear API',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              noteId: {
+                type: 'number',
+                description: 'ID of the note to duplicate',
+              },
+              titleSuffix: {
+                type: 'string',
+                description: 'Suffix to add to the duplicated note title (default: " (Copy)")',
+              },
+              copyTags: {
+                type: 'boolean',
+                description: 'Whether to copy tags from the original note (default: true)',
+              },
+            },
+            required: ['noteId'],
+          },
+        },
+        {
+          name: 'archive_note',
+          description: 'Archive or unarchive a note using sync-safe Bear API',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              noteId: {
+                type: 'number',
+                description: 'ID of the note to archive/unarchive',
+              },
+              archived: {
+                type: 'boolean',
+                description: 'True to archive, false to unarchive',
+              },
+            },
+            required: ['noteId', 'archived'],
+          },
+        },
+        {
+          name: 'trigger_hashtag_parsing',
+          description: 'Trigger Bear to reparse hashtags in a note using sync-safe API',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              note_id: {
+                type: 'string',
+                description: 'Note ID to trigger parsing for'
+              },
+              note_title: {
+                type: 'string', 
+                description: 'Note title to trigger parsing for (alternative to note_id)'
+              }
+            },
+            oneOf: [
+              { required: ["note_id"] },
+              { required: ["note_title"] }
+            ]
+          },
+        },
+        {
+          name: 'batch_trigger_hashtag_parsing',
+          description: 'Trigger hashtag parsing for multiple notes using sync-safe API',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              tag_filter: {
+                type: 'string',
+                description: 'Filter notes by tag name'
+              },
+              title_pattern: {
+                type: 'string',
+                description: 'Filter notes by title pattern'
+              },
+              limit: {
+                type: 'number',
+                description: 'Maximum number of notes to process'
+              },
+              created_after: {
+                type: 'string',
+                description: 'Filter notes created after this date (ISO string)'
+              }
+            }
+          },
+        },
       ];
     }
 
@@ -1580,8 +1729,8 @@ ${topTagsData}`,
             data: {
               noteId: result.noteId,
               title: title.trim(),
-              backupCreated: result.backupPath,
-              message: `Note created successfully with ID ${result.noteId}`
+              message: `Note created successfully with ID ${result.noteId}`,
+              tagWarnings: result.tagWarnings
             }
           }, null, 2)
         }]
@@ -1634,8 +1783,7 @@ ${topTagsData}`,
             text: JSON.stringify({
               success: false,
               error: 'Conflict detected: Note was modified by another process',
-              conflictDetected: true,
-              backupCreated: result.backupPath
+              conflictDetected: true
             }, null, 2)
           }]
         };
@@ -1648,8 +1796,8 @@ ${topTagsData}`,
             success: true,
             data: {
               noteId,
-              backupCreated: result.backupPath,
-              message: `Note ${noteId} updated successfully`
+              message: `Note ${noteId} updated successfully`,
+              tagWarnings: result.tagWarnings
             }
           }, null, 2)
         }]
@@ -1688,7 +1836,6 @@ ${topTagsData}`,
             data: {
               originalNoteId: noteId,
               newNoteId: result.newNoteId,
-              backupCreated: result.backupPath,
               message: `Note ${noteId} duplicated successfully as note ${result.newNoteId}`
             }
           }, null, 2)
@@ -1729,7 +1876,6 @@ ${topTagsData}`,
             data: {
               noteId,
               archived,
-              backupCreated: result.backupPath,
               message: `Note ${noteId} ${archived ? 'archived' : 'unarchived'} successfully`
             }
           }, null, 2)

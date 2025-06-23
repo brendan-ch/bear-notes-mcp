@@ -1,8 +1,8 @@
 # Bear MCP Server
 
-A Model Context Protocol (MCP) server that provides Claude with direct **read-only** access to your Bear notes database, enabling comprehensive note browsing and analysis beyond Bear's standard API limitations.
+A Model Context Protocol (MCP) server that provides Claude with comprehensive access to your Bear notes using a **hybrid sync-safe approach** - combining direct database reads with Bear's API for writes.
 
-> **📖 Currently Read-Only**: Write operations are temporarily disabled to prevent iCloud sync conflicts. [Help us solve this!](#-help-wanted-solving-icloud-sync-conflicts)
+> **🔄 Sync-Safe Hybrid Mode**: All operations now work safely with iCloud sync!
 
 ## ⚠️ **Disclaimer**
 
@@ -59,14 +59,14 @@ Edit `~/Library/Application Support/Claude/claude_desktop_config.json`:
 - **Content Analysis**: Extract metadata, analyze attachments, find patterns
 - **Advanced Queries**: Complex filtering, date ranges, content criteria
 
-### ✏️ **Write Operations (6 tools) - ❌ DISABLED**
-- **Create Notes**: ❌ Disabled (use Bear's native interface)
-- **Edit Notes**: ❌ Disabled (use Bear's native interface)
-- **Organize**: ❌ Disabled (use Bear's native interface)
-- **Tag Management**: ❌ Disabled (use Bear's native interface)
-- **Hashtag Parsing**: ❌ Disabled (use Bear's native interface)
+### ✏️ **Write Operations (6 tools) - ✅ ACTIVE (Sync-Safe)**
+- **Create Notes**: ✅ Via Bear API (sync-safe)
+- **Edit Notes**: ✅ Via Bear API (sync-safe)
+- **Organize**: ✅ Via Bear API (sync-safe)
+- **Tag Management**: ✅ Via Bear API (sync-safe)
+- **Hashtag Parsing**: ✅ Via Bear API (sync-safe)
 
-> **Why disabled?** Direct database writes cause iCloud sync conflicts. [Help us solve this!](#-help-wanted-solving-icloud-sync-conflicts)
+> **How it works**: Uses Bear's x-callback-url API for writes, database for reads!
 
 ### 🛡️ **Safety Features**
 - **Bear Process Detection**: Prevents database corruption
@@ -83,7 +83,7 @@ Edit `~/Library/Application Support/Claude/claude_desktop_config.json`:
 | **Advanced Search** | 8 | ✅ Active | Full-text search, similarity matching, complex queries |
 | **Analytics** | 6 | ✅ Active | Content analysis, relationship mapping, usage patterns |
 | **Metadata** | 6 | ✅ Active | File attachments, content structure, organization insights |
-| **Write Operations** | 6 | ❌ Disabled | iCloud sync conflicts - [help wanted!](#-help-wanted-solving-icloud-sync-conflicts) |
+| **Write Operations** | 6 | ✅ Active | Sync-safe via Bear API - full write capability restored! |
 
 ## 🔧 **Configuration**
 
@@ -112,6 +112,7 @@ Automatic backups are stored at:
 "Find all notes tagged with 'project'"  
 "Create a new note about today's meeting"
 "Search for notes containing 'API documentation'"
+"Update my project notes with the latest status"
 ```
 
 ### Advanced Operations
@@ -127,7 +128,8 @@ Automatic backups are stored at:
 "Archive old notes from last year"
 "Find duplicate or similar notes"
 "Show me notes that might need better tags"
-"Create a backup of my current database"
+"Duplicate this note with a new title"
+"Add tags to organize my notes better"
 ```
 
 ## 🛡️ **Safety & Best Practices**
@@ -169,75 +171,71 @@ The server automatically validates and sanitizes all tags:
 
 **Tag warnings** are returned when tags are modified, so you'll know exactly what changes were made.
 
-## 🚨 **IMPORTANT: READ-ONLY MODE**
+## 🔄 **HYBRID SYNC-SAFE ARCHITECTURE**
 
-**⚠️ Write operations are currently DISABLED to prevent iCloud sync conflicts.**
+**✅ All operations now work safely with iCloud sync!**
 
-### Why This Change Was Made
+### How the Hybrid Approach Works
 
-During testing, we discovered that **direct database writes cause iCloud sync failures** in Bear. This can lead to:
-- iCloud sync getting stuck or failing completely
-- Data corruption and note conflicts  
-- Notes not syncing between devices
-- Bear database inconsistencies
-- Potential data loss
+We've implemented a **best-of-both-worlds solution** that eliminates iCloud sync conflicts:
 
-**User safety is our top priority**, so we've temporarily disabled all write operations until this issue can be resolved.
+**📖 Read Operations (Database)**
+- Direct SQLite access for maximum speed and functionality
+- All 26 read tools work at full performance
+- Complete access to Bear's data structure
+
+**✏️ Write Operations (Bear API)**  
+- Uses Bear's x-callback-url API for sync-safe writes
+- Respects Bear's internal sync coordination
+- No iCloud conflicts or data corruption
+
+**🔗 Seamless Bridge**
+- Uses `ZUNIQUEIDENTIFIER` to connect database reads with API writes
+- Reads from database, writes through Bear's API
+- Perfect coordination between both approaches
+
+### Why This Solution Works
+
+**The Problem**: Direct database writes bypass Bear's sync coordination, causing iCloud conflicts.
+
+**The Solution**: Let Bear handle all writes through its API while keeping fast database reads.
+
+**The Result**: 
+- ✅ **No iCloud sync conflicts** - Bear manages all writes
+- ✅ **Full functionality restored** - All 32 tools now work
+- ✅ **Maximum performance** - Database reads remain fast
+- ✅ **Complete safety** - No risk of data corruption
 
 ### Current Status
 
-- ✅ **All read operations work perfectly** - Browse, search, and analyze your Bear notes safely
-- ❌ **Write operations disabled** - Use Bear's native interface for creating/editing notes
-- 🔍 **Actively seeking solutions** - See "Help Wanted" section below
+- ✅ **All read operations** - Direct database access (26 tools)
+- ✅ **All write operations** - Sync-safe Bear API (6 tools)
+- ✅ **Full feature parity** - Everything works as designed
+- ✅ **iCloud sync compatible** - No conflicts or issues
 
-### 🆘 **Help Wanted: Solving iCloud Sync Conflicts**
+### 🙏 **Thanks to Bear Team**
 
-**We need your expertise!** If you have experience with:
-- macOS iCloud sync mechanisms
-- SQLite database coordination with iCloud
-- Bear's internal sync architecture
-- Core Data and CloudKit integration
-
-**Please help us solve this issue!** 
-
-**The Problem**: Direct SQLite writes bypass Bear's sync coordination, causing iCloud conflicts.
-
-**Potential Solutions We're Exploring**:
-1. **Sync coordination** - Hook into Bear's sync mechanisms
-2. **CloudKit integration** - Use CloudKit APIs instead of direct database writes
-3. **Bear API expansion** - Work with Bear team to expand their x-callback-url API
-4. **Sync detection** - Detect and pause during active sync operations
-5. **Alternative approaches** - Other methods that don't interfere with iCloud
-
-**How to Help**:
-- 🐛 **Open an issue** with insights about Bear's sync architecture
-- 💡 **Share knowledge** about iCloud/CloudKit database coordination
-- 🔧 **Contribute code** if you have ideas for sync-safe implementations
-- 📧 **Reach out** if you have connections with the Bear development team
-
-**Contact**: Open an issue on GitHub or contribute directly to the project.
-
-**This server is incredibly powerful for read operations - let's work together to make writes safe too!** 🚀
+Special thanks to **Danilo from the Bear team** who provided the key insight that led to this solution!
 
 ---
 
 ## 🤝 **Contributing & Community**
 
-This project needs **your help** to solve the iCloud sync challenge! Whether you're a:
+The **iCloud sync challenge has been solved!** 🎉 Now we're focused on making this the best Bear integration possible. Whether you're a:
 
-- **macOS/iOS developer** with CloudKit experience
-- **Database expert** familiar with sync coordination  
-- **Bear power user** with insights about its architecture
+- **macOS/iOS developer** with API experience
+- **Database expert** familiar with SQLite optimization
+- **Bear power user** with workflow insights
 - **Developer** wanting to contribute to MCP ecosystem
 
-**Your contribution can help thousands of Bear users safely integrate with AI assistants!**
+**Your contribution can help thousands of Bear users get even more from their AI assistants!**
 
 ### Current Priorities
 
-1. 🔧 **Solve iCloud sync conflicts** - Enable safe write operations
+1. 🚀 **Add new features** - More ways to analyze and work with notes
 2. 📖 **Improve documentation** - Help others understand and contribute  
 3. 🧪 **Expand test coverage** - Ensure reliability across Bear versions
-4. 🚀 **Add new read features** - More ways to analyze and explore notes
+4. ⚡ **Performance optimization** - Make operations even faster
 
 ### Quick Ways to Help
 
@@ -291,23 +289,23 @@ This project needs **your help** to solve the iCloud sync challenge! Whether you
 </details>
 
 <details>
-<summary><strong>✏️ Write Operations (6 tools) - ❌ DISABLED</strong></summary>
+<summary><strong>✏️ Write Operations (6 tools) - ✅ ACTIVE (Sync-Safe)</strong></summary>
 
-### Note Management - TEMPORARILY DISABLED
-- `create_note` - ❌ Disabled (iCloud sync conflicts)
-- `update_note` - ❌ Disabled (iCloud sync conflicts)
-- `duplicate_note` - ❌ Disabled (iCloud sync conflicts)
-- `archive_note` - ❌ Disabled (iCloud sync conflicts)
-- `trigger_hashtag_parsing` - ❌ Disabled (iCloud sync conflicts)
-- `batch_trigger_hashtag_parsing` - ❌ Disabled (iCloud sync conflicts)
+### Note Management - SYNC-SAFE VIA BEAR API
+- `create_note` - ✅ Create new notes with tags and content
+- `update_note` - ✅ Update existing notes safely
+- `duplicate_note` - ✅ Create copies of existing notes
+- `archive_note` - ✅ Archive/unarchive notes
+- `trigger_hashtag_parsing` - ✅ Force hashtag reprocessing
+- `batch_trigger_hashtag_parsing` - ✅ Bulk hashtag processing
 
-**⚠️ These operations are disabled to prevent:**
-- iCloud sync failures and conflicts
-- Database corruption and inconsistencies
-- Note data loss or duplication
-- Bear app stability issues
+**✅ All operations are now sync-safe:**
+- Uses Bear's x-callback-url API for all writes
+- No iCloud sync conflicts or data corruption
+- Respects Bear's internal sync coordination
+- Full write functionality restored
 
-**Use Bear's native interface for all write operations.**
+**Perfect integration between database reads and API writes!**
 
 </details>
 

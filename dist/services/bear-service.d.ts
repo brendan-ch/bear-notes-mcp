@@ -376,9 +376,8 @@ export declare class BearService {
         isArchived?: boolean;
         isPinned?: boolean;
     }): Promise<{
-        noteId: number;
+        noteId: string;
         success: boolean;
-        backupPath?: string;
         tagWarnings?: string[];
     }>;
     /**
@@ -395,7 +394,6 @@ export declare class BearService {
         expectedModificationDate?: Date;
     }): Promise<{
         success: boolean;
-        backupPath?: string;
         conflictDetected?: boolean;
         tagWarnings?: string[];
     }>;
@@ -406,16 +404,14 @@ export declare class BearService {
         titleSuffix?: string;
         copyTags?: boolean;
     }): Promise<{
-        newNoteId: number;
+        newNoteId: string;
         success: boolean;
-        backupPath?: string;
     }>;
     /**
-     * Archive or unarchive a note
+     * Archive or unarchive a note using sync-safe Bear API
      */
     archiveNote(noteId: number, archived: boolean): Promise<{
         success: boolean;
-        backupPath?: string;
     }>;
     /**
      * Generate a UUID for new notes (Bear format)
