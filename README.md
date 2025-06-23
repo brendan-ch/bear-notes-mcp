@@ -138,13 +138,28 @@ Automatic backups are stored at:
 - Use specific search terms for better results
 - Archive notes instead of deleting when possible
 
-### 🏷️ **Tag Validation Rules**
-The server automatically validates and sanitizes tags according to Bear's requirements:
+### 🏷️ **Tag Formatting Guidelines**
+
+**✅ RECOMMENDED TAG FORMATS:**
+- Simple tags: `work`, `personal`, `urgent`, `meeting`
+- Nested categories: `work/projects`, `personal/health`, `study/math`
+- Time-based: `2024`, `january`, `q1`
+- Project codes: `proj001`, `alpha`, `beta`
+
+**❌ AVOID THESE FORMATS (auto-corrected):**
+- **Hyphens**: `project-alpha` → becomes `projectalpha`
+- **Spaces**: `work meeting` → becomes `workmeeting`  
+- **Underscores**: `tag_name` → becomes `tagname`
+- **Mixed case**: `ProjectAlpha` → becomes `projectalpha`
+
+**🔧 Automatic Tag Sanitization:**
+The server automatically validates and sanitizes all tags:
 - **Lowercase only**: `Project` → `project`
 - **No spaces**: `tag name` → `tagname`
 - **No underscores**: `tag_name` → `tagname`
+- **No hyphens**: `project-alpha` → `projectalpha`
 - **No commas**: `tag,name` → `tagname`
-- **✅ Forward slashes allowed**: `project/alpha` → `project/alpha` (for nested tags)
+- **✅ Forward slashes preserved**: `project/alpha` → `project/alpha` (for nested tags)
 
 **Tag warnings** are returned when tags are modified, so you'll know exactly what changes were made.
 

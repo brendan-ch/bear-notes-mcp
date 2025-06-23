@@ -78,7 +78,7 @@ Find a note by its exact title.
 
 **Example:**
 ```
-"Find note titled 'Meeting Notes - Feb 2024'"
+"Find note titled 'Meeting Notes Feb 2024'"
 ```
 
 ---
