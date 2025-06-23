@@ -141,7 +141,6 @@ Automatic backups are stored at:
 ### 🏷️ **Tag Validation Rules**
 The server automatically validates and sanitizes tags according to Bear's requirements:
 - **Lowercase only**: `Project` → `project`
-- **No hyphens**: `tag-name` → `tagname`
 - **No spaces**: `tag name` → `tagname`
 - **No underscores**: `tag_name` → `tagname`
 - **No commas**: `tag,name` → `tagname`

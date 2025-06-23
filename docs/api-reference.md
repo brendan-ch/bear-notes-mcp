@@ -204,7 +204,7 @@ Get auto-complete suggestions for search queries.
 {
   "terms": ["machine", "learning", "algorithm"],
   "titles": ["Machine Learning Basics", "Learning Python"],
-  "tags": ["machine-learning", "learning"]
+  "tags": ["machinelearning", "learning"]
 }
 ```
 
@@ -589,7 +589,7 @@ All tag inputs are automatically validated and sanitized according to Bear's req
 | Input Example | Output | Rule Applied |
 |---------------|--------|--------------|
 | `Project` | `project` | Lowercase conversion |
-| `tag-name` | `tagname` | Hyphen removal |
+| `tagname` | `tagname` | ✅ No changes needed |
 | `tag name` | `tagname` | Space removal |
 | `tag_name` | `tagname` | Underscore removal |
 | `tag,name` | `tagname` | Comma removal |
@@ -605,7 +605,7 @@ When tags are modified during validation, operations return `tagWarnings` in the
   "success": true,
   "backupPath": "/path/to/backup.sqlite",
   "tagWarnings": [
-    "Tag \"Project-Name\" was sanitized to \"projectname\"",
+    "Tag \"Project Name\" was sanitized to \"projectname\"",
     "Tag \"tag with spaces\" was sanitized to \"tagwithspaces\""
   ]
 }
@@ -616,7 +616,7 @@ When tags are modified during validation, operations return `tagWarnings` in the
 - ✅ `work` - Single word
 - ✅ `project/alpha` - Nested tag with forward slash
 - ✅ `meeting2024` - Numbers allowed
-- ❌ `Project-Name` - Will become `projectname`
+- ❌ `Project Name` - Will become `projectname`
 - ❌ `tag with spaces` - Will become `tagwithspaces`
 - ❌ `tag_name` - Will become `tagname`
 

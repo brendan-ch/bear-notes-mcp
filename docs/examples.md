@@ -62,11 +62,11 @@ Practical examples and workflows for the Bear MCP Server.
 
 #### Tag Management and Validation
 ```
-"Create a note with tags 'Project-Alpha' and 'work meeting'"
-# Result: Tags become 'projectalpha' and 'workmeeting' with warnings
+"Create a note with tags 'projectalpha' and 'workmeeting'"
+# Result: Tags created as-is since they follow Bear's rules
 
-"Add tags 'project/frontend' and 'JavaScript_React' to note 456"
-# Result: 'project/frontend' stays, 'JavaScript_React' becomes 'javascriptreact'
+"Add tags 'project/frontend' and 'javascriptreact' to note 456"
+# Result: Both tags created as-is, nested tag preserved
 
 "Create a note with nested tags 'work/projects/2024' and 'personal/health'"
 # Result: Both tags preserved as nested tags work with forward slashes
@@ -87,28 +87,28 @@ Practical examples and workflows for the Bear MCP Server.
 
 #### Step 1: Assess Current State
 ```
-"Find all notes tagged with 'machine-learning' or 'ML'"
+"Find all notes tagged with 'machinelearning' or 'ml'"
 "Search for notes containing 'neural network' or 'deep learning'"
 "Show me notes with attachments tagged 'research'"
 ```
 
 #### Step 2: Create Project Structure
 ```
-"Create a new note titled 'ML Project Overview' with tags 'machine-learning' and 'project-overview'"
-"Create a note titled 'Research Papers' with content 'Collection of relevant papers' and tags 'machine-learning' and 'references'"
+"Create a new note titled 'ML Project Overview' with tags 'machinelearning' and 'project/overview'"
+"Create a note titled 'Research Papers' with content 'Collection of relevant papers' and tags 'machinelearning' and 'references'"
 ```
 
 #### Step 3: Organize Existing Content
 ```
 "Find notes similar to 'neural networks and backpropagation algorithms'"
-"Update note 789 to add tags 'machine-learning' and 'neural-networks'"
-"Archive old notes tagged 'ml-draft' created before 2023"
+"Update note 789 to add tags 'machinelearning' and 'neuralnetworks'"
+"Archive old notes tagged 'mldraft' created before 2023"
 ```
 
 #### Step 4: Analysis and Insights
 ```
 "Analyze my note-taking patterns for machine learning topics"
-"What are my most-used tags related to 'machine-learning'?"
+"What are my most-used tags related to 'machinelearning'?"
 "Find duplicate or similar notes in my research collection"
 ```
 
@@ -150,7 +150,7 @@ Tags: meetings, team, weekly"
 #### Step 3: Organize Past Meetings
 ```
 "Find meeting notes without proper tags"
-"Update meeting notes from January to add 'Q1-2024' tag"
+"Update meeting notes from January to add 'q1/2024' tag"
 "Archive meeting notes older than 6 months"
 ```
 
@@ -226,7 +226,7 @@ Tags: meetings, team, weekly"
 ```
 "Create a note with standardized project tags using nested structure"
 "Update old notes to use consistent tag format"
-"Convert old tags like 'Project-Alpha' to clean format"
+"Convert old tags to clean format using proper naming"
 ```
 
 #### Step 3: Tag Hierarchy Planning
@@ -246,7 +246,6 @@ Tags: meetings, team, weekly"
 - **Project codes**: `proj001`, `alpha`, `beta`
 
 ### ❌ Tags to Avoid (Auto-Sanitized)
-- **With hyphens**: `project-alpha` → becomes `projectalpha`
 - **With spaces**: `work meeting` → becomes `workmeeting`
 - **With underscores**: `project_alpha` → becomes `projectalpha`
 - **Mixed case**: `ProjectAlpha` → becomes `projectalpha`
@@ -295,8 +294,8 @@ Tags: meetings, team, weekly"
 
 #### Bulk Tag Management
 ```
-"Find all notes tagged 'old-project' and update them to 'archived-project'"
-"Add 'needs-review' tag to all notes older than 1 year"
+"Find all notes tagged 'oldproject' and update them to 'archived/project'"
+"Add 'needsreview' tag to all notes older than 1 year"
 "Standardize tag naming conventions across all notes"
 ```
 
@@ -340,7 +339,7 @@ Tags: meetings, team, weekly"
 
 #### Consistent Tagging Strategy
 ```
-✅ Good: Use hierarchical tags like 'project/web-app', 'meeting/weekly'
+✅ Good: Use hierarchical tags like 'project/webapp', 'meeting/weekly'
 ❌ Avoid: Inconsistent tag naming like 'proj', 'project', 'projects'
 ```
 
@@ -383,7 +382,7 @@ Tags: meetings, team, weekly"
 **Solution**: Use pagination and more specific criteria
 ```
 Instead of: "Show me all my notes"
-Try: "Show me my 20 most recent notes" or "Find notes tagged 'current-project'"
+Try: "Show me my 20 most recent notes" or "Find notes tagged 'current/project'"
 ```
 
 ### Issue: Bear Process Running
@@ -441,7 +440,7 @@ Try: Use date ranges, tag filters, and limit parameters
     "ZARCHIVED": 0,
     "ZPINNED": 1,
     "ZENCRYPTED": 0,
-    "tags": ["machine-learning", "project", "overview"],
+    "tags": ["machinelearning", "project", "overview"],
     "relevanceScore": 0.95,
     "matchedTerms": ["machine", "learning"],
     "snippets": ["This project focuses on machine learning algorithms..."]
@@ -482,7 +481,7 @@ Try: Use date ranges, tag filters, and limit parameters
 
 ### Project Kickoff Workflow
 1. `"Create project overview note with standard template"`
-2. `"Set up project-specific tags and organization"`
+2. `"Set up projectspecific tags and organization"`
 3. `"Find related existing notes and tag them appropriately"`
 4. `"Create project milestone and tracking notes"`
 5. `"Establish project documentation structure"`

@@ -176,14 +176,14 @@ export BEAR_DB_PATH="/path/to/your/database.sqlite"
   "noteId": 456,
   "success": true,
   "tagWarnings": [
-    "Tag \"Project-Alpha\" was sanitized to \"projectalpha\"",
+    "Tag \"Project Alpha\" was sanitized to \"projectalpha\"",
     "Tag \"work meeting\" was sanitized to \"workmeeting\""
   ]
 }
 ```
 
 **Understanding tag sanitization**:
-- `Project-Alpha` → `projectalpha` (removed hyphens, made lowercase)
+- `Project Alpha` → `projectalpha` (removed spaces, made lowercase)
 - `work meeting` → `workmeeting` (removed spaces)
 - `tag_name` → `tagname` (removed underscores)
 - `project/alpha` → `project/alpha` (✅ forward slashes preserved)
