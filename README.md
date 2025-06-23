@@ -2,6 +2,17 @@
 
 A Model Context Protocol (MCP) server that provides Claude with direct access to your Bear notes database, enabling comprehensive note management beyond Bear's standard API limitations.
 
+## ⚠️ **Disclaimer**
+
+This tool directly accesses Bear's database. While comprehensive safety measures are implemented:
+- Always maintain regular Bear backups
+- Test with database copies when experimenting  
+- The tool is not affiliated with Bear's developers
+- Use at your own risk for production databases
+
+  
+
+
 ## 🚀 Quick Start (5 minutes)
 
 ### Prerequisites
@@ -221,21 +232,10 @@ Automatic backups are stored at:
 - **Concurrent operations**: Read operations can run simultaneously
 - **Write operations**: Queued for safety
 
-## 🤝 **Contributing**
-
-See [CONTRIBUTING.md](docs/CONTRIBUTING.md) for development setup and guidelines.
-
 ## 📄 **License**
 
 MIT License - see [LICENSE](LICENSE) file for details.
 
-## ⚠️ **Disclaimer**
-
-This tool directly accesses Bear's database. While comprehensive safety measures are implemented:
-- Always maintain regular Bear backups
-- Test with database copies when experimenting  
-- The tool is not affiliated with Bear's developers
-- Use at your own risk for production databases
 
 ---
 
