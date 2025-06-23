@@ -10,7 +10,6 @@ This tool directly accesses Bear's database. While comprehensive safety measures
 - The tool is not affiliated with Bear's developers
 - Use at your own risk for production databases
 
----
 
 ## 🚀 Quick Start (5 minutes)
 
