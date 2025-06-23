@@ -138,6 +138,17 @@ Automatic backups are stored at:
 - Use specific search terms for better results
 - Archive notes instead of deleting when possible
 
+### 🏷️ **Tag Validation Rules**
+The server automatically validates and sanitizes tags according to Bear's requirements:
+- **Lowercase only**: `Project` → `project`
+- **No hyphens**: `tag-name` → `tagname`
+- **No spaces**: `tag name` → `tagname`
+- **No underscores**: `tag_name` → `tagname`
+- **No commas**: `tag,name` → `tagname`
+- **✅ Forward slashes allowed**: `project/alpha` → `project/alpha` (for nested tags)
+
+**Tag warnings** are returned when tags are modified, so you'll know exactly what changes were made.
+
 ## 🔍 **All Available Tools**
 
 <details>

@@ -158,6 +158,74 @@ export BEAR_DB_PATH="/path/to/your/database.sqlite"
 
 ---
 
+### Tag Validation Issues
+
+#### ❌ "Tag warnings" in responses
+**Symptoms**: Responses include `tagWarnings` array with tag modification messages
+
+**Cause**: Tags were automatically sanitized to meet Bear's requirements (this is normal)
+
+**What this means**:
+- ✅ **This is expected behavior** - tags are automatically cleaned up
+- ✅ **Your tags were created successfully** - just in a Bear-compatible format
+- ✅ **No action needed** - the warnings are informational
+
+**Example**:
+```json
+{
+  "noteId": 456,
+  "success": true,
+  "tagWarnings": [
+    "Tag \"Project-Alpha\" was sanitized to \"projectalpha\"",
+    "Tag \"work meeting\" was sanitized to \"workmeeting\""
+  ]
+}
+```
+
+**Understanding tag sanitization**:
+- `Project-Alpha` → `projectalpha` (removed hyphens, made lowercase)
+- `work meeting` → `workmeeting` (removed spaces)
+- `tag_name` → `tagname` (removed underscores)
+- `project/alpha` → `project/alpha` (✅ forward slashes preserved)
+
+**Best practices**:
+- Use the suggested format from warnings for future tags
+- Nested tags with forward slashes work perfectly: `work/projects/alpha`
+- Keep tags simple: lowercase, no special characters except forward slashes
+
+---
+
+#### ❌ Tags not appearing in Bear sidebar
+**Symptoms**: Tags exist in database but don't show in Bear's tag sidebar
+
+**Cause**: Bear needs to reparse the note content to recognize hashtags
+
+**Solution**:
+1. **Restart Bear** (simplest solution):
+   ```bash
+   osascript -e 'tell application "Bear" to quit'
+   # Wait a moment
+   open -a Bear
+   ```
+
+2. **Use the hashtag parsing trigger**:
+   ```
+   "Trigger hashtag parsing for note titled 'My Note'"
+   ```
+
+3. **Manual trigger** (if available):
+   - Open the note in Bear
+   - Make a small edit (add a space)
+   - Delete the space
+   - Bear will reparse the hashtags
+
+**Why this happens**:
+- Bear parses hashtags when content is edited
+- Direct database changes bypass Bear's parsing
+- This is why the server includes parsing triggers
+
+---
+
 ### Runtime Issues
 
 #### ❌ "Bear is currently running" warnings

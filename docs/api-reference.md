@@ -492,6 +492,7 @@ Create a new note with content and tags.
 - Automatic Bear process detection
 - Pre-operation database backup
 - Input validation and sanitization
+- **Tag validation and sanitization** (see Tag Validation Rules below)
 - Automatic tag creation if they don't exist
 
 **Example:**
@@ -526,6 +527,7 @@ Update an existing note's content, title, or tags.
 - Conflict detection using modification dates
 - Automatic backup before changes
 - Comprehensive input validation
+- **Tag validation and sanitization** (see Tag Validation Rules below)
 - Tag management with automatic creation
 
 **Example:**
@@ -579,6 +581,44 @@ Archive or unarchive a note.
 "Archive note 123"
 "Unarchive note 123"
 ```
+
+## 🏷️ Tag Validation Rules
+
+All tag inputs are automatically validated and sanitized according to Bear's requirements:
+
+| Input Example | Output | Rule Applied |
+|---------------|--------|--------------|
+| `Project` | `project` | Lowercase conversion |
+| `tag-name` | `tagname` | Hyphen removal |
+| `tag name` | `tagname` | Space removal |
+| `tag_name` | `tagname` | Underscore removal |
+| `tag,name` | `tagname` | Comma removal |
+| `project/alpha` | `project/alpha` | ✅ Forward slashes preserved (nested tags) |
+
+### Tag Validation Response
+
+When tags are modified during validation, operations return `tagWarnings` in the response:
+
+```json
+{
+  "noteId": 456,
+  "success": true,
+  "backupPath": "/path/to/backup.sqlite",
+  "tagWarnings": [
+    "Tag \"Project-Name\" was sanitized to \"projectname\"",
+    "Tag \"tag with spaces\" was sanitized to \"tagwithspaces\""
+  ]
+}
+```
+
+### Valid Tag Examples
+- ✅ `project` - Simple lowercase tag
+- ✅ `work` - Single word
+- ✅ `project/alpha` - Nested tag with forward slash
+- ✅ `meeting2024` - Numbers allowed
+- ❌ `Project-Name` - Will become `projectname`
+- ❌ `tag with spaces` - Will become `tagwithspaces`
+- ❌ `tag_name` - Will become `tagname`
 
 ## 🛡️ Safety Features
 

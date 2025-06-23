@@ -60,6 +60,18 @@ Practical examples and workflows for the Bear MCP Server.
 "Duplicate my 'Template' note with suffix ' - New Project'"
 ```
 
+#### Tag Management and Validation
+```
+"Create a note with tags 'Project-Alpha' and 'work meeting'"
+# Result: Tags become 'projectalpha' and 'workmeeting' with warnings
+
+"Add tags 'project/frontend' and 'JavaScript_React' to note 456"
+# Result: 'project/frontend' stays, 'JavaScript_React' becomes 'javascriptreact'
+
+"Create a note with nested tags 'work/projects/2024' and 'personal/health'"
+# Result: Both tags preserved as nested tags work with forward slashes
+```
+
 #### Archive and Organize
 ```
 "Archive note 456"
@@ -198,6 +210,54 @@ Tags: meetings, team, weekly"
 "Show me notes with specific tags for selective backup"
 "Identify notes with attachments that need special handling"
 ```
+
+### Scenario 5: Tag Organization and Cleanup
+
+**Goal**: Optimize tag usage and create a consistent tagging system
+
+#### Step 1: Tag Analysis
+```
+"Analyze my tag usage patterns and suggest improvements"
+"Show me all tags and their usage counts"
+"Find tags that might be duplicates or need consolidation"
+```
+
+#### Step 2: Tag Standardization
+```
+"Create a note with standardized project tags using nested structure"
+"Update old notes to use consistent tag format"
+"Convert old tags like 'Project-Alpha' to clean format"
+```
+
+#### Step 3: Tag Hierarchy Planning
+```
+"Plan a tag hierarchy for work projects: work/project/alpha"
+"Create template notes with proper nested tag examples"
+"Document tag conventions for consistent future use"
+```
+
+## 🏷️ Tag Best Practices
+
+### ✅ Recommended Tag Formats
+- **Simple tags**: `work`, `personal`, `urgent`
+- **Nested categories**: `work/projects/alpha`, `personal/health/fitness`
+- **Time-based**: `2024`, `q1`, `january`
+- **Status indicators**: `todo`, `inprogress`, `completed`
+- **Project codes**: `proj001`, `alpha`, `beta`
+
+### ❌ Tags to Avoid (Auto-Sanitized)
+- **With hyphens**: `project-alpha` → becomes `projectalpha`
+- **With spaces**: `work meeting` → becomes `workmeeting`
+- **With underscores**: `project_alpha` → becomes `projectalpha`
+- **Mixed case**: `ProjectAlpha` → becomes `projectalpha`
+- **With commas**: `work,urgent` → becomes `workurgent`
+
+### 💡 Pro Tips
+- Use forward slashes for hierarchy: `work/projects/2024/alpha`
+- Keep tags short and memorable
+- Be consistent with naming conventions
+- Use nested tags for better organization
+- Let the server handle tag validation automatically
 
 #### Step 3: Content Verification
 ```
