@@ -372,6 +372,7 @@ export declare class BearService {
         noteId: number;
         success: boolean;
         backupPath?: string;
+        tagWarnings?: string[];
     }>;
     /**
      * Update an existing note
@@ -387,6 +388,7 @@ export declare class BearService {
         success: boolean;
         backupPath?: string;
         conflictDetected?: boolean;
+        tagWarnings?: string[];
     }>;
     /**
      * Duplicate an existing note
@@ -420,13 +422,22 @@ export declare class BearService {
      */
     private triggerBearReparse;
     /**
-     * Validate and sanitize tag names for Bear compatibility
+     * Validate and sanitize tag names according to Bear's rules
+     * Bear tag rules:
+     * - No capital letters (converts to lowercase)
+     * - No hyphens (removes them)
+     * - No spaces (removes them)
+     * - No underscores (removes them)
+     * - No commas (removes them)
+     * - Forward slashes allowed for nested tags (e.g., project/alpha)
+     * - Must not be empty after sanitization
+     */
+    private validateAndSanitizeTags;
+    /**
+     * Legacy method kept for backward compatibility
+     * @deprecated Use validateAndSanitizeTags instead
      */
     private sanitizeTagName;
-    /**
-     * Link a note to tags (create tags if they don't exist)
-     */
-    private linkNoteTags;
     /**
      * Trigger Bear to reparse a note by opening it in edit mode via x-callback-url
      * This uses Bear's API to simulate opening the note for editing, which should trigger parsing

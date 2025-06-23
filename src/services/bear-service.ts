@@ -1917,16 +1917,22 @@ export class BearService {
     tags?: string[];
     isArchived?: boolean;
     isPinned?: boolean;
-  }): Promise<{ noteId: number; success: boolean; backupPath?: string }> {
+  }): Promise<{ noteId: number; success: boolean; backupPath?: string; tagWarnings?: string[] }> {
+    // Validate and sanitize tags first
+    const tagValidation = this.validateAndSanitizeTags(options.tags || []);
+    const sanitizedTags = tagValidation.sanitized;
+    const tagWarnings = tagValidation.warnings;
+
     // Check if Bear is running - if so, use API approach instead of database writes
     const isBearRunning = await this.isBearRunning();
     if (isBearRunning) {
       // Bear is running - using API approach for note creation
-      const result = await this.createNoteViaBearAPI(options.title, options.content || '', options.tags || []);
+      const result = await this.createNoteViaBearAPI(options.title, options.content || '', sanitizedTags);
       return {
         noteId: -1, // API doesn't return internal ID
         success: true,
-        backupPath: undefined
+        backupPath: undefined,
+        tagWarnings: tagWarnings.length > 0 ? tagWarnings : undefined
       };
     }
 
@@ -1943,8 +1949,7 @@ export class BearService {
       let noteContent = `# ${options.title}\n\n`;
       
       // Add hashtags on separate lines (Bear format)
-      if (options.tags && options.tags.length > 0) {
-        const sanitizedTags = options.tags.map(tag => this.sanitizeTagName(tag));
+      if (sanitizedTags.length > 0) {
         noteContent += sanitizedTags.map(tag => `#${tag}`).join('\n') + '\n\n';
       }
       
@@ -1998,7 +2003,8 @@ export class BearService {
       return {
         noteId,
         success: true,
-        backupPath
+        backupPath,
+        tagWarnings: tagWarnings.length > 0 ? tagWarnings : undefined
       };
     } catch (error) {
       throw new Error(`Failed to create note: ${error instanceof Error ? error.message : 'Unknown error'}`);
@@ -2017,7 +2023,17 @@ export class BearService {
     isArchived?: boolean;
     isPinned?: boolean;
     expectedModificationDate?: Date;
-  }): Promise<{ success: boolean; backupPath?: string; conflictDetected?: boolean }> {
+  }): Promise<{ success: boolean; backupPath?: string; conflictDetected?: boolean; tagWarnings?: string[] }> {
+    // Validate and sanitize tags if provided
+    let sanitizedTags: string[] | undefined;
+    let tagWarnings: string[] = [];
+    
+    if (options.tags !== undefined) {
+      const tagValidation = this.validateAndSanitizeTags(options.tags);
+      sanitizedTags = tagValidation.sanitized;
+      tagWarnings = tagValidation.warnings;
+    }
+
     // Safety check - ensure Bear is not running
     const isBearRunning = await this.isBearRunning();
     if (isBearRunning) {
@@ -2045,17 +2061,18 @@ export class BearService {
         throw new Error(`Note with ID ${noteId} not found or is trashed`);
       }
 
-      // Conflict detection
-      if (options.expectedModificationDate) {
-        const currentModDate = CoreDataUtils.toDate(currentNote.ZMODIFICATIONDATE);
-        if (Math.abs(currentModDate.getTime() - options.expectedModificationDate.getTime()) > 1000) {
-          return {
-            success: false,
-            conflictDetected: true,
-            backupPath
-          };
+              // Conflict detection
+        if (options.expectedModificationDate) {
+          const currentModDate = CoreDataUtils.toDate(currentNote.ZMODIFICATIONDATE);
+          if (Math.abs(currentModDate.getTime() - options.expectedModificationDate.getTime()) > 1000) {
+            return {
+              success: false,
+              conflictDetected: true,
+              backupPath,
+              tagWarnings: tagWarnings.length > 0 ? tagWarnings : undefined
+            };
+          }
         }
-      }
 
       const now = CoreDataUtils.fromDate(new Date());
       const updates: string[] = [];
@@ -2071,8 +2088,7 @@ export class BearService {
         let noteContent = options.content;
         
         // Add hashtags to content if provided
-        if (options.tags !== undefined && options.tags.length > 0) {
-          const sanitizedTags = options.tags.map(tag => this.sanitizeTagName(tag));
+        if (sanitizedTags !== undefined && sanitizedTags.length > 0) {
           const hashtagsLine = sanitizedTags.map(tag => `#${tag}`).join(' ');
           noteContent = noteContent ? `${noteContent}\n${hashtagsLine}` : hashtagsLine;
         }
@@ -2114,7 +2130,8 @@ export class BearService {
 
       return {
         success: true,
-        backupPath
+        backupPath,
+        tagWarnings: tagWarnings.length > 0 ? tagWarnings : undefined
       };
     } catch (error) {
       throw new Error(`Failed to update note: ${error instanceof Error ? error.message : 'Unknown error'}`);
@@ -2260,49 +2277,97 @@ export class BearService {
   }
 
   /**
-   * Validate and sanitize tag names for Bear compatibility
+   * Validate and sanitize tag names according to Bear's rules
+   * Bear tag rules:
+   * - No capital letters (converts to lowercase)
+   * - No hyphens (removes them)
+   * - No spaces (removes them)
+   * - No underscores (removes them)
+   * - No commas (removes them)
+   * - Forward slashes allowed for nested tags (e.g., project/alpha)
+   * - Must not be empty after sanitization
    */
-  private sanitizeTagName(tagName: string): string {
-    // Remove hyphens as they break Bear's tag parser
-    return tagName.replace(/-/g, '');
+  private validateAndSanitizeTags(tags: string[]): { 
+    sanitized: string[], 
+    warnings: string[] 
+  } {
+    const sanitized: string[] = [];
+    const warnings: string[] = [];
+
+    for (const originalTag of tags) {
+      const trimmed = originalTag.trim();
+      
+      if (!trimmed) {
+        warnings.push(`Empty tag ignored`);
+        continue;
+      }
+
+      let sanitizedTag = trimmed;
+      let hadChanges = false;
+
+      // Convert to lowercase
+      if (sanitizedTag !== sanitizedTag.toLowerCase()) {
+        sanitizedTag = sanitizedTag.toLowerCase();
+        hadChanges = true;
+      }
+
+      // Remove hyphens
+      if (sanitizedTag.includes('-')) {
+        sanitizedTag = sanitizedTag.replace(/-/g, '');
+        hadChanges = true;
+      }
+
+      // Remove spaces
+      if (sanitizedTag.includes(' ')) {
+        sanitizedTag = sanitizedTag.replace(/\s+/g, '');
+        hadChanges = true;
+      }
+
+      // Remove underscores
+      if (sanitizedTag.includes('_')) {
+        sanitizedTag = sanitizedTag.replace(/_/g, '');
+        hadChanges = true;
+      }
+
+      // Remove commas
+      if (sanitizedTag.includes(',')) {
+        sanitizedTag = sanitizedTag.replace(/,/g, '');
+        hadChanges = true;
+      }
+
+      // Clean up multiple slashes and remove leading/trailing slashes
+      sanitizedTag = sanitizedTag
+        .replace(/\/+/g, '/') // Multiple slashes to single
+        .replace(/^\/+|\/+$/g, ''); // Remove leading/trailing slashes
+
+      // Check if tag is still valid after sanitization
+      if (!sanitizedTag) {
+        warnings.push(`Tag "${originalTag}" became empty after sanitization and was ignored`);
+        continue;
+      }
+
+      // Add to results
+      sanitized.push(sanitizedTag);
+
+      // Add warning if changes were made
+      if (hadChanges) {
+        warnings.push(`Tag "${originalTag}" was sanitized to "${sanitizedTag}"`);
+      }
+    }
+
+    return { sanitized, warnings };
   }
 
   /**
-   * Link a note to tags (create tags if they don't exist)
+   * Legacy method kept for backward compatibility
+   * @deprecated Use validateAndSanitizeTags instead
    */
-  private async linkNoteTags(noteId: number, tagNames: string[]): Promise<void> {
-    for (const tagName of tagNames) {
-      // Sanitize tag name to ensure Bear compatibility
-      const sanitizedTagName = this.sanitizeTagName(tagName);
-      // Find or create the tag
-      let [tag] = await this.database.query<{ Z_PK: number }>(`
-        SELECT Z_PK FROM ZSFNOTETAG WHERE ZTITLE = ?
-      `, [sanitizedTagName]);
-
-      if (!tag) {
-        // Create new tag with all required columns
-        const now = CoreDataUtils.fromDate(new Date());
-        const uniqueId = uuidv4().toUpperCase();
-        
-        const tagResult = await this.database.query<{ id: number }>(`
-          INSERT INTO ZSFNOTETAG (
-            Z_ENT, Z_OPT, ZENCRYPTED, ZHIDESUBTAGSNOTES, ZISROOT, ZPINNED, 
-            ZSORTING, ZSORTINGDIRECTION, ZVERSION, ZMODIFICATIONDATE, 
-            ZTITLE, ZUNIQUEIDENTIFIER
-          )
-          VALUES (13, 6, 0, 0, 0, NULL, 0, NULL, 3, ?, ?, ?)
-          RETURNING Z_PK as id
-        `, [now, sanitizedTagName, uniqueId]);
-        tag = { Z_PK: tagResult[0].id };
-      }
-
-      // Link note to tag
-      await this.database.query(`
-        INSERT OR IGNORE INTO Z_5TAGS (Z_5NOTES, Z_13TAGS)
-        VALUES (?, ?)
-      `, [noteId, tag.Z_PK]);
-    }
+  private sanitizeTagName(tagName: string): string {
+    const result = this.validateAndSanitizeTags([tagName]);
+    return result.sanitized[0] || '';
   }
+
+
 
   /**
    * Trigger Bear to reparse a note by opening it in edit mode via x-callback-url
@@ -2456,8 +2521,9 @@ export class BearService {
       const { promisify } = await import('util');
       const execAsync = promisify(exec);
       
-      // Sanitize tags to remove hyphens (Bear doesn't support them)
-      const sanitizedTags = tags.map(tag => this.sanitizeTagName(tag));
+      // Validate and sanitize tags according to Bear's rules
+      const tagValidation = this.validateAndSanitizeTags(tags);
+      const sanitizedTags = tagValidation.sanitized;
       
       // Build the content with embedded hashtags in Bear format
       const hashtagsLine = sanitizedTags.map(tag => `#${tag}`).join(' ');
