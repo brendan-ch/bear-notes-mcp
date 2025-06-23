@@ -366,6 +366,8 @@ export declare class BearService {
     private extractTitlePatterns;
     /**
      * Create a new note with title, content, and tags
+     * Note: Bear automatically extracts the title from the first line of content (markdown header).
+     * We don't set ZTITLE directly to avoid inconsistencies between database and Bear's display.
      */
     createNote(options: {
         title: string;
@@ -381,6 +383,8 @@ export declare class BearService {
     }>;
     /**
      * Update an existing note
+     * Note: Title changes are handled by updating the content's first line (markdown header).
+     * We clear ZTITLE so Bear will re-extract it from the updated content.
      */
     updateNote(noteId: number, options: {
         title?: string;

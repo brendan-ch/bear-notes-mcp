@@ -494,6 +494,7 @@ Create a new note with content and tags.
 - Input validation and sanitization
 - **Tag validation and sanitization** (see Tag Validation Rules below)
 - Automatic tag creation if they don't exist
+- **Title consistency**: Titles are embedded in content as markdown headers; Bear extracts them automatically to prevent database/display inconsistencies
 
 **Example:**
 ```
@@ -529,6 +530,7 @@ Update an existing note's content, title, or tags.
 - Comprehensive input validation
 - **Tag validation and sanitization** (see Tag Validation Rules below)
 - Tag management with automatic creation
+- **Title consistency**: Title changes update the content's first line; Bear re-extracts the title automatically
 
 **Example:**
 ```

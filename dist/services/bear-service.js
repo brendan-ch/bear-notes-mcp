@@ -1488,6 +1488,8 @@ export class BearService {
     }
     /**
      * Create a new note with title, content, and tags
+     * Note: Bear automatically extracts the title from the first line of content (markdown header).
+     * We don't set ZTITLE directly to avoid inconsistencies between database and Bear's display.
      */
     async createNote(options) {
         // Validate and sanitize tags first
@@ -1523,6 +1525,7 @@ export class BearService {
                 noteContent += options.content;
             }
             // Insert the new note with proper versioning and device info
+            // Note: ZTITLE is set to NULL - Bear will extract it from the first line of ZTEXT
             const noteResult = await this.database.query(`
         INSERT INTO ZSFNOTE (
           ZUNIQUEIDENTIFIER, 
@@ -1542,7 +1545,7 @@ export class BearService {
         RETURNING Z_PK as id
       `, [
                 uuid,
-                options.title,
+                null, // Let Bear extract title from content
                 noteContent,
                 now,
                 now,
@@ -1576,6 +1579,8 @@ export class BearService {
     }
     /**
      * Update an existing note
+     * Note: Title changes are handled by updating the content's first line (markdown header).
+     * We clear ZTITLE so Bear will re-extract it from the updated content.
      */
     async updateNote(noteId, options) {
         // Validate and sanitize tags if provided
@@ -1620,12 +1625,32 @@ export class BearService {
             const updates = [];
             const params = [];
             // Build dynamic update query
-            if (options.title !== undefined) {
-                updates.push('ZTITLE = ?');
-                params.push(options.title);
-            }
-            if (options.content !== undefined) {
-                let noteContent = options.content;
+            // Note: We don't update ZTITLE directly - Bear extracts it from content
+            // Handle content updates (including title changes)
+            if (options.content !== undefined || options.title !== undefined) {
+                let noteContent = '';
+                // If title is being updated, start with the new title as markdown header
+                if (options.title !== undefined) {
+                    noteContent = `# ${options.title}\n\n`;
+                }
+                else if (options.content !== undefined) {
+                    // If only content is being updated, preserve existing title from current content
+                    const existingContent = currentNote.ZTEXT || '';
+                    const titleMatch = existingContent.match(/^# (.+?)$/m);
+                    if (titleMatch) {
+                        noteContent = `# ${titleMatch[1]}\n\n`;
+                    }
+                }
+                // Add the actual content
+                if (options.content !== undefined) {
+                    noteContent += options.content;
+                }
+                else if (options.title !== undefined) {
+                    // If only title is being updated, preserve existing content (minus old title)
+                    const existingContent = currentNote.ZTEXT || '';
+                    const contentWithoutTitle = existingContent.replace(/^# .+?\n\n?/m, '');
+                    noteContent += contentWithoutTitle;
+                }
                 // Add hashtags to content if provided
                 if (sanitizedTags !== undefined && sanitizedTags.length > 0) {
                     const hashtagsLine = sanitizedTags.map(tag => `#${tag}`).join(' ');
@@ -1633,6 +1658,9 @@ export class BearService {
                 }
                 updates.push('ZTEXT = ?');
                 params.push(noteContent);
+                // Clear ZTITLE so Bear will re-extract it from content
+                updates.push('ZTITLE = ?');
+                params.push(null);
             }
             if (options.isArchived !== undefined) {
                 updates.push('ZARCHIVED = ?', 'ZARCHIVEDDATE = ?');

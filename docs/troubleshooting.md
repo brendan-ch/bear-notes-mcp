@@ -195,6 +195,23 @@ export BEAR_DB_PATH="/path/to/your/database.sqlite"
 
 ---
 
+#### ❌ Note titles showing inconsistently
+**Symptoms**: Note title in Bear's note list doesn't match the title shown when viewing the note
+
+**Cause**: This was an issue in earlier versions where the database title field didn't match the content title
+
+**Solution**: 
+✅ **Fixed in current version** - The server now lets Bear extract titles from content automatically:
+- Titles are always embedded as markdown headers (`# Title`) in the note content
+- The database title field (`ZTITLE`) is cleared so Bear re-extracts it from content
+- This ensures perfect consistency between the note list and note content
+
+**If you have old notes with inconsistent titles**:
+1. Update the note (even with a small change) - this will trigger title re-extraction
+2. Or restart Bear to refresh the note list display
+
+---
+
 #### ❌ Tags not appearing in Bear sidebar
 **Symptoms**: Tags exist in database but don't show in Bear's tag sidebar
 

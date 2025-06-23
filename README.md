@@ -68,6 +68,7 @@ Edit `~/Library/Application Support/Claude/claude_desktop_config.json`:
 - **Automatic Backups**: Every write operation creates a backup
 - **Read-Only Mode**: Safe exploration without changes
 - **Conflict Detection**: Prevents overwriting concurrent changes
+- **Title Consistency**: Titles are handled through content to match Bear's behavior exactly
 
 ## 📊 **Capabilities Overview**
 
