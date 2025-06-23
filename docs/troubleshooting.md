@@ -215,31 +215,34 @@ export BEAR_DB_PATH="/path/to/your/database.sqlite"
 #### ❌ Tags not appearing in Bear sidebar
 **Symptoms**: Tags exist in database but don't show in Bear's tag sidebar
 
-**Cause**: Bear needs to reparse the note content to recognize hashtags
+**Cause**: Bear needs to reparse the note content to recognize hashtags when notes are created via direct database writes
 
 **Solution**:
-1. **Restart Bear** (simplest solution):
+1. **Restart Bear** (most reliable solution):
    ```bash
    osascript -e 'tell application "Bear" to quit'
    # Wait a moment
    open -a Bear
    ```
+   Bear will automatically parse all hashtags when it starts.
 
-2. **Use the hashtag parsing trigger**:
+2. **Use the hashtag parsing trigger** (Bear must be running):
    ```
    "Trigger hashtag parsing for note titled 'My Note'"
    ```
 
-3. **Manual trigger** (if available):
+3. **Manual trigger**:
    - Open the note in Bear
    - Make a small edit (add a space)
    - Delete the space
    - Bear will reparse the hashtags
 
 **Why this happens**:
-- Bear parses hashtags when content is edited
-- Direct database changes bypass Bear's parsing
-- This is why the server includes parsing triggers
+- When Bear is closed, we write directly to the database for safety
+- Bear parses hashtags when it starts or when content is edited
+- This is normal behavior - tags will appear after Bear restart
+
+**Best practice**: After creating/updating notes, restart Bear to see all tags in the sidebar.
 
 ---
 

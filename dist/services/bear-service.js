@@ -1559,10 +1559,8 @@ export class BearService {
                 0 // Don't skip sync
             ]);
             const noteId = noteResult[0].id;
-            // Try multiple approaches to trigger Bear's hashtag parsing
-            await this.triggerBearHashtagParsing(noteId);
-            // Clear Bear's cache to force sidebar refresh
-            await this.clearBearCache();
+            // Note: Bear will automatically parse hashtags when it next starts
+            // No need to trigger parsing while Bear is closed
             return {
                 noteId,
                 success: true,
@@ -1682,10 +1680,7 @@ export class BearService {
         `, params);
             }
             // Tags are now handled purely through content - no database relationships needed
-            // Trigger Bear to reparse the note for tag recognition
-            await this.triggerBearReparse(noteId);
-            // Clear Bear's cache to force sidebar refresh
-            await this.clearBearCache();
+            // Bear will automatically parse hashtags when it next starts
             return {
                 success: true,
                 backupPath,
@@ -1901,21 +1896,21 @@ export class BearService {
         SELECT ZUNIQUEIDENTIFIER FROM ZSFNOTE WHERE Z_PK = ?
       `, [noteId]);
             if (!note?.ZUNIQUEIDENTIFIER) {
-                // Could not find note identifier for Bear API call
-                return;
+                throw new Error('Could not find note identifier for Bear API call');
             }
             // Use Bear's x-callback-url API to open the note in edit mode
             // This should trigger Bear's hashtag parsing
             const { exec } = await import('child_process');
             const { promisify } = await import('util');
             const execAsync = promisify(exec);
-            const bearURL = `bear://x-callback-url/open-note?id=${note.ZUNIQUEIDENTIFIER}&edit=yes&show_window=no`;
+            // Simple approach: just open the note, which should trigger parsing
+            const bearURL = `bear://x-callback-url/open-note?id=${note.ZUNIQUEIDENTIFIER}&show_window=no`;
             await execAsync(`open "${bearURL}"`);
-            // Wait a moment for Bear to process the edit trigger
-            await new Promise(resolve => setTimeout(resolve, 500));
+            // Wait a moment for Bear to process
+            await new Promise(resolve => setTimeout(resolve, 300));
         }
         catch (error) {
-            // Silent error handling to avoid JSON-RPC interference
+            throw new Error(`Failed to trigger Bear parsing via API: ${error instanceof Error ? error.message : 'Unknown error'}`);
         }
     }
     /**
@@ -1983,33 +1978,43 @@ export class BearService {
     /**
      * Public method to trigger hashtag parsing for a specific note
      * Can be called by MCP tools to help users fix sidebar display issues
+     * Note: Bear must be running for this to work effectively
      */
     async triggerHashtagParsing(noteId, noteTitle) {
         if (!noteId && !noteTitle) {
             throw new Error('Either noteId or noteTitle is required');
         }
+        // Check if Bear is running
+        const isBearRunning = await this.isBearRunning();
+        if (!isBearRunning) {
+            return `Bear is not running. Please start Bear first, then the hashtags will be parsed automatically. Alternatively, restart Bear to trigger parsing for all notes.`;
+        }
         try {
+            await this.database.connect(true); // Read mode
             // Find the note
             let query;
             let params;
             if (noteId) {
-                query = 'SELECT Z_PK FROM ZSFNOTE WHERE ZUNIQUEIDENTIFIER = ? AND ZTRASHED = 0';
+                query = 'SELECT Z_PK, ZUNIQUEIDENTIFIER FROM ZSFNOTE WHERE ZUNIQUEIDENTIFIER = ? AND ZTRASHED = 0';
                 params = [noteId];
             }
             else {
-                query = 'SELECT Z_PK FROM ZSFNOTE WHERE ZTITLE = ? AND ZTRASHED = 0';
+                query = 'SELECT Z_PK, ZUNIQUEIDENTIFIER FROM ZSFNOTE WHERE ZTITLE = ? AND ZTRASHED = 0';
                 params = [noteTitle];
             }
             const note = await this.database.queryOne(query, params);
             if (!note) {
                 throw new Error(`Note not found: ${noteId || noteTitle}`);
             }
-            // Trigger the hashtag parsing
-            await this.triggerBearHashtagParsing(note.Z_PK);
-            return `Hashtag parsing triggered for note: ${noteId || noteTitle}. Check Bear's sidebar in a few seconds.`;
+            // Use Bear's API to open the note in edit mode, which triggers parsing
+            await this.triggerBearParseViaAPI(note.Z_PK);
+            return `Hashtag parsing triggered for note: ${noteId || noteTitle}. Bear should update the sidebar shortly.`;
         }
         catch (error) {
             throw new Error(`Failed to trigger hashtag parsing: ${error instanceof Error ? error.message : 'Unknown error'}`);
+        }
+        finally {
+            await this.database.disconnect();
         }
     }
     /**

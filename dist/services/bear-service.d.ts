@@ -465,6 +465,7 @@ export declare class BearService {
     /**
      * Public method to trigger hashtag parsing for a specific note
      * Can be called by MCP tools to help users fix sidebar display issues
+     * Note: Bear must be running for this to work effectively
      */
     triggerHashtagParsing(noteId?: string, noteTitle?: string): Promise<string>;
     /**

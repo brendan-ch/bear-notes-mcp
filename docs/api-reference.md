@@ -501,6 +501,8 @@ Create a new note with content and tags.
 "Create a new note titled 'Meeting Notes' with content 'Discussed project timeline' and tags 'work' and 'meetings'"
 ```
 
+**Note**: Tags are embedded as hashtags in the note content. Bear will parse them automatically when it next starts. If Bear is running during creation, restart Bear to see tags in the sidebar.
+
 ---
 
 #### `update_note`
@@ -536,6 +538,8 @@ Update an existing note's content, title, or tags.
 ```
 "Update note 123 to add 'urgent' tag and change title to 'Urgent Meeting Notes'"
 ```
+
+**Note**: Tag changes are embedded in the note content. Restart Bear to see updated tags in the sidebar.
 
 ---
 
