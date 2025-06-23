@@ -245,9 +245,7 @@ The server automatically validates and sanitizes tags according to Bear's requir
 
 ## 📄 **License**
 
-Apache License 2.0 - see [LICENSE](LICENSE) file for details.
-
-This project requires attribution when redistributed. See [NOTICE](NOTICE) file for attribution requirements.
+MIT License - see [LICENSE](LICENSE) file for details.
 
 
 ---

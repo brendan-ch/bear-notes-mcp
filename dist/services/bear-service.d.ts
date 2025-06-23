@@ -1,3 +1,8 @@
+/**
+ * Bear MCP Server - Bear Service
+ * Copyright (c) 2024 Bear MCP Server
+ * MIT License - see LICENSE file for details
+ */
 import { NoteWithTags, TagWithCount, DatabaseStats, NoteSearchOptions } from '../types/bear.js';
 /**
  * Service layer for Bear database operations
