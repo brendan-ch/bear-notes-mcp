@@ -1500,16 +1500,11 @@ export class BearService {
             const { exec } = await import('child_process');
             const { promisify } = await import('util');
             const execAsync = promisify(exec);
-            // Build the content with embedded hashtags in Bear format
+            // Build the content (tags will be handled via API parameter)
             let noteContent = '';
-            // Add content first
+            // Add content only (no hashtags - API will handle tags)
             if (options.content) {
                 noteContent = options.content;
-            }
-            // Add hashtags at the end if provided
-            if (sanitizedTags.length > 0) {
-                const hashtagsLine = sanitizedTags.map(tag => `#${tag}`).join(' ');
-                noteContent = noteContent ? `${noteContent}\n\n${hashtagsLine}` : hashtagsLine;
             }
             // Create the Bear URL with proper encoding
             const encodedTitle = encodeURIComponent(options.title);
@@ -1608,11 +1603,7 @@ export class BearService {
                 // No content/title updates, preserve existing content
                 noteContent = currentNote.ZTEXT || '';
             }
-            // Add hashtags at the end if provided
-            if (sanitizedTags !== undefined && sanitizedTags.length > 0) {
-                const hashtagsLine = sanitizedTags.map(tag => `#${tag}`).join(' ');
-                noteContent = noteContent ? `${noteContent}\n\n${hashtagsLine}` : hashtagsLine;
-            }
+            // Note: Tags will be handled via API parameter, not embedded in content
             // Create the Bear URL with proper encoding
             const encodedId = encodeURIComponent(currentNote.ZUNIQUEIDENTIFIER);
             const encodedContent = encodeURIComponent(noteContent);
