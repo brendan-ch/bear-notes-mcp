@@ -1644,11 +1644,6 @@ export class BearService {
      * Duplicate an existing note
      */
     async duplicateNote(noteId, options = {}) {
-        // Safety check - ensure Bear is not running
-        const isBearRunning = await this.isBearRunning();
-        if (isBearRunning) {
-            throw new Error('Cannot duplicate notes while Bear is running. Please close Bear first.');
-        }
         await this.database.connect(true); // Read mode first
         try {
             // Get the source note

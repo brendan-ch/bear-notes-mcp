@@ -185,7 +185,7 @@ class BearMCPServer {
       },
       {
         name: 'check_bear_status',
-        description: 'Check if Bear app is currently running (critical safety check)',
+        description: 'Check if Bear app is currently running (informational - write operations now use sync-safe Bear API)',
         inputSchema: {
           type: 'object',
           properties: {},
@@ -896,7 +896,7 @@ class BearMCPServer {
           {
             type: 'text',
             text: `Bear App Status: ${isRunning ? '🔴 RUNNING' : '🟢 NOT RUNNING'}
-${isRunning ? '⚠️  WARNING: Close Bear before performing write operations!' : '✅ Safe to perform database operations'}`,
+${isRunning ? '✅ Write operations use sync-safe Bear API' : '✅ All database operations available'}`,
           },
         ],
       };

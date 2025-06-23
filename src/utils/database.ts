@@ -100,10 +100,11 @@ export class BearDatabase {
    * Perform comprehensive safety checks before database operations
    */
   async performSafetyChecks(requireWriteAccess: boolean = false): Promise<void> {
-    // Only check if Bear is running for write operations
+    // Only check if Bear is running for direct database write operations
+    // Note: Modern write operations use sync-safe Bear API, so this check is rarely triggered
     if (requireWriteAccess && await this.isBearRunning()) {
       throw new BearSafetyError(
-        'Bear app is currently running. Please close Bear before performing write operations to prevent corruption.'
+        'Direct database writes are not allowed while Bear is running. Use sync-safe Bear API instead.'
       );
     }
 
