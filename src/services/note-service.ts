@@ -15,6 +15,7 @@ import {
 } from '../types/bear.js';
 import { INoteService, IDatabaseService, SERVICE_TOKENS } from './interfaces/index.js';
 import { globalContainer } from './container/service-container.js';
+import { SqlParameters } from '../types/database.js';
 
 /**
  * Service for managing Bear notes
@@ -42,7 +43,7 @@ export class NoteService implements INoteService {
         WHERE 1=1
       `;
 
-      const params: any[] = [];
+      const params: SqlParameters = [];
 
       // Apply filters
       if (!options.includeTrashed) {
@@ -318,7 +319,7 @@ export class NoteService implements INoteService {
 
       const now = CoreDataUtils.now();
       const updateFields: string[] = [];
-      const updateParams: any[] = [];
+      const updateParams: SqlParameters = [];
 
       // Build dynamic update query
       if (options.title !== undefined) {

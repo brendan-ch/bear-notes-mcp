@@ -7,6 +7,7 @@ import { BearDatabase } from '../utils/database.js';
 import { DatabaseStats } from '../types/bear.js';
 import { IDatabaseService } from './interfaces/index.js';
 import { config } from '../config/index.js';
+import { SqlParameters } from '../types/database.js';
 
 export class DatabaseService implements IDatabaseService {
   private database: BearDatabase;
@@ -42,7 +43,7 @@ export class DatabaseService implements IDatabaseService {
   /**
    * Execute a query and return multiple results
    */
-  async query<T = any>(sql: string, params?: any[]): Promise<T[]> {
+  async query<T = unknown>(sql: string, params?: SqlParameters): Promise<T[]> {
     if (!this._isConnected) {
       throw new Error('Database not connected. Call connect() first.');
     }
@@ -52,7 +53,7 @@ export class DatabaseService implements IDatabaseService {
   /**
    * Execute a query and return a single result
    */
-  async queryOne<T = any>(sql: string, params?: any[]): Promise<T | null> {
+  async queryOne<T = unknown>(sql: string, params?: SqlParameters): Promise<T | null> {
     if (!this._isConnected) {
       throw new Error('Database not connected. Call connect() first.');
     }

@@ -2,6 +2,7 @@ import { ITagService, IDatabaseService, SERVICE_TOKENS } from './interfaces/inde
 import { globalContainer } from './container/service-container.js';
 import { TagWithCount, NoteWithTags, BearNote } from '../types/bear.js';
 import { CoreDataUtils } from '../utils/database.js';
+import { SqlParameters } from '../types/database.js';
 
 /**
  * TagService - Handles all tag management and operations for Bear notes
@@ -173,16 +174,18 @@ export class TagService implements ITagService {
 
       // Find the note
       let query: string;
-      let params: any[];
+      let params: SqlParameters;
 
       if (noteId) {
         query =
           'SELECT Z_PK, ZUNIQUEIDENTIFIER, ZTITLE, ZTEXT FROM ZSFNOTE WHERE ZUNIQUEIDENTIFIER = ? AND ZTRASHED = 0';
         params = [noteId];
-      } else {
+      } else if (noteTitle) {
         query =
           'SELECT Z_PK, ZUNIQUEIDENTIFIER, ZTITLE, ZTEXT FROM ZSFNOTE WHERE ZTITLE = ? AND ZTRASHED = 0';
         params = [noteTitle];
+      } else {
+        throw new Error('Either noteId or noteTitle is required');
       }
 
       const note = await this.database.queryOne<{
@@ -225,7 +228,7 @@ export class TagService implements ITagService {
 
       // Build query to find notes
       let query = 'SELECT Z_PK, ZUNIQUEIDENTIFIER, ZTITLE FROM ZSFNOTE WHERE ZTRASHED = 0';
-      const params: any[] = [];
+      const params: SqlParameters = [];
 
       if (options.title_pattern) {
         query += ' AND ZTITLE LIKE ?';

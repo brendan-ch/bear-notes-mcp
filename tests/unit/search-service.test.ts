@@ -9,7 +9,7 @@ const mockDatabaseService = new MockBearDatabase();
 
 jest.mock('../../src/services/container/service-container.js', () => ({
   globalContainer: {
-    get: jest.fn((token: string) => {
+    resolve: jest.fn((token: string) => {
       if (token === SERVICE_TOKENS.DATABASE_SERVICE) {
         return mockDatabaseService;
       }
@@ -33,7 +33,7 @@ describe('SearchService', () => {
 
   describe('Constructor and Initialization', () => {
     it('should initialize with database service dependency', () => {
-      // The constructor calls globalContainer.get during initialization
+      // The constructor calls globalContainer.resolve during initialization
       // Since we create searchService in beforeEach, we need to check if it was called
       expect(searchService).toBeInstanceOf(SearchService);
       // Verify the service was properly injected by checking if database calls work

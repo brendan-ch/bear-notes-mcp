@@ -5,11 +5,14 @@
 
 import { IServiceContainer } from '../interfaces/index.js';
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 type ServiceFactory<T = any> = () => T;
 
 interface ServiceRegistration {
-  factory: ServiceFactory;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  factory: ServiceFactory<any>;
   singleton: boolean;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   instance?: any;
 }
 

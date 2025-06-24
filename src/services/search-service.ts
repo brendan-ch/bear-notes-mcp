@@ -2,6 +2,7 @@ import { ISearchService, IDatabaseService, SERVICE_TOKENS } from './interfaces/i
 import { globalContainer } from './container/service-container.js';
 import { NoteWithTags, NoteSearchOptions } from '../types/bear.js';
 import { CoreDataUtils } from '../utils/database.js';
+import { SqlParameters } from '../types/database.js';
 
 /**
  * SearchService - Handles all search and filtering operations for Bear notes
@@ -18,7 +19,7 @@ export class SearchService implements ISearchService {
   private database: IDatabaseService;
 
   constructor() {
-    this.database = globalContainer.get<IDatabaseService>(SERVICE_TOKENS.DATABASE_SERVICE);
+    this.database = globalContainer.resolve<IDatabaseService>(SERVICE_TOKENS.DATABASE_SERVICE);
   }
 
   /**
@@ -72,7 +73,7 @@ export class SearchService implements ISearchService {
         WHERE 1=1
       `;
 
-      const params: any[] = [];
+      const params: SqlParameters = [];
 
       // Basic filters
       if (!options.includeTrashed) {
@@ -269,7 +270,7 @@ export class SearchService implements ISearchService {
         WHERE n.ZTRASHED = 0 AND n.ZTEXT IS NOT NULL
       `;
 
-      const params: any[] = [];
+      const params: SqlParameters = [];
 
       if (options.excludeNoteId) {
         sql += ' AND n.Z_PK != ?';
@@ -368,7 +369,7 @@ export class SearchService implements ISearchService {
         WHERE 1=1
       `;
 
-      const params: any[] = [];
+      const params: SqlParameters = [];
 
       // Basic filters
       if (!options.includeTrashed) {
@@ -510,7 +511,7 @@ export class SearchService implements ISearchService {
         WHERE 1=1
       `;
 
-      const params: any[] = [];
+      const params: SqlParameters = [];
 
       // Title search (OR logic for multiple terms)
       if (criteria.titleContains && criteria.titleContains.length > 0) {
@@ -788,7 +789,10 @@ export class SearchService implements ISearchService {
   private analyzeSearchMatches(
     note: NoteWithTags,
     searchTerms: string[],
-    options: any
+    options: {
+      caseSensitive?: boolean;
+      includeSnippets?: boolean;
+    }
   ): {
     relevanceScore: number;
     matchedTerms: string[];

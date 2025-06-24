@@ -11,6 +11,7 @@ import {
   DatabaseStats,
   NoteSearchOptions,
 } from '../../types/bear.js';
+import { SqlParameters } from '../../types/database.js';
 
 /**
  * Database service interface - handles low-level database operations
@@ -22,8 +23,8 @@ export interface IDatabaseService {
   isConnected(): boolean;
 
   // Database operations
-  query<T = any>(sql: string, params?: any[]): Promise<T[]>;
-  queryOne<T = any>(sql: string, params?: any[]): Promise<T | null>;
+  query<T = unknown>(sql: string, params?: SqlParameters): Promise<T[]>;
+  queryOne<T = unknown>(sql: string, params?: SqlParameters): Promise<T | null>;
   
   // Database maintenance
   getDatabaseStats(): Promise<DatabaseStats>;
@@ -285,7 +286,7 @@ export interface IAnalyticsService {
       noteTitle: string;
       filePath: string;
       contentType: string;
-      metadata?: any;
+      metadata?: Record<string, unknown>;
     }>;
     attachmentsByType: Array<{ type: string; count: number; totalSize: number }>;
   }>;
