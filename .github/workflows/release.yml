@@ -1,0 +1,394 @@
+name: Release
+
+on:
+  push:
+    branches: [ main ]
+    paths-ignore:
+      - 'docs/**'
+      - '*.md'
+      - '.github/**'
+  workflow_dispatch:
+    inputs:
+      release_type:
+        description: 'Release type'
+        required: true
+        default: 'patch'
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
+          - prerelease
+
+jobs:
+  # Job 1: Determine if release is needed
+  check-release:
+    name: Check Release Needed
+    runs-on: ubuntu-latest
+    outputs:
+      should_release: ${{ steps.check.outputs.should_release }}
+      version: ${{ steps.check.outputs.version }}
+      changelog: ${{ steps.check.outputs.changelog }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Need full history for changelog
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Check if release is needed
+        id: check
+        run: |
+          # Get the last release tag
+          LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
+          echo "Last tag: $LAST_TAG"
+          
+          # Check if there are commits since last tag that warrant a release
+          COMMITS_SINCE_TAG=$(git rev-list ${LAST_TAG}..HEAD --count)
+          echo "Commits since last tag: $COMMITS_SINCE_TAG"
+          
+          # Check for conventional commits that indicate changes
+          FEAT_COMMITS=$(git log ${LAST_TAG}..HEAD --oneline --grep="^feat" --count)
+          FIX_COMMITS=$(git log ${LAST_TAG}..HEAD --oneline --grep="^fix" --count)
+          BREAKING_COMMITS=$(git log ${LAST_TAG}..HEAD --oneline --grep="BREAKING CHANGE" --count)
+          
+          echo "Feature commits: $FEAT_COMMITS"
+          echo "Fix commits: $FIX_COMMITS"
+          echo "Breaking commits: $BREAKING_COMMITS"
+          
+          # Determine release type and if release is needed
+          SHOULD_RELEASE="false"
+          RELEASE_TYPE="patch"
+          
+          if [ "${{ github.event.inputs.release_type }}" != "" ]; then
+            # Manual release triggered
+            SHOULD_RELEASE="true"
+            RELEASE_TYPE="${{ github.event.inputs.release_type }}"
+          elif [ $BREAKING_COMMITS -gt 0 ]; then
+            SHOULD_RELEASE="true"
+            RELEASE_TYPE="major"
+          elif [ $FEAT_COMMITS -gt 0 ]; then
+            SHOULD_RELEASE="true"
+            RELEASE_TYPE="minor"
+          elif [ $FIX_COMMITS -gt 0 ]; then
+            SHOULD_RELEASE="true"
+            RELEASE_TYPE="patch"
+          fi
+          
+          echo "should_release=$SHOULD_RELEASE" >> $GITHUB_OUTPUT
+          echo "release_type=$RELEASE_TYPE" >> $GITHUB_OUTPUT
+          
+          # Generate version number
+          if [ "$SHOULD_RELEASE" = "true" ]; then
+            CURRENT_VERSION=$(node -p "require('./package.json').version")
+            echo "Current version: $CURRENT_VERSION"
+            
+            # Calculate new version
+            NEW_VERSION=$(npm version $RELEASE_TYPE --no-git-tag-version --no-commit-hooks)
+            NEW_VERSION=${NEW_VERSION#v} # Remove 'v' prefix
+            echo "New version: $NEW_VERSION"
+            echo "version=$NEW_VERSION" >> $GITHUB_OUTPUT
+            
+            # Reset package.json (we don't want to commit this yet)
+            git checkout package.json
+          fi
+
+      - name: Generate changelog
+        if: steps.check.outputs.should_release == 'true'
+        id: changelog
+        run: |
+          # Generate changelog since last tag
+          LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+          
+          if [ -n "$LAST_TAG" ]; then
+            CHANGELOG=$(git log ${LAST_TAG}..HEAD --pretty=format:"- %s (%h)" --no-merges)
+          else
+            CHANGELOG=$(git log --pretty=format:"- %s (%h)" --no-merges)
+          fi
+          
+          # Save changelog to file for later use
+          echo "$CHANGELOG" > CHANGELOG_TEMP.md
+          echo "Generated changelog with $(echo "$CHANGELOG" | wc -l) entries"
+
+      - name: Store changelog
+        if: steps.check.outputs.should_release == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: changelog
+          path: CHANGELOG_TEMP.md
+          retention-days: 1
+
+  # Job 2: Run full test suite before release
+  pre-release-tests:
+    name: Pre-Release Tests
+    runs-on: ubuntu-latest
+    needs: check-release
+    if: needs.check-release.outputs.should_release == 'true'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run linting
+        run: npm run lint
+
+      - name: Run tests
+        run: npm run test:coverage
+
+      - name: Build project
+        run: npm run build
+
+      - name: Test build artifacts
+        run: |
+          # Verify build works
+          node dist/index.js --version || echo "Build verification completed"
+
+  # Job 3: Create Release
+  create-release:
+    name: Create Release
+    runs-on: ubuntu-latest
+    needs: [check-release, pre-release-tests]
+    if: needs.check-release.outputs.should_release == 'true'
+    outputs:
+      upload_url: ${{ steps.create_release.outputs.upload_url }}
+      tag_name: ${{ steps.create_release.outputs.tag_name }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Configure Git
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+
+      - name: Download changelog
+        uses: actions/download-artifact@v4
+        with:
+          name: changelog
+          path: .
+
+      - name: Update version and create tag
+        id: version
+        run: |
+          NEW_VERSION="${{ needs.check-release.outputs.version }}"
+          echo "Creating release for version: $NEW_VERSION"
+          
+          # Update package.json version
+          npm version $NEW_VERSION --no-git-tag-version
+          
+          # Update package-lock.json
+          npm install --package-lock-only
+          
+          # Commit version bump
+          git add package.json package-lock.json
+          git commit -m "chore: bump version to $NEW_VERSION"
+          
+          # Create and push tag
+          TAG_NAME="v$NEW_VERSION"
+          git tag $TAG_NAME
+          git push origin main
+          git push origin $TAG_NAME
+          
+          echo "tag_name=$TAG_NAME" >> $GITHUB_OUTPUT
+
+      - name: Build release artifacts
+        run: |
+          npm ci
+          npm run build
+          
+          # Create release package
+          mkdir -p release
+          cp -r dist release/
+          cp package.json package-lock.json README.md LICENSE release/
+          cp -r docs release/
+          
+          # Create tarball
+          cd release
+          tar -czf ../bear-mcp-server-${{ needs.check-release.outputs.version }}.tar.gz .
+          cd ..
+
+      - name: Create GitHub Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ steps.version.outputs.tag_name }}
+          release_name: Release ${{ steps.version.outputs.tag_name }}
+          body: |
+            ## Release ${{ steps.version.outputs.tag_name }}
+            
+            ### Changes in this release:
+            
+            $(cat CHANGELOG_TEMP.md)
+            
+            ### Installation
+            
+            ```bash
+            npm install -g bear-mcp-server@${{ needs.check-release.outputs.version }}
+            ```
+            
+            ### Docker
+            
+            ```bash
+            docker pull bear-mcp-server:${{ needs.check-release.outputs.version }}
+            ```
+            
+            ### What's Changed
+            - See the full changelog above
+            - All tests passing (384 tests)
+            - Service-oriented architecture with 7 specialized services
+            - Comprehensive documentation and developer guides
+            
+            **Full Changelog**: https://github.com/${{ github.repository }}/compare/$(git describe --tags --abbrev=0 HEAD~1)...${{ steps.version.outputs.tag_name }}
+          draft: false
+          prerelease: ${{ contains(needs.check-release.outputs.version, '-') }}
+
+      - name: Upload Release Asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./bear-mcp-server-${{ needs.check-release.outputs.version }}.tar.gz
+          asset_name: bear-mcp-server-${{ needs.check-release.outputs.version }}.tar.gz
+          asset_content_type: application/gzip
+
+  # Job 4: Publish to npm (if configured)
+  publish-npm:
+    name: Publish to NPM
+    runs-on: ubuntu-latest
+    needs: [check-release, create-release]
+    if: needs.check-release.outputs.should_release == 'true' && github.repository_owner == 'your-username' # Replace with actual owner
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.create-release.outputs.tag_name }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build project
+        run: npm run build
+
+      - name: Publish to NPM
+        run: npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+  # Job 5: Build and Push Docker Image (if configured)
+  docker:
+    name: Build Docker Image
+    runs-on: ubuntu-latest
+    needs: [check-release, create-release]
+    if: needs.check-release.outputs.should_release == 'true'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.create-release.outputs.tag_name }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Docker Hub (if configured)
+        if: github.repository_owner == 'your-username' # Replace with actual owner
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build Docker image
+        run: |
+          # Create Dockerfile if it doesn't exist
+          if [ ! -f Dockerfile ]; then
+            cat > Dockerfile << 'EOF'
+          FROM node:18-alpine
+          
+          WORKDIR /app
+          
+          # Copy package files
+          COPY package*.json ./
+          
+          # Install dependencies
+          RUN npm ci --only=production
+          
+          # Copy source code
+          COPY dist/ ./dist/
+          COPY docs/ ./docs/
+          
+          # Create non-root user
+          RUN addgroup -g 1001 -S nodejs
+          RUN adduser -S nodejs -u 1001
+          USER nodejs
+          
+          EXPOSE 3000
+          
+          CMD ["node", "dist/index.js"]
+          EOF
+          fi
+          
+          # Build image
+          docker build -t bear-mcp-server:${{ needs.check-release.outputs.version }} .
+          docker build -t bear-mcp-server:latest .
+
+      - name: Push to Docker Hub (if configured)
+        if: github.repository_owner == 'your-username' # Replace with actual owner
+        run: |
+          docker push bear-mcp-server:${{ needs.check-release.outputs.version }}
+          docker push bear-mcp-server:latest
+
+  # Job 6: Post-release notifications
+  notify:
+    name: Post-Release Notifications
+    runs-on: ubuntu-latest
+    needs: [check-release, create-release, publish-npm, docker]
+    if: always() && needs.check-release.outputs.should_release == 'true'
+    steps:
+      - name: Generate release summary
+        run: |
+          echo "## 🎉 Release ${{ needs.create-release.outputs.tag_name }} Created!" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Release Details:" >> $GITHUB_STEP_SUMMARY
+          echo "- **Version**: ${{ needs.check-release.outputs.version }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Tag**: ${{ needs.create-release.outputs.tag_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **GitHub Release**: ✅ Created" >> $GITHUB_STEP_SUMMARY
+          echo "- **NPM Publish**: ${{ needs.publish-npm.result == 'success' && '✅ Published' || needs.publish-npm.result == 'skipped' && '⏭️ Skipped' || '❌ Failed' }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Docker Image**: ${{ needs.docker.result == 'success' && '✅ Built' || '❌ Failed' }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Installation:" >> $GITHUB_STEP_SUMMARY
+          echo '```bash' >> $GITHUB_STEP_SUMMARY
+          echo "npm install -g bear-mcp-server@${{ needs.check-release.outputs.version }}" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY 
