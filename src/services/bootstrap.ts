@@ -12,6 +12,8 @@ import { TagService } from './tag-service.js';
 import { CacheService } from './cache-service.js';
 import { PerformanceService } from './performance-service.js';
 import { ValidationService } from './validation-service.js';
+import { LoggingService } from './logging-service.js';
+import { HealthService } from './health-service.js';
 import { config } from '../config/index.js';
 
 /**
@@ -64,6 +66,29 @@ export function bootstrapServices(): void {
     () => new ValidationService()
   );
 
+  // Register LoggingService as singleton
+  globalContainer.registerSingleton(
+    SERVICE_TOKENS.LOGGING_SERVICE,
+    () => new LoggingService({
+      level: config.env === 'development' ? 'debug' : 'info',
+      enableConsole: true,
+      enableFile: true,
+      logDir: './logs',
+      serviceName: 'bear-mcp-server',
+      environment: config.env,
+    })
+  );
+
+  // Register HealthService as singleton (with dependencies)
+  globalContainer.registerSingleton(
+    SERVICE_TOKENS.HEALTH_SERVICE,
+    () => {
+      const databaseService = globalContainer.resolve(SERVICE_TOKENS.DATABASE_SERVICE) as any;
+      const cacheService = globalContainer.resolve(SERVICE_TOKENS.CACHE_SERVICE) as any;
+      return new HealthService({}, databaseService, cacheService);
+    }
+  );
+
   // TODO: Register other services as they are created
   // globalContainer.registerSingleton(SERVICE_TOKENS.ANALYTICS_SERVICE, () => new AnalyticsService());
   // globalContainer.registerSingleton(SERVICE_TOKENS.BEAR_API_SERVICE, () => new BearApiService());
@@ -89,6 +114,8 @@ export function validateServiceRegistration(): void {
     SERVICE_TOKENS.CACHE_SERVICE,
     SERVICE_TOKENS.PERFORMANCE_SERVICE,
     SERVICE_TOKENS.VALIDATION_SERVICE,
+    SERVICE_TOKENS.LOGGING_SERVICE,
+    SERVICE_TOKENS.HEALTH_SERVICE,
   ];
 
   const missingServices = requiredServices.filter(

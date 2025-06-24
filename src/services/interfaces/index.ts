@@ -433,6 +433,89 @@ export interface IValidationService {
   };
 }
 
+/**
+ * Logging service interface - handles structured logging and monitoring
+ */
+export interface ILoggingService {
+  // Core logging methods
+  debug(message: string, meta?: Record<string, unknown>): void;
+  info(message: string, meta?: Record<string, unknown>): void;
+  warn(message: string, meta?: Record<string, unknown>): void;
+  error(message: string, error?: Error | unknown, meta?: Record<string, unknown>): void;
+  
+  // Structured logging with context
+  child(context: Record<string, unknown>): ILoggingService;
+  
+  // Performance logging
+  startTimer(label: string): () => void;
+  logPerformance(operation: string, duration: number, meta?: Record<string, unknown>): void;
+  
+  // Health checks and monitoring
+  logHealthCheck(service: string, status: 'healthy' | 'unhealthy' | 'degraded', details?: Record<string, unknown>): void;
+  logSystemMetrics(metrics: Record<string, unknown>): void;
+  
+  // Service lifecycle logging
+  logServiceStart(serviceName: string, version?: string): void;
+  logServiceStop(serviceName: string, reason?: string): void;
+  
+  // Database operation logging
+  logDatabaseOperation(operation: string, duration: number, rowsAffected?: number, error?: Error): void;
+  
+  // Security and audit logging
+  logSecurityEvent(event: string, details: Record<string, unknown>): void;
+  logAuditEvent(action: string, resource: string, user?: string, details?: Record<string, unknown>): void;
+  
+  // Configuration
+  setLevel(level: 'debug' | 'info' | 'warn' | 'error'): void;
+  getLevel(): string;
+  
+  // Cleanup
+  close(): Promise<void>;
+}
+
+/**
+ * Health check service interface - provides health monitoring
+ */
+export interface IHealthService {
+  // Health check methods
+  checkHealth(): Promise<{
+    status: 'healthy' | 'unhealthy' | 'degraded';
+    timestamp: Date;
+    uptime: number;
+    services: Record<string, {
+      status: 'healthy' | 'unhealthy' | 'degraded';
+      responseTime?: number;
+      error?: string;
+      lastCheck: Date;
+    }>;
+    system: {
+      memory: {
+        used: number;
+        total: number;
+        percentage: number;
+      };
+      cpu: {
+        usage: number;
+      };
+      disk?: {
+        used: number;
+        total: number;
+        percentage: number;
+      };
+    };
+  }>;
+  
+  // Individual service health checks
+  checkDatabaseHealth(): Promise<{ status: 'healthy' | 'unhealthy' | 'degraded'; responseTime: number; error?: string }>;
+  checkBearHealth(): Promise<{ status: 'healthy' | 'unhealthy' | 'degraded'; responseTime: number; error?: string }>;
+  checkCacheHealth(): Promise<{ status: 'healthy' | 'unhealthy' | 'degraded'; responseTime: number; error?: string }>;
+  
+  // Monitoring configuration
+  setHealthCheckInterval(intervalMs: number): void;
+  startHealthChecks(): void;
+  stopHealthChecks(): void;
+}
+
 // Re-export cache and performance interfaces
 export type { ICacheService, CacheEntry, CacheStats, CacheOptions } from '../cache-service.js';
 export type { IPerformanceService, QueryPerformance, SystemMetrics, PerformanceReport } from '../performance-service.js';
@@ -446,6 +529,8 @@ export const SERVICE_TOKENS = {
   CACHE_SERVICE: 'CacheService',
   PERFORMANCE_SERVICE: 'PerformanceService',
   VALIDATION_SERVICE: 'ValidationService',
+  LOGGING_SERVICE: 'LoggingService',
+  HEALTH_SERVICE: 'HealthService',
   ANALYTICS_SERVICE: 'AnalyticsService',
   BEAR_API_SERVICE: 'BearApiService',
   FILE_SYSTEM_SERVICE: 'FileSystemService',
