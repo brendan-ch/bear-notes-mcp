@@ -2068,6 +2068,16 @@ export class BearService {
       if (options.title !== undefined || options.content !== undefined) {
         if (options.content !== undefined) {
           noteContent = options.content;
+          
+          // CRITICAL FIX: Remove duplicate title headers from content during updates
+          // This prevents duplicate titles when Claude sends content with markdown headers
+          const titleToCheck = options.title !== undefined ? options.title : currentNote.ZTITLE;
+          if (titleToCheck) {
+            const titleHeaderPattern = new RegExp(`^#\\s+${titleToCheck.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\s*\\n+`, 'i');
+            if (titleHeaderPattern.test(noteContent)) {
+              noteContent = noteContent.replace(titleHeaderPattern, '');
+            }
+          }
         } else {
           // If only title is being updated, preserve existing content (minus old title)
           const existingContent = currentNote.ZTEXT || '';
@@ -2077,6 +2087,15 @@ export class BearService {
       } else {
         // No content/title updates, preserve existing content
         noteContent = currentNote.ZTEXT || '';
+        
+        // CRITICAL FIX: Even for tags-only updates, remove duplicate title headers
+        // This prevents duplicate titles when Claude adds tags to notes with existing headers
+        if (currentNote.ZTITLE) {
+          const titleHeaderPattern = new RegExp(`^#\\s+${currentNote.ZTITLE.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\s*\\n+`, 'i');
+          if (titleHeaderPattern.test(noteContent)) {
+            noteContent = noteContent.replace(titleHeaderPattern, '');
+          }
+        }
       }
       
       // Note: Tags will be handled via API parameter, not embedded in content
@@ -2266,7 +2285,7 @@ export class BearService {
    * - No capital letters (converts to lowercase)
    * - No hyphens (removes them)
    * - No spaces (removes them)
-   * - No underscores (removes them)
+   * - Underscores allowed (kept as-is)
    * - No commas (removes them)
    * - Forward slashes allowed for nested tags (e.g., project/alpha)
    * - Must not be empty after sanitization
@@ -2307,11 +2326,8 @@ export class BearService {
         hadChanges = true;
       }
 
-      // Remove underscores
-      if (sanitizedTag.includes('_')) {
-        sanitizedTag = sanitizedTag.replace(/_/g, '');
-        hadChanges = true;
-      }
+      // Keep underscores (they are allowed in Bear tags)
+      // No processing needed for underscores
 
       // Remove commas
       if (sanitizedTag.includes(',')) {
@@ -2359,15 +2375,25 @@ export class BearService {
    * Most effective method to trigger Bear's hashtag parsing
    * Uses Bear's API to update the note with its own content, forcing a reparse
    */
-  private async triggerBearParseEffectively(noteUUID: string, noteContent: string): Promise<void> {
+  private async triggerBearParseEffectively(noteUUID: string, noteContent: string, noteTitle?: string): Promise<void> {
     try {
       const { exec } = await import('child_process');
       const { promisify } = await import('util');
       const execAsync = promisify(exec);
       
+      // CRITICAL FIX: Remove duplicate title headers before triggering reparse
+      // This prevents duplicate titles when hashtag parsing updates notes with existing headers
+      let processedContent = noteContent;
+      if (noteTitle) {
+        const titleHeaderPattern = new RegExp(`^#\\s+${noteTitle.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\s*\\n+`, 'i');
+        if (titleHeaderPattern.test(processedContent)) {
+          processedContent = processedContent.replace(titleHeaderPattern, '');
+        }
+      }
+      
       // Use Bear's API to replace the note content with itself
       // This forces Bear to reparse all hashtags in the content
-      const encodedContent = encodeURIComponent(noteContent);
+      const encodedContent = encodeURIComponent(processedContent);
       const bearURL = `bear://x-callback-url/add-text?id=${noteUUID}&mode=replace&text=${encodedContent}&show_window=no`;
       
       await execAsync(`open "${bearURL}"`);
@@ -2404,14 +2430,14 @@ export class BearService {
       let params: any[];
       
       if (noteId) {
-        query = 'SELECT Z_PK, ZUNIQUEIDENTIFIER, ZTEXT FROM ZSFNOTE WHERE ZUNIQUEIDENTIFIER = ? AND ZTRASHED = 0';
+        query = 'SELECT Z_PK, ZUNIQUEIDENTIFIER, ZTITLE, ZTEXT FROM ZSFNOTE WHERE ZUNIQUEIDENTIFIER = ? AND ZTRASHED = 0';
         params = [noteId];
       } else {
-        query = 'SELECT Z_PK, ZUNIQUEIDENTIFIER, ZTEXT FROM ZSFNOTE WHERE ZTITLE = ? AND ZTRASHED = 0';
+        query = 'SELECT Z_PK, ZUNIQUEIDENTIFIER, ZTITLE, ZTEXT FROM ZSFNOTE WHERE ZTITLE = ? AND ZTRASHED = 0';
         params = [noteTitle];
       }
       
-      const note = await this.database.queryOne<{ Z_PK: number; ZUNIQUEIDENTIFIER: string; ZTEXT: string }>(query, params);
+      const note = await this.database.queryOne<{ Z_PK: number; ZUNIQUEIDENTIFIER: string; ZTITLE: string; ZTEXT: string }>(query, params);
       
       if (!note) {
         throw new Error(`Note not found: ${noteId || noteTitle}`);
@@ -2419,7 +2445,7 @@ export class BearService {
       
       // Most effective approach: Use Bear's API to "update" the note with its own content
       // This forces Bear to reparse all hashtags in the content
-      await this.triggerBearParseEffectively(note.ZUNIQUEIDENTIFIER, note.ZTEXT);
+      await this.triggerBearParseEffectively(note.ZUNIQUEIDENTIFIER, note.ZTEXT, note.ZTITLE);
       
       return `Hashtag parsing triggered for note: ${noteId || noteTitle}. Bear should update the sidebar within a few seconds.`;
       
@@ -2455,7 +2481,14 @@ export class BearService {
       
       // Add the actual content
       if (content) {
-        bearContent += content;
+        // CRITICAL FIX: Remove duplicate title headers from content
+        // This prevents duplicate titles when content includes headers matching the title
+        let processedContent = content;
+        const titleHeaderPattern = new RegExp(`^#\\s+${title.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\s*\\n+`, 'i');
+        if (titleHeaderPattern.test(processedContent)) {
+          processedContent = processedContent.replace(titleHeaderPattern, '');
+        }
+        bearContent += processedContent;
       }
       
       // Create the Bear URL with proper encoding
@@ -2534,7 +2567,7 @@ export class BearService {
           `, [note.Z_PK]);
           
           if (fullNote?.ZTEXT) {
-            await this.triggerBearParseEffectively(note.ZUNIQUEIDENTIFIER, fullNote.ZTEXT);
+            await this.triggerBearParseEffectively(note.ZUNIQUEIDENTIFIER, fullNote.ZTEXT, note.ZTITLE);
             successCount++;
           }
           

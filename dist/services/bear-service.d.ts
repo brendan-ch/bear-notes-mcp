@@ -432,7 +432,7 @@ export declare class BearService {
      * - No capital letters (converts to lowercase)
      * - No hyphens (removes them)
      * - No spaces (removes them)
-     * - No underscores (removes them)
+     * - Underscores allowed (kept as-is)
      * - No commas (removes them)
      * - Forward slashes allowed for nested tags (e.g., project/alpha)
      * - Must not be empty after sanitization

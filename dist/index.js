@@ -642,7 +642,7 @@ class BearMCPServer {
                         tags: {
                             type: 'array',
                             items: { type: 'string' },
-                            description: 'Array of tag names to apply to the note. Tags are automatically sanitized: lowercase only, no spaces/hyphens/underscores (use forward slashes for nested tags like "work/project")',
+                            description: 'Array of tag names to apply to the note. Tags are automatically sanitized: lowercase only, no spaces/hyphens (underscores allowed, use forward slashes for nested tags like "work/project")',
                         },
                         isArchived: {
                             type: 'boolean',
@@ -677,7 +677,7 @@ class BearMCPServer {
                         tags: {
                             type: 'array',
                             items: { type: 'string' },
-                            description: 'New array of tag names (replaces existing tags). Tags are automatically sanitized: lowercase only, no spaces/hyphens/underscores (use forward slashes for nested tags like "work/project")',
+                            description: 'New array of tag names (replaces existing tags). Tags are automatically sanitized: lowercase only, no spaces/hyphens (underscores allowed, use forward slashes for nested tags like "work/project")',
                         },
                         isArchived: {
                             type: 'boolean',
