@@ -1,12 +1,21 @@
 # API Reference
 
-Complete reference for all Bear MCP Server tools.
+Complete reference for all Bear MCP Server tools and services.
 
-## 🔄 **HYBRID SYNC-SAFE MODE**
+## 🏗️ **SERVICE-ORIENTED ARCHITECTURE**
 
-**✅ All operations now work safely with the hybrid sync-safe architecture!**
+**✅ Completely refactored service-based architecture with comprehensive testing!**
 
-The server uses a **hybrid approach**: direct database reads for speed + Bear's x-callback-url API for sync-safe writes.
+The server now uses a **modern service architecture** with 7 specialized services:
+- **DatabaseService**: SQLite operations and connection management  
+- **NoteService**: Note CRUD operations with hybrid read/write approach
+- **SearchService**: Advanced search and content discovery
+- **TagService**: Tag management and organization
+- **CacheService**: Performance optimization with intelligent caching
+- **LoggingService**: Structured logging and audit trails
+- **HealthService**: System monitoring and health checks
+
+All operations maintain the **hybrid sync-safe approach**: database reads for performance + Bear API writes for safety.
 
 ## 📖 Read Operations (26 tools)
 
