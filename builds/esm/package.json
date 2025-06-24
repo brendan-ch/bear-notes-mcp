@@ -1,0 +1,35 @@
+{
+  "name": "bear-mcp-server",
+  "version": "1.0.0",
+  "description": "MCP server for interfacing with Bear's SQLite database",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "keywords": [
+    "mcp",
+    "bear",
+    "sqlite",
+    "notes",
+    "claude"
+  ],
+  "author": "Bear MCP Integration",
+  "license": "MIT",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^0.4.0",
+    "@types/uuid": "^10.0.0",
+    "@types/winston": "^2.4.4",
+    "dotenv": "^16.5.0",
+    "sqlite3": "^5.1.6",
+    "uuid": "^11.1.0",
+    "winston": "^3.17.0",
+    "zod": "^3.22.4"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "bin": {
+    "bear-mcp-server": "./index.js"
+  }
+}

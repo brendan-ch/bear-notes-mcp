@@ -1,0 +1,26 @@
+{
+  "database": {
+    "path": "./data/bear-dev.db",
+    "timeout": 5000,
+    "readonly": false
+  },
+  "server": {
+    "port": 3001,
+    "host": "localhost"
+  },
+  "logging": {
+    "level": "debug",
+    "file": "./logs/bear-mcp-dev.log",
+    "console": true
+  },
+  "cache": {
+    "enabled": true,
+    "maxSize": 100,
+    "ttl": 300000
+  },
+  "development": {
+    "hotReload": true,
+    "mockData": true,
+    "verbose": true
+  }
+}
