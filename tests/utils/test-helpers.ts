@@ -196,6 +196,198 @@ export class MockBearDatabase {
   checkIntegrity = jest.fn(async (): Promise<boolean> => {
     return true;
   });
+
+  // Additional methods for SearchService testing
+  setQueryResult = jest.fn((result: any[]) => {
+    this.query.mockResolvedValueOnce(result);
+  });
+
+  reset = jest.fn(() => {
+    this.connected = false;
+    this.readOnly = true;
+    jest.clearAllMocks();
+    
+    // Re-initialize all mock functions
+    this.connect = jest.fn(async (readOnly: boolean = true): Promise<void> => {
+      this.connected = true;
+      this.readOnly = readOnly;
+    });
+
+    this.disconnect = jest.fn(async (): Promise<void> => {
+      this.connected = false;
+    });
+
+    this.query = jest.fn(async (sql: string, params: any[] = []): Promise<any[]> => {
+      if (!this.connected) {
+        throw new Error('Database not connected');
+      }
+
+      // Handle getTags query specifically (it starts with SELECT t.*, COUNT)
+      if (
+        sql.includes('SELECT t.*, COUNT(nt.Z_5NOTES) as noteCount') ||
+        (sql.includes('ZSFNOTETAG t') && sql.includes('COUNT') && sql.includes('GROUP BY'))
+      ) {
+        // Return tags with note counts for getTags method
+        const tagsWithCounts = mockBearTags.map((tag, index) => ({
+          ...tag,
+          noteCount: index + 1,
+        }));
+        return tagsWithCounts;
+      }
+
+      // Mock responses based on SQL patterns
+      if (sql.includes('ZSFNOTE') && sql.includes('COUNT')) {
+        return [{ count: mockBearNotes.length }];
+      }
+
+      if (sql.includes('ZSFNOTE') && !sql.includes('COUNT')) {
+        // Handle note searches and filters
+        let filteredNotes = [...mockBearNotes];
+
+        // Handle WHERE conditions in SQL
+        if (sql.includes('Z_PK = ?') && params.length > 0) {
+          const id = params[0];
+          filteredNotes = filteredNotes.filter(note => note.Z_PK === id);
+        }
+
+        if (sql.includes('ZTITLE = ?') && params.length > 0) {
+          const title = params[0];
+          filteredNotes = filteredNotes.filter(note => note.ZTITLE === title);
+        }
+
+        if (sql.includes('ZTITLE LIKE ?') || sql.includes('ZTEXT LIKE ?')) {
+          if (params.length > 0) {
+            const searchTerm = String(params[0]).replace(/%/g, '').toLowerCase();
+            filteredNotes = filteredNotes.filter(note => {
+              const titleMatch = note.ZTITLE?.toLowerCase().includes(searchTerm);
+              const textMatch = note.ZTEXT?.toLowerCase().includes(searchTerm);
+              return titleMatch || textMatch;
+            });
+          }
+        }
+
+        // Add tags to notes
+        const notesWithTags = filteredNotes.map(note => ({
+          ...note,
+          tag_names:
+            note.Z_PK === 1
+              ? 'test,sample'
+              : note.Z_PK === 2
+                ? 'archived,old'
+                : note.Z_PK === 3
+                  ? 'trash'
+                  : note.Z_PK === 4
+                    ? 'important,pinned'
+                    : 'quick,untitled',
+        }));
+
+        return notesWithTags;
+      }
+
+      if (sql.includes('ZSFNOTETAG') && sql.includes('COUNT')) {
+        return [{ count: mockBearTags.length }];
+      }
+
+      if (sql.includes('ZSFNOTETAG')) {
+        // Check if this is the getTags query with COUNT and GROUP BY
+        if (sql.includes('COUNT(') && sql.includes('GROUP BY')) {
+          // Return tags with note counts
+          const tagsWithCounts = mockBearTags.map((tag, index) => ({
+            ...tag,
+            noteCount: index + 1,
+          }));
+          return tagsWithCounts;
+        }
+        // Return count for simple COUNT queries
+        if (sql.includes('COUNT')) {
+          return [{ count: mockBearTags.length }];
+        }
+        // Regular tag query
+        return mockBearTags;
+      }
+
+      if (sql.includes('sqlite_master')) {
+        return mockDatabaseSchema;
+      }
+
+      if (sql.includes('integrity_check')) {
+        return [{ integrity_check: 'ok' }];
+      }
+
+      // Handle tag-based note queries
+      if (sql.includes('Z_5TAGS') && params.length > 0) {
+        const tagName = params[0];
+        const filteredNotes = mockBearNotes.filter(note => {
+          // Mock tag associations
+          const noteTags =
+            note.Z_PK === 1
+              ? ['test', 'sample']
+              : note.Z_PK === 2
+                ? ['archived', 'old']
+                : note.Z_PK === 3
+                  ? ['trash']
+                  : note.Z_PK === 4
+                    ? ['important', 'pinned']
+                    : ['quick', 'untitled'];
+          return noteTags.includes(tagName);
+        });
+
+        const notesWithTags = filteredNotes.map(note => ({
+          ...note,
+          tag_names:
+            note.Z_PK === 1
+              ? 'test,sample'
+              : note.Z_PK === 2
+                ? 'archived,old'
+                : note.Z_PK === 3
+                  ? 'trash'
+                : note.Z_PK === 4
+                  ? 'important,pinned'
+                  : 'quick,untitled',
+        }));
+
+        return notesWithTags;
+      }
+
+      return [];
+    });
+
+    this.queryOne = jest.fn(async (sql: string, params: any[] = []): Promise<any | null> => {
+      const results = await this.query(sql, params);
+      return results.length > 0 ? results[0] : null;
+    });
+
+    this.execute = jest.fn(async (sql: string, params: any[] = []): Promise<{ changes: number; lastID: number }> => {
+      if (!this.connected || this.readOnly) {
+        throw new Error('Database not writable');
+      }
+      return { changes: 1, lastID: 1 };
+    });
+
+    this.isBearRunning = jest.fn(async (): Promise<boolean> => {
+      return false; // Always return false in tests
+    });
+
+    this.verifyDatabaseAccess = jest.fn(async (): Promise<void> => {
+      // Always pass in tests
+    });
+
+    this.createBackup = jest.fn(async (): Promise<string> => {
+      return '/tmp/test_backup.sqlite';
+    });
+
+    this.getSchema = jest.fn(async (): Promise<{ name: string; sql: string }[]> => {
+      return mockDatabaseSchema;
+    });
+
+    this.checkIntegrity = jest.fn(async (): Promise<boolean> => {
+      return true;
+    });
+
+    this.setQueryResult = jest.fn((result: any[]) => {
+      this.query.mockResolvedValueOnce(result);
+    });
+  });
 }
 
 /**
