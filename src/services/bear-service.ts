@@ -2437,9 +2437,19 @@ export class BearService {
       const tagValidation = this.validateAndSanitizeTags(tags);
       const sanitizedTags = tagValidation.sanitized;
       
-      // Build the content with embedded hashtags in Bear format
+      // Build the content with embedded hashtags in Bear format (no title header since Bear API handles title separately)
       const hashtagsLine = sanitizedTags.map(tag => `#${tag}`).join(' ');
-      const bearContent = `# ${title}\n\n${hashtagsLine}\n\n${content}`;
+      let bearContent = '';
+      
+      // Add hashtags line if there are tags
+      if (hashtagsLine) {
+        bearContent += hashtagsLine + '\n\n';
+      }
+      
+      // Add the actual content
+      if (content) {
+        bearContent += content;
+      }
       
       // Create the Bear URL with proper encoding
       const encodedTitle = encodeURIComponent(title);
