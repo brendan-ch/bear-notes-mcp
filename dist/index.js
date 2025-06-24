@@ -1,380 +1,1907 @@
 #!/usr/bin/env node
-"use strict";var Wt=Object.create;var Qe=Object.defineProperty;var Kt=Object.getOwnPropertyDescriptor;var Gt=Object.getOwnPropertyNames;var zt=Object.getPrototypeOf,Vt=Object.prototype.hasOwnProperty;var Xt=(r,e)=>{for(var t in e)Qe(r,t,{get:e[t],enumerable:!0})},Yt=(r,e,t,n)=>{if(e&&typeof e=="object"||typeof e=="function")for(let s of Gt(e))!Vt.call(r,s)&&s!==t&&Qe(r,s,{get:()=>e[s],enumerable:!(n=Kt(e,s))||n.enumerable});return r};var C=(r,e,t)=>(t=r!=null?Wt(zt(r)):{},Yt(e||!r||!r.__esModule?Qe(t,"default",{value:r,enumerable:!0}):t,r));var c={};Xt(c,{BRAND:()=>vn,DIRTY:()=>Q,EMPTY_PATH:()=>tn,INVALID:()=>f,NEVER:()=>cs,OK:()=>O,ParseStatus:()=>I,Schema:()=>_,ZodAny:()=>Y,ZodArray:()=>G,ZodBigInt:()=>te,ZodBoolean:()=>ne,ZodBranded:()=>Ie,ZodCatch:()=>me,ZodDate:()=>se,ZodDefault:()=>he,ZodDiscriminatedUnion:()=>Ce,ZodEffects:()=>P,ZodEnum:()=>de,ZodError:()=>A,ZodFirstPartyTypeKind:()=>y,ZodFunction:()=>Le,ZodIntersection:()=>oe,ZodIssueCode:()=>h,ZodLazy:()=>ce,ZodLiteral:()=>ue,ZodMap:()=>be,ZodNaN:()=>Ne,ZodNativeEnum:()=>le,ZodNever:()=>$,ZodNull:()=>re,ZodNullable:()=>U,ZodNumber:()=>ee,ZodObject:()=>R,ZodOptional:()=>L,ZodParsedType:()=>p,ZodPipeline:()=>we,ZodPromise:()=>J,ZodReadonly:()=>pe,ZodRecord:()=>De,ZodSchema:()=>_,ZodSet:()=>_e,ZodString:()=>X,ZodSymbol:()=>Te,ZodTransformer:()=>P,ZodTuple:()=>H,ZodType:()=>_,ZodUndefined:()=>ae,ZodUnion:()=>ie,ZodUnknown:()=>K,ZodVoid:()=>Ee,addIssueToContext:()=>m,any:()=>Dn,array:()=>Mn,bigint:()=>On,boolean:()=>It,coerce:()=>os,custom:()=>xt,date:()=>An,datetimeRegex:()=>_t,defaultErrorMap:()=>q,discriminatedUnion:()=>Bn,effect:()=>Qn,enum:()=>Xn,function:()=>Gn,getErrorMap:()=>ge,getParsedType:()=>B,instanceof:()=>In,intersection:()=>Hn,isAborted:()=>Re,isAsync:()=>fe,isDirty:()=>Ze,isValid:()=>V,late:()=>Sn,lazy:()=>zn,literal:()=>Vn,makeIssue:()=>Se,map:()=>Wn,nan:()=>wn,nativeEnum:()=>Yn,never:()=>kn,null:()=>Cn,nullable:()=>ts,number:()=>St,object:()=>$n,objectUtil:()=>et,oboolean:()=>is,onumber:()=>rs,optional:()=>es,ostring:()=>as,pipeline:()=>ss,preprocess:()=>ns,promise:()=>Jn,quotelessJson:()=>Jt,record:()=>qn,set:()=>Kn,setErrorMap:()=>en,strictObject:()=>Fn,string:()=>vt,symbol:()=>Rn,transformer:()=>Qn,tuple:()=>Un,undefined:()=>Zn,union:()=>jn,unknown:()=>Ln,util:()=>N,void:()=>Pn});var N;(function(r){r.assertEqual=s=>{};function e(s){}r.assertIs=e;function t(s){throw new Error}r.assertNever=t,r.arrayToEnum=s=>{let a={};for(let i of s)a[i]=i;return a},r.getValidEnumValues=s=>{let a=r.objectKeys(s).filter(o=>typeof s[s[o]]!="number"),i={};for(let o of a)i[o]=s[o];return r.objectValues(i)},r.objectValues=s=>r.objectKeys(s).map(function(a){return s[a]}),r.objectKeys=typeof Object.keys=="function"?s=>Object.keys(s):s=>{let a=[];for(let i in s)Object.prototype.hasOwnProperty.call(s,i)&&a.push(i);return a},r.find=(s,a)=>{for(let i of s)if(a(i))return i},r.isInteger=typeof Number.isInteger=="function"?s=>Number.isInteger(s):s=>typeof s=="number"&&Number.isFinite(s)&&Math.floor(s)===s;function n(s,a=" | "){return s.map(i=>typeof i=="string"?`'${i}'`:i).join(a)}r.joinValues=n,r.jsonStringifyReplacer=(s,a)=>typeof a=="bigint"?a.toString():a})(N||(N={}));var et;(function(r){r.mergeShapes=(e,t)=>({...e,...t})})(et||(et={}));var p=N.arrayToEnum(["string","nan","number","integer","float","boolean","date","bigint","symbol","function","undefined","null","array","object","unknown","promise","void","never","map","set"]),B=r=>{switch(typeof r){case"undefined":return p.undefined;case"string":return p.string;case"number":return Number.isNaN(r)?p.nan:p.number;case"boolean":return p.boolean;case"function":return p.function;case"bigint":return p.bigint;case"symbol":return p.symbol;case"object":return Array.isArray(r)?p.array:r===null?p.null:r.then&&typeof r.then=="function"&&r.catch&&typeof r.catch=="function"?p.promise:typeof Map<"u"&&r instanceof Map?p.map:typeof Set<"u"&&r instanceof Set?p.set:typeof Date<"u"&&r instanceof Date?p.date:p.object;default:return p.unknown}};var h=N.arrayToEnum(["invalid_type","invalid_literal","custom","invalid_union","invalid_union_discriminator","invalid_enum_value","unrecognized_keys","invalid_arguments","invalid_return_type","invalid_date","invalid_string","too_small","too_big","invalid_intersection_types","not_multiple_of","not_finite"]),Jt=r=>JSON.stringify(r,null,2).replace(/"([^"]+)":/g,"$1:"),A=class r extends Error{get errors(){return this.issues}constructor(e){super(),this.issues=[],this.addIssue=n=>{this.issues=[...this.issues,n]},this.addIssues=(n=[])=>{this.issues=[...this.issues,...n]};let t=new.target.prototype;Object.setPrototypeOf?Object.setPrototypeOf(this,t):this.__proto__=t,this.name="ZodError",this.issues=e}format(e){let t=e||function(a){return a.message},n={_errors:[]},s=a=>{for(let i of a.issues)if(i.code==="invalid_union")i.unionErrors.map(s);else if(i.code==="invalid_return_type")s(i.returnTypeError);else if(i.code==="invalid_arguments")s(i.argumentsError);else if(i.path.length===0)n._errors.push(t(i));else{let o=n,d=0;for(;d<i.path.length;){let u=i.path[d];d===i.path.length-1?(o[u]=o[u]||{_errors:[]},o[u]._errors.push(t(i))):o[u]=o[u]||{_errors:[]},o=o[u],d++}}};return s(this),n}static assert(e){if(!(e instanceof r))throw new Error(`Not a ZodError: ${e}`)}toString(){return this.message}get message(){return JSON.stringify(this.issues,N.jsonStringifyReplacer,2)}get isEmpty(){return this.issues.length===0}flatten(e=t=>t.message){let t={},n=[];for(let s of this.issues)s.path.length>0?(t[s.path[0]]=t[s.path[0]]||[],t[s.path[0]].push(e(s))):n.push(e(s));return{formErrors:n,fieldErrors:t}}get formErrors(){return this.flatten()}};A.create=r=>new A(r);var Qt=(r,e)=>{let t;switch(r.code){case h.invalid_type:r.received===p.undefined?t="Required":t=`Expected ${r.expected}, received ${r.received}`;break;case h.invalid_literal:t=`Invalid literal value, expected ${JSON.stringify(r.expected,N.jsonStringifyReplacer)}`;break;case h.unrecognized_keys:t=`Unrecognized key(s) in object: ${N.joinValues(r.keys,", ")}`;break;case h.invalid_union:t="Invalid input";break;case h.invalid_union_discriminator:t=`Invalid discriminator value. Expected ${N.joinValues(r.options)}`;break;case h.invalid_enum_value:t=`Invalid enum value. Expected ${N.joinValues(r.options)}, received '${r.received}'`;break;case h.invalid_arguments:t="Invalid function arguments";break;case h.invalid_return_type:t="Invalid function return type";break;case h.invalid_date:t="Invalid date";break;case h.invalid_string:typeof r.validation=="object"?"includes"in r.validation?(t=`Invalid input: must include "${r.validation.includes}"`,typeof r.validation.position=="number"&&(t=`${t} at one or more positions greater than or equal to ${r.validation.position}`)):"startsWith"in r.validation?t=`Invalid input: must start with "${r.validation.startsWith}"`:"endsWith"in r.validation?t=`Invalid input: must end with "${r.validation.endsWith}"`:N.assertNever(r.validation):r.validation!=="regex"?t=`Invalid ${r.validation}`:t="Invalid";break;case h.too_small:r.type==="array"?t=`Array must contain ${r.exact?"exactly":r.inclusive?"at least":"more than"} ${r.minimum} element(s)`:r.type==="string"?t=`String must contain ${r.exact?"exactly":r.inclusive?"at least":"over"} ${r.minimum} character(s)`:r.type==="number"?t=`Number must be ${r.exact?"exactly equal to ":r.inclusive?"greater than or equal to ":"greater than "}${r.minimum}`:r.type==="date"?t=`Date must be ${r.exact?"exactly equal to ":r.inclusive?"greater than or equal to ":"greater than "}${new Date(Number(r.minimum))}`:t="Invalid input";break;case h.too_big:r.type==="array"?t=`Array must contain ${r.exact?"exactly":r.inclusive?"at most":"less than"} ${r.maximum} element(s)`:r.type==="string"?t=`String must contain ${r.exact?"exactly":r.inclusive?"at most":"under"} ${r.maximum} character(s)`:r.type==="number"?t=`Number must be ${r.exact?"exactly":r.inclusive?"less than or equal to":"less than"} ${r.maximum}`:r.type==="bigint"?t=`BigInt must be ${r.exact?"exactly":r.inclusive?"less than or equal to":"less than"} ${r.maximum}`:r.type==="date"?t=`Date must be ${r.exact?"exactly":r.inclusive?"smaller than or equal to":"smaller than"} ${new Date(Number(r.maximum))}`:t="Invalid input";break;case h.custom:t="Invalid input";break;case h.invalid_intersection_types:t="Intersection results could not be merged";break;case h.not_multiple_of:t=`Number must be a multiple of ${r.multipleOf}`;break;case h.not_finite:t="Number must be finite";break;default:t=e.defaultError,N.assertNever(r)}return{message:t}},q=Qt;var ft=q;function en(r){ft=r}function ge(){return ft}var Se=r=>{let{data:e,path:t,errorMaps:n,issueData:s}=r,a=[...t,...s.path||[]],i={...s,path:a};if(s.message!==void 0)return{...s,path:a,message:s.message};let o="",d=n.filter(u=>!!u).slice().reverse();for(let u of d)o=u(i,{data:e,defaultError:o}).message;return{...s,path:a,message:o}},tn=[];function m(r,e){let t=ge(),n=Se({issueData:e,data:r.data,path:r.path,errorMaps:[r.common.contextualErrorMap,r.schemaErrorMap,t,t===q?void 0:q].filter(s=>!!s)});r.common.issues.push(n)}var I=class r{constructor(){this.value="valid"}dirty(){this.value==="valid"&&(this.value="dirty")}abort(){this.value!=="aborted"&&(this.value="aborted")}static mergeArray(e,t){let n=[];for(let s of t){if(s.status==="aborted")return f;s.status==="dirty"&&e.dirty(),n.push(s.value)}return{status:e.value,value:n}}static async mergeObjectAsync(e,t){let n=[];for(let s of t){let a=await s.key,i=await s.value;n.push({key:a,value:i})}return r.mergeObjectSync(e,n)}static mergeObjectSync(e,t){let n={};for(let s of t){let{key:a,value:i}=s;if(a.status==="aborted"||i.status==="aborted")return f;a.status==="dirty"&&e.dirty(),i.status==="dirty"&&e.dirty(),a.value!=="__proto__"&&(typeof i.value<"u"||s.alwaysSet)&&(n[a.value]=i.value)}return{status:e.value,value:n}}},f=Object.freeze({status:"aborted"}),Q=r=>({status:"dirty",value:r}),O=r=>({status:"valid",value:r}),Re=r=>r.status==="aborted",Ze=r=>r.status==="dirty",V=r=>r.status==="valid",fe=r=>typeof Promise<"u"&&r instanceof Promise;var g;(function(r){r.errToObj=e=>typeof e=="string"?{message:e}:e||{},r.toString=e=>typeof e=="string"?e:e?.message})(g||(g={}));var k=class{constructor(e,t,n,s){this._cachedPath=[],this.parent=e,this.data=t,this._path=n,this._key=s}get path(){return this._cachedPath.length||(Array.isArray(this._key)?this._cachedPath.push(...this._path,...this._key):this._cachedPath.push(...this._path,this._key)),this._cachedPath}},yt=(r,e)=>{if(V(e))return{success:!0,data:e.value};if(!r.common.issues.length)throw new Error("Validation failed but no issues detected.");return{success:!1,get error(){if(this._error)return this._error;let t=new A(r.common.issues);return this._error=t,this._error}}};function E(r){if(!r)return{};let{errorMap:e,invalid_type_error:t,required_error:n,description:s}=r;if(e&&(t||n))throw new Error(`Can't use "invalid_type_error" or "required_error" in conjunction with custom error map.`);return e?{errorMap:e,description:s}:{errorMap:(i,o)=>{let{message:d}=r;return i.code==="invalid_enum_value"?{message:d??o.defaultError}:typeof o.data>"u"?{message:d??n??o.defaultError}:i.code!=="invalid_type"?{message:o.defaultError}:{message:d??t??o.defaultError}},description:s}}var _=class{get description(){return this._def.description}_getType(e){return B(e.data)}_getOrReturnCtx(e,t){return t||{common:e.parent.common,data:e.data,parsedType:B(e.data),schemaErrorMap:this._def.errorMap,path:e.path,parent:e.parent}}_processInputParams(e){return{status:new I,ctx:{common:e.parent.common,data:e.data,parsedType:B(e.data),schemaErrorMap:this._def.errorMap,path:e.path,parent:e.parent}}}_parseSync(e){let t=this._parse(e);if(fe(t))throw new Error("Synchronous parse encountered promise.");return t}_parseAsync(e){let t=this._parse(e);return Promise.resolve(t)}parse(e,t){let n=this.safeParse(e,t);if(n.success)return n.data;throw n.error}safeParse(e,t){let n={common:{issues:[],async:t?.async??!1,contextualErrorMap:t?.errorMap},path:t?.path||[],schemaErrorMap:this._def.errorMap,parent:null,data:e,parsedType:B(e)},s=this._parseSync({data:e,path:n.path,parent:n});return yt(n,s)}"~validate"(e){let t={common:{issues:[],async:!!this["~standard"].async},path:[],schemaErrorMap:this._def.errorMap,parent:null,data:e,parsedType:B(e)};if(!this["~standard"].async)try{let n=this._parseSync({data:e,path:[],parent:t});return V(n)?{value:n.value}:{issues:t.common.issues}}catch(n){n?.message?.toLowerCase()?.includes("encountered")&&(this["~standard"].async=!0),t.common={issues:[],async:!0}}return this._parseAsync({data:e,path:[],parent:t}).then(n=>V(n)?{value:n.value}:{issues:t.common.issues})}async parseAsync(e,t){let n=await this.safeParseAsync(e,t);if(n.success)return n.data;throw n.error}async safeParseAsync(e,t){let n={common:{issues:[],contextualErrorMap:t?.errorMap,async:!0},path:t?.path||[],schemaErrorMap:this._def.errorMap,parent:null,data:e,parsedType:B(e)},s=this._parse({data:e,path:n.path,parent:n}),a=await(fe(s)?s:Promise.resolve(s));return yt(n,a)}refine(e,t){let n=s=>typeof t=="string"||typeof t>"u"?{message:t}:typeof t=="function"?t(s):t;return this._refinement((s,a)=>{let i=e(s),o=()=>a.addIssue({code:h.custom,...n(s)});return typeof Promise<"u"&&i instanceof Promise?i.then(d=>d?!0:(o(),!1)):i?!0:(o(),!1)})}refinement(e,t){return this._refinement((n,s)=>e(n)?!0:(s.addIssue(typeof t=="function"?t(n,s):t),!1))}_refinement(e){return new P({schema:this,typeName:y.ZodEffects,effect:{type:"refinement",refinement:e}})}superRefine(e){return this._refinement(e)}constructor(e){this.spa=this.safeParseAsync,this._def=e,this.parse=this.parse.bind(this),this.safeParse=this.safeParse.bind(this),this.parseAsync=this.parseAsync.bind(this),this.safeParseAsync=this.safeParseAsync.bind(this),this.spa=this.spa.bind(this),this.refine=this.refine.bind(this),this.refinement=this.refinement.bind(this),this.superRefine=this.superRefine.bind(this),this.optional=this.optional.bind(this),this.nullable=this.nullable.bind(this),this.nullish=this.nullish.bind(this),this.array=this.array.bind(this),this.promise=this.promise.bind(this),this.or=this.or.bind(this),this.and=this.and.bind(this),this.transform=this.transform.bind(this),this.brand=this.brand.bind(this),this.default=this.default.bind(this),this.catch=this.catch.bind(this),this.describe=this.describe.bind(this),this.pipe=this.pipe.bind(this),this.readonly=this.readonly.bind(this),this.isNullable=this.isNullable.bind(this),this.isOptional=this.isOptional.bind(this),this["~standard"]={version:1,vendor:"zod",validate:t=>this["~validate"](t)}}optional(){return L.create(this,this._def)}nullable(){return U.create(this,this._def)}nullish(){return this.nullable().optional()}array(){return G.create(this)}promise(){return J.create(this,this._def)}or(e){return ie.create([this,e],this._def)}and(e){return oe.create(this,e,this._def)}transform(e){return new P({...E(this._def),schema:this,typeName:y.ZodEffects,effect:{type:"transform",transform:e}})}default(e){let t=typeof e=="function"?e:()=>e;return new he({...E(this._def),innerType:this,defaultValue:t,typeName:y.ZodDefault})}brand(){return new Ie({typeName:y.ZodBranded,type:this,...E(this._def)})}catch(e){let t=typeof e=="function"?e:()=>e;return new me({...E(this._def),innerType:this,catchValue:t,typeName:y.ZodCatch})}describe(e){let t=this.constructor;return new t({...this._def,description:e})}pipe(e){return we.create(this,e)}readonly(){return pe.create(this)}isOptional(){return this.safeParse(void 0).success}isNullable(){return this.safeParse(null).success}},nn=/^c[^\s-]{8,}$/i,sn=/^[0-9a-z]+$/,an=/^[0-9A-HJKMNP-TV-Z]{26}$/i,rn=/^[0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12}$/i,on=/^[a-z0-9_-]{21}$/i,cn=/^[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+\.[A-Za-z0-9-_]*$/,un=/^[-+]?P(?!$)(?:(?:[-+]?\d+Y)|(?:[-+]?\d+[.,]\d+Y$))?(?:(?:[-+]?\d+M)|(?:[-+]?\d+[.,]\d+M$))?(?:(?:[-+]?\d+W)|(?:[-+]?\d+[.,]\d+W$))?(?:(?:[-+]?\d+D)|(?:[-+]?\d+[.,]\d+D$))?(?:T(?=[\d+-])(?:(?:[-+]?\d+H)|(?:[-+]?\d+[.,]\d+H$))?(?:(?:[-+]?\d+M)|(?:[-+]?\d+[.,]\d+M$))?(?:[-+]?\d+(?:[.,]\d+)?S)?)??$/,dn=/^(?!\.)(?!.*\.\.)([A-Z0-9_'+\-\.]*)[A-Z0-9_+-]@([A-Z0-9][A-Z0-9\-]*\.)+[A-Z]{2,}$/i,ln="^(\\p{Extended_Pictographic}|\\p{Emoji_Component})+$",tt,hn=/^(?:(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])\.){3}(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])$/,mn=/^(?:(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])\.){3}(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])\/(3[0-2]|[12]?[0-9])$/,pn=/^(([0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(ffff(:0{1,4}){0,1}:){0,1}((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])|([0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9]))$/,gn=/^(([0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(ffff(:0{1,4}){0,1}:){0,1}((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])|([0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9]))\/(12[0-8]|1[01][0-9]|[1-9]?[0-9])$/,fn=/^([0-9a-zA-Z+/]{4})*(([0-9a-zA-Z+/]{2}==)|([0-9a-zA-Z+/]{3}=))?$/,yn=/^([0-9a-zA-Z-_]{4})*(([0-9a-zA-Z-_]{2}(==)?)|([0-9a-zA-Z-_]{3}(=)?))?$/,Et="((\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-((0[13578]|1[02])-(0[1-9]|[12]\\d|3[01])|(0[469]|11)-(0[1-9]|[12]\\d|30)|(02)-(0[1-9]|1\\d|2[0-8])))",Tn=new RegExp(`^${Et}$`);function bt(r){let e="[0-5]\\d";r.precision?e=`${e}\\.\\d{${r.precision}}`:r.precision==null&&(e=`${e}(\\.\\d+)?`);let t=r.precision?"+":"?";return`([01]\\d|2[0-3]):[0-5]\\d(:${e})${t}`}function En(r){return new RegExp(`^${bt(r)}$`)}function _t(r){let e=`${Et}T${bt(r)}`,t=[];return t.push(r.local?"Z?":"Z"),r.offset&&t.push("([+-]\\d{2}:?\\d{2})"),e=`${e}(${t.join("|")})`,new RegExp(`^${e}$`)}function bn(r,e){return!!((e==="v4"||!e)&&hn.test(r)||(e==="v6"||!e)&&pn.test(r))}function _n(r,e){if(!cn.test(r))return!1;try{let[t]=r.split("."),n=t.replace(/-/g,"+").replace(/_/g,"/").padEnd(t.length+(4-t.length%4)%4,"="),s=JSON.parse(atob(n));return!(typeof s!="object"||s===null||"typ"in s&&s?.typ!=="JWT"||!s.alg||e&&s.alg!==e)}catch{return!1}}function Nn(r,e){return!!((e==="v4"||!e)&&mn.test(r)||(e==="v6"||!e)&&gn.test(r))}var X=class r extends _{_parse(e){if(this._def.coerce&&(e.data=String(e.data)),this._getType(e)!==p.string){let a=this._getOrReturnCtx(e);return m(a,{code:h.invalid_type,expected:p.string,received:a.parsedType}),f}let n=new I,s;for(let a of this._def.checks)if(a.kind==="min")e.data.length<a.value&&(s=this._getOrReturnCtx(e,s),m(s,{code:h.too_small,minimum:a.value,type:"string",inclusive:!0,exact:!1,message:a.message}),n.dirty());else if(a.kind==="max")e.data.length>a.value&&(s=this._getOrReturnCtx(e,s),m(s,{code:h.too_big,maximum:a.value,type:"string",inclusive:!0,exact:!1,message:a.message}),n.dirty());else if(a.kind==="length"){let i=e.data.length>a.value,o=e.data.length<a.value;(i||o)&&(s=this._getOrReturnCtx(e,s),i?m(s,{code:h.too_big,maximum:a.value,type:"string",inclusive:!0,exact:!0,message:a.message}):o&&m(s,{code:h.too_small,minimum:a.value,type:"string",inclusive:!0,exact:!0,message:a.message}),n.dirty())}else if(a.kind==="email")dn.test(e.data)||(s=this._getOrReturnCtx(e,s),m(s,{validation:"email",code:h.invalid_string,message:a.message}),n.dirty());else if(a.kind==="emoji")tt||(tt=new RegExp(ln,"u")),tt.test(e.data)||(s=this._getOrReturnCtx(e,s),m(s,{validation:"emoji",code:h.invalid_string,message:a.message}),n.dirty());else if(a.kind==="uuid")rn.test(e.data)||(s=this._getOrReturnCtx(e,s),m(s,{validation:"uuid",code:h.invalid_string,message:a.message}),n.dirty());else if(a.kind==="nanoid")on.test(e.data)||(s=this._getOrReturnCtx(e,s),m(s,{validation:"nanoid",code:h.invalid_string,message:a.message}),n.dirty());else if(a.kind==="cuid")nn.test(e.data)||(s=this._getOrReturnCtx(e,s),m(s,{validation:"cuid",code:h.invalid_string,message:a.message}),n.dirty());else if(a.kind==="cuid2")sn.test(e.data)||(s=this._getOrReturnCtx(e,s),m(s,{validation:"cuid2",code:h.invalid_string,message:a.message}),n.dirty());else if(a.kind==="ulid")an.test(e.data)||(s=this._getOrReturnCtx(e,s),m(s,{validation:"ulid",code:h.invalid_string,message:a.message}),n.dirty());else if(a.kind==="url")try{new URL(e.data)}catch{s=this._getOrReturnCtx(e,s),m(s,{validation:"url",code:h.invalid_string,message:a.message}),n.dirty()}else a.kind==="regex"?(a.regex.lastIndex=0,a.regex.test(e.data)||(s=this._getOrReturnCtx(e,s),m(s,{validation:"regex",code:h.invalid_string,message:a.message}),n.dirty())):a.kind==="trim"?e.data=e.data.trim():a.kind==="includes"?e.data.includes(a.value,a.position)||(s=this._getOrReturnCtx(e,s),m(s,{code:h.invalid_string,validation:{includes:a.value,position:a.position},message:a.message}),n.dirty()):a.kind==="toLowerCase"?e.data=e.data.toLowerCase():a.kind==="toUpperCase"?e.data=e.data.toUpperCase():a.kind==="startsWith"?e.data.startsWith(a.value)||(s=this._getOrReturnCtx(e,s),m(s,{code:h.invalid_string,validation:{startsWith:a.value},message:a.message}),n.dirty()):a.kind==="endsWith"?e.data.endsWith(a.value)||(s=this._getOrReturnCtx(e,s),m(s,{code:h.invalid_string,validation:{endsWith:a.value},message:a.message}),n.dirty()):a.kind==="datetime"?_t(a).test(e.data)||(s=this._getOrReturnCtx(e,s),m(s,{code:h.invalid_string,validation:"datetime",message:a.message}),n.dirty()):a.kind==="date"?Tn.test(e.data)||(s=this._getOrReturnCtx(e,s),m(s,{code:h.invalid_string,validation:"date",message:a.message}),n.dirty()):a.kind==="time"?En(a).test(e.data)||(s=this._getOrReturnCtx(e,s),m(s,{code:h.invalid_string,validation:"time",message:a.message}),n.dirty()):a.kind==="duration"?un.test(e.data)||(s=this._getOrReturnCtx(e,s),m(s,{validation:"duration",code:h.invalid_string,message:a.message}),n.dirty()):a.kind==="ip"?bn(e.data,a.version)||(s=this._getOrReturnCtx(e,s),m(s,{validation:"ip",code:h.invalid_string,message:a.message}),n.dirty()):a.kind==="jwt"?_n(e.data,a.alg)||(s=this._getOrReturnCtx(e,s),m(s,{validation:"jwt",code:h.invalid_string,message:a.message}),n.dirty()):a.kind==="cidr"?Nn(e.data,a.version)||(s=this._getOrReturnCtx(e,s),m(s,{validation:"cidr",code:h.invalid_string,message:a.message}),n.dirty()):a.kind==="base64"?fn.test(e.data)||(s=this._getOrReturnCtx(e,s),m(s,{validation:"base64",code:h.invalid_string,message:a.message}),n.dirty()):a.kind==="base64url"?yn.test(e.data)||(s=this._getOrReturnCtx(e,s),m(s,{validation:"base64url",code:h.invalid_string,message:a.message}),n.dirty()):N.assertNever(a);return{status:n.value,value:e.data}}_regex(e,t,n){return this.refinement(s=>e.test(s),{validation:t,code:h.invalid_string,...g.errToObj(n)})}_addCheck(e){return new r({...this._def,checks:[...this._def.checks,e]})}email(e){return this._addCheck({kind:"email",...g.errToObj(e)})}url(e){return this._addCheck({kind:"url",...g.errToObj(e)})}emoji(e){return this._addCheck({kind:"emoji",...g.errToObj(e)})}uuid(e){return this._addCheck({kind:"uuid",...g.errToObj(e)})}nanoid(e){return this._addCheck({kind:"nanoid",...g.errToObj(e)})}cuid(e){return this._addCheck({kind:"cuid",...g.errToObj(e)})}cuid2(e){return this._addCheck({kind:"cuid2",...g.errToObj(e)})}ulid(e){return this._addCheck({kind:"ulid",...g.errToObj(e)})}base64(e){return this._addCheck({kind:"base64",...g.errToObj(e)})}base64url(e){return this._addCheck({kind:"base64url",...g.errToObj(e)})}jwt(e){return this._addCheck({kind:"jwt",...g.errToObj(e)})}ip(e){return this._addCheck({kind:"ip",...g.errToObj(e)})}cidr(e){return this._addCheck({kind:"cidr",...g.errToObj(e)})}datetime(e){return typeof e=="string"?this._addCheck({kind:"datetime",precision:null,offset:!1,local:!1,message:e}):this._addCheck({kind:"datetime",precision:typeof e?.precision>"u"?null:e?.precision,offset:e?.offset??!1,local:e?.local??!1,...g.errToObj(e?.message)})}date(e){return this._addCheck({kind:"date",message:e})}time(e){return typeof e=="string"?this._addCheck({kind:"time",precision:null,message:e}):this._addCheck({kind:"time",precision:typeof e?.precision>"u"?null:e?.precision,...g.errToObj(e?.message)})}duration(e){return this._addCheck({kind:"duration",...g.errToObj(e)})}regex(e,t){return this._addCheck({kind:"regex",regex:e,...g.errToObj(t)})}includes(e,t){return this._addCheck({kind:"includes",value:e,position:t?.position,...g.errToObj(t?.message)})}startsWith(e,t){return this._addCheck({kind:"startsWith",value:e,...g.errToObj(t)})}endsWith(e,t){return this._addCheck({kind:"endsWith",value:e,...g.errToObj(t)})}min(e,t){return this._addCheck({kind:"min",value:e,...g.errToObj(t)})}max(e,t){return this._addCheck({kind:"max",value:e,...g.errToObj(t)})}length(e,t){return this._addCheck({kind:"length",value:e,...g.errToObj(t)})}nonempty(e){return this.min(1,g.errToObj(e))}trim(){return new r({...this._def,checks:[...this._def.checks,{kind:"trim"}]})}toLowerCase(){return new r({...this._def,checks:[...this._def.checks,{kind:"toLowerCase"}]})}toUpperCase(){return new r({...this._def,checks:[...this._def.checks,{kind:"toUpperCase"}]})}get isDatetime(){return!!this._def.checks.find(e=>e.kind==="datetime")}get isDate(){return!!this._def.checks.find(e=>e.kind==="date")}get isTime(){return!!this._def.checks.find(e=>e.kind==="time")}get isDuration(){return!!this._def.checks.find(e=>e.kind==="duration")}get isEmail(){return!!this._def.checks.find(e=>e.kind==="email")}get isURL(){return!!this._def.checks.find(e=>e.kind==="url")}get isEmoji(){return!!this._def.checks.find(e=>e.kind==="emoji")}get isUUID(){return!!this._def.checks.find(e=>e.kind==="uuid")}get isNANOID(){return!!this._def.checks.find(e=>e.kind==="nanoid")}get isCUID(){return!!this._def.checks.find(e=>e.kind==="cuid")}get isCUID2(){return!!this._def.checks.find(e=>e.kind==="cuid2")}get isULID(){return!!this._def.checks.find(e=>e.kind==="ulid")}get isIP(){return!!this._def.checks.find(e=>e.kind==="ip")}get isCIDR(){return!!this._def.checks.find(e=>e.kind==="cidr")}get isBase64(){return!!this._def.checks.find(e=>e.kind==="base64")}get isBase64url(){return!!this._def.checks.find(e=>e.kind==="base64url")}get minLength(){let e=null;for(let t of this._def.checks)t.kind==="min"&&(e===null||t.value>e)&&(e=t.value);return e}get maxLength(){let e=null;for(let t of this._def.checks)t.kind==="max"&&(e===null||t.value<e)&&(e=t.value);return e}};X.create=r=>new X({checks:[],typeName:y.ZodString,coerce:r?.coerce??!1,...E(r)});function xn(r,e){let t=(r.toString().split(".")[1]||"").length,n=(e.toString().split(".")[1]||"").length,s=t>n?t:n,a=Number.parseInt(r.toFixed(s).replace(".","")),i=Number.parseInt(e.toFixed(s).replace(".",""));return a%i/10**s}var ee=class r extends _{constructor(){super(...arguments),this.min=this.gte,this.max=this.lte,this.step=this.multipleOf}_parse(e){if(this._def.coerce&&(e.data=Number(e.data)),this._getType(e)!==p.number){let a=this._getOrReturnCtx(e);return m(a,{code:h.invalid_type,expected:p.number,received:a.parsedType}),f}let n,s=new I;for(let a of this._def.checks)a.kind==="int"?N.isInteger(e.data)||(n=this._getOrReturnCtx(e,n),m(n,{code:h.invalid_type,expected:"integer",received:"float",message:a.message}),s.dirty()):a.kind==="min"?(a.inclusive?e.data<a.value:e.data<=a.value)&&(n=this._getOrReturnCtx(e,n),m(n,{code:h.too_small,minimum:a.value,type:"number",inclusive:a.inclusive,exact:!1,message:a.message}),s.dirty()):a.kind==="max"?(a.inclusive?e.data>a.value:e.data>=a.value)&&(n=this._getOrReturnCtx(e,n),m(n,{code:h.too_big,maximum:a.value,type:"number",inclusive:a.inclusive,exact:!1,message:a.message}),s.dirty()):a.kind==="multipleOf"?xn(e.data,a.value)!==0&&(n=this._getOrReturnCtx(e,n),m(n,{code:h.not_multiple_of,multipleOf:a.value,message:a.message}),s.dirty()):a.kind==="finite"?Number.isFinite(e.data)||(n=this._getOrReturnCtx(e,n),m(n,{code:h.not_finite,message:a.message}),s.dirty()):N.assertNever(a);return{status:s.value,value:e.data}}gte(e,t){return this.setLimit("min",e,!0,g.toString(t))}gt(e,t){return this.setLimit("min",e,!1,g.toString(t))}lte(e,t){return this.setLimit("max",e,!0,g.toString(t))}lt(e,t){return this.setLimit("max",e,!1,g.toString(t))}setLimit(e,t,n,s){return new r({...this._def,checks:[...this._def.checks,{kind:e,value:t,inclusive:n,message:g.toString(s)}]})}_addCheck(e){return new r({...this._def,checks:[...this._def.checks,e]})}int(e){return this._addCheck({kind:"int",message:g.toString(e)})}positive(e){return this._addCheck({kind:"min",value:0,inclusive:!1,message:g.toString(e)})}negative(e){return this._addCheck({kind:"max",value:0,inclusive:!1,message:g.toString(e)})}nonpositive(e){return this._addCheck({kind:"max",value:0,inclusive:!0,message:g.toString(e)})}nonnegative(e){return this._addCheck({kind:"min",value:0,inclusive:!0,message:g.toString(e)})}multipleOf(e,t){return this._addCheck({kind:"multipleOf",value:e,message:g.toString(t)})}finite(e){return this._addCheck({kind:"finite",message:g.toString(e)})}safe(e){return this._addCheck({kind:"min",inclusive:!0,value:Number.MIN_SAFE_INTEGER,message:g.toString(e)})._addCheck({kind:"max",inclusive:!0,value:Number.MAX_SAFE_INTEGER,message:g.toString(e)})}get minValue(){let e=null;for(let t of this._def.checks)t.kind==="min"&&(e===null||t.value>e)&&(e=t.value);return e}get maxValue(){let e=null;for(let t of this._def.checks)t.kind==="max"&&(e===null||t.value<e)&&(e=t.value);return e}get isInt(){return!!this._def.checks.find(e=>e.kind==="int"||e.kind==="multipleOf"&&N.isInteger(e.value))}get isFinite(){let e=null,t=null;for(let n of this._def.checks){if(n.kind==="finite"||n.kind==="int"||n.kind==="multipleOf")return!0;n.kind==="min"?(t===null||n.value>t)&&(t=n.value):n.kind==="max"&&(e===null||n.value<e)&&(e=n.value)}return Number.isFinite(t)&&Number.isFinite(e)}};ee.create=r=>new ee({checks:[],typeName:y.ZodNumber,coerce:r?.coerce||!1,...E(r)});var te=class r extends _{constructor(){super(...arguments),this.min=this.gte,this.max=this.lte}_parse(e){if(this._def.coerce)try{e.data=BigInt(e.data)}catch{return this._getInvalidInput(e)}if(this._getType(e)!==p.bigint)return this._getInvalidInput(e);let n,s=new I;for(let a of this._def.checks)a.kind==="min"?(a.inclusive?e.data<a.value:e.data<=a.value)&&(n=this._getOrReturnCtx(e,n),m(n,{code:h.too_small,type:"bigint",minimum:a.value,inclusive:a.inclusive,message:a.message}),s.dirty()):a.kind==="max"?(a.inclusive?e.data>a.value:e.data>=a.value)&&(n=this._getOrReturnCtx(e,n),m(n,{code:h.too_big,type:"bigint",maximum:a.value,inclusive:a.inclusive,message:a.message}),s.dirty()):a.kind==="multipleOf"?e.data%a.value!==BigInt(0)&&(n=this._getOrReturnCtx(e,n),m(n,{code:h.not_multiple_of,multipleOf:a.value,message:a.message}),s.dirty()):N.assertNever(a);return{status:s.value,value:e.data}}_getInvalidInput(e){let t=this._getOrReturnCtx(e);return m(t,{code:h.invalid_type,expected:p.bigint,received:t.parsedType}),f}gte(e,t){return this.setLimit("min",e,!0,g.toString(t))}gt(e,t){return this.setLimit("min",e,!1,g.toString(t))}lte(e,t){return this.setLimit("max",e,!0,g.toString(t))}lt(e,t){return this.setLimit("max",e,!1,g.toString(t))}setLimit(e,t,n,s){return new r({...this._def,checks:[...this._def.checks,{kind:e,value:t,inclusive:n,message:g.toString(s)}]})}_addCheck(e){return new r({...this._def,checks:[...this._def.checks,e]})}positive(e){return this._addCheck({kind:"min",value:BigInt(0),inclusive:!1,message:g.toString(e)})}negative(e){return this._addCheck({kind:"max",value:BigInt(0),inclusive:!1,message:g.toString(e)})}nonpositive(e){return this._addCheck({kind:"max",value:BigInt(0),inclusive:!0,message:g.toString(e)})}nonnegative(e){return this._addCheck({kind:"min",value:BigInt(0),inclusive:!0,message:g.toString(e)})}multipleOf(e,t){return this._addCheck({kind:"multipleOf",value:e,message:g.toString(t)})}get minValue(){let e=null;for(let t of this._def.checks)t.kind==="min"&&(e===null||t.value>e)&&(e=t.value);return e}get maxValue(){let e=null;for(let t of this._def.checks)t.kind==="max"&&(e===null||t.value<e)&&(e=t.value);return e}};te.create=r=>new te({checks:[],typeName:y.ZodBigInt,coerce:r?.coerce??!1,...E(r)});var ne=class extends _{_parse(e){if(this._def.coerce&&(e.data=!!e.data),this._getType(e)!==p.boolean){let n=this._getOrReturnCtx(e);return m(n,{code:h.invalid_type,expected:p.boolean,received:n.parsedType}),f}return O(e.data)}};ne.create=r=>new ne({typeName:y.ZodBoolean,coerce:r?.coerce||!1,...E(r)});var se=class r extends _{_parse(e){if(this._def.coerce&&(e.data=new Date(e.data)),this._getType(e)!==p.date){let a=this._getOrReturnCtx(e);return m(a,{code:h.invalid_type,expected:p.date,received:a.parsedType}),f}if(Number.isNaN(e.data.getTime())){let a=this._getOrReturnCtx(e);return m(a,{code:h.invalid_date}),f}let n=new I,s;for(let a of this._def.checks)a.kind==="min"?e.data.getTime()<a.value&&(s=this._getOrReturnCtx(e,s),m(s,{code:h.too_small,message:a.message,inclusive:!0,exact:!1,minimum:a.value,type:"date"}),n.dirty()):a.kind==="max"?e.data.getTime()>a.value&&(s=this._getOrReturnCtx(e,s),m(s,{code:h.too_big,message:a.message,inclusive:!0,exact:!1,maximum:a.value,type:"date"}),n.dirty()):N.assertNever(a);return{status:n.value,value:new Date(e.data.getTime())}}_addCheck(e){return new r({...this._def,checks:[...this._def.checks,e]})}min(e,t){return this._addCheck({kind:"min",value:e.getTime(),message:g.toString(t)})}max(e,t){return this._addCheck({kind:"max",value:e.getTime(),message:g.toString(t)})}get minDate(){let e=null;for(let t of this._def.checks)t.kind==="min"&&(e===null||t.value>e)&&(e=t.value);return e!=null?new Date(e):null}get maxDate(){let e=null;for(let t of this._def.checks)t.kind==="max"&&(e===null||t.value<e)&&(e=t.value);return e!=null?new Date(e):null}};se.create=r=>new se({checks:[],coerce:r?.coerce||!1,typeName:y.ZodDate,...E(r)});var Te=class extends _{_parse(e){if(this._getType(e)!==p.symbol){let n=this._getOrReturnCtx(e);return m(n,{code:h.invalid_type,expected:p.symbol,received:n.parsedType}),f}return O(e.data)}};Te.create=r=>new Te({typeName:y.ZodSymbol,...E(r)});var ae=class extends _{_parse(e){if(this._getType(e)!==p.undefined){let n=this._getOrReturnCtx(e);return m(n,{code:h.invalid_type,expected:p.undefined,received:n.parsedType}),f}return O(e.data)}};ae.create=r=>new ae({typeName:y.ZodUndefined,...E(r)});var re=class extends _{_parse(e){if(this._getType(e)!==p.null){let n=this._getOrReturnCtx(e);return m(n,{code:h.invalid_type,expected:p.null,received:n.parsedType}),f}return O(e.data)}};re.create=r=>new re({typeName:y.ZodNull,...E(r)});var Y=class extends _{constructor(){super(...arguments),this._any=!0}_parse(e){return O(e.data)}};Y.create=r=>new Y({typeName:y.ZodAny,...E(r)});var K=class extends _{constructor(){super(...arguments),this._unknown=!0}_parse(e){return O(e.data)}};K.create=r=>new K({typeName:y.ZodUnknown,...E(r)});var $=class extends _{_parse(e){let t=this._getOrReturnCtx(e);return m(t,{code:h.invalid_type,expected:p.never,received:t.parsedType}),f}};$.create=r=>new $({typeName:y.ZodNever,...E(r)});var Ee=class extends _{_parse(e){if(this._getType(e)!==p.undefined){let n=this._getOrReturnCtx(e);return m(n,{code:h.invalid_type,expected:p.void,received:n.parsedType}),f}return O(e.data)}};Ee.create=r=>new Ee({typeName:y.ZodVoid,...E(r)});var G=class r extends _{_parse(e){let{ctx:t,status:n}=this._processInputParams(e),s=this._def;if(t.parsedType!==p.array)return m(t,{code:h.invalid_type,expected:p.array,received:t.parsedType}),f;if(s.exactLength!==null){let i=t.data.length>s.exactLength.value,o=t.data.length<s.exactLength.value;(i||o)&&(m(t,{code:i?h.too_big:h.too_small,minimum:o?s.exactLength.value:void 0,maximum:i?s.exactLength.value:void 0,type:"array",inclusive:!0,exact:!0,message:s.exactLength.message}),n.dirty())}if(s.minLength!==null&&t.data.length<s.minLength.value&&(m(t,{code:h.too_small,minimum:s.minLength.value,type:"array",inclusive:!0,exact:!1,message:s.minLength.message}),n.dirty()),s.maxLength!==null&&t.data.length>s.maxLength.value&&(m(t,{code:h.too_big,maximum:s.maxLength.value,type:"array",inclusive:!0,exact:!1,message:s.maxLength.message}),n.dirty()),t.common.async)return Promise.all([...t.data].map((i,o)=>s.type._parseAsync(new k(t,i,t.path,o)))).then(i=>I.mergeArray(n,i));let a=[...t.data].map((i,o)=>s.type._parseSync(new k(t,i,t.path,o)));return I.mergeArray(n,a)}get element(){return this._def.type}min(e,t){return new r({...this._def,minLength:{value:e,message:g.toString(t)}})}max(e,t){return new r({...this._def,maxLength:{value:e,message:g.toString(t)}})}length(e,t){return new r({...this._def,exactLength:{value:e,message:g.toString(t)}})}nonempty(e){return this.min(1,e)}};G.create=(r,e)=>new G({type:r,minLength:null,maxLength:null,exactLength:null,typeName:y.ZodArray,...E(e)});function ye(r){if(r instanceof R){let e={};for(let t in r.shape){let n=r.shape[t];e[t]=L.create(ye(n))}return new R({...r._def,shape:()=>e})}else return r instanceof G?new G({...r._def,type:ye(r.element)}):r instanceof L?L.create(ye(r.unwrap())):r instanceof U?U.create(ye(r.unwrap())):r instanceof H?H.create(r.items.map(e=>ye(e))):r}var R=class r extends _{constructor(){super(...arguments),this._cached=null,this.nonstrict=this.passthrough,this.augment=this.extend}_getCached(){if(this._cached!==null)return this._cached;let e=this._def.shape(),t=N.objectKeys(e);return this._cached={shape:e,keys:t},this._cached}_parse(e){if(this._getType(e)!==p.object){let u=this._getOrReturnCtx(e);return m(u,{code:h.invalid_type,expected:p.object,received:u.parsedType}),f}let{status:n,ctx:s}=this._processInputParams(e),{shape:a,keys:i}=this._getCached(),o=[];if(!(this._def.catchall instanceof $&&this._def.unknownKeys==="strip"))for(let u in s.data)i.includes(u)||o.push(u);let d=[];for(let u of i){let l=a[u],T=s.data[u];d.push({key:{status:"valid",value:u},value:l._parse(new k(s,T,s.path,u)),alwaysSet:u in s.data})}if(this._def.catchall instanceof $){let u=this._def.unknownKeys;if(u==="passthrough")for(let l of o)d.push({key:{status:"valid",value:l},value:{status:"valid",value:s.data[l]}});else if(u==="strict")o.length>0&&(m(s,{code:h.unrecognized_keys,keys:o}),n.dirty());else if(u!=="strip")throw new Error("Internal ZodObject error: invalid unknownKeys value.")}else{let u=this._def.catchall;for(let l of o){let T=s.data[l];d.push({key:{status:"valid",value:l},value:u._parse(new k(s,T,s.path,l)),alwaysSet:l in s.data})}}return s.common.async?Promise.resolve().then(async()=>{let u=[];for(let l of d){let T=await l.key,v=await l.value;u.push({key:T,value:v,alwaysSet:l.alwaysSet})}return u}).then(u=>I.mergeObjectSync(n,u)):I.mergeObjectSync(n,d)}get shape(){return this._def.shape()}strict(e){return g.errToObj,new r({...this._def,unknownKeys:"strict",...e!==void 0?{errorMap:(t,n)=>{let s=this._def.errorMap?.(t,n).message??n.defaultError;return t.code==="unrecognized_keys"?{message:g.errToObj(e).message??s}:{message:s}}}:{}})}strip(){return new r({...this._def,unknownKeys:"strip"})}passthrough(){return new r({...this._def,unknownKeys:"passthrough"})}extend(e){return new r({...this._def,shape:()=>({...this._def.shape(),...e})})}merge(e){return new r({unknownKeys:e._def.unknownKeys,catchall:e._def.catchall,shape:()=>({...this._def.shape(),...e._def.shape()}),typeName:y.ZodObject})}setKey(e,t){return this.augment({[e]:t})}catchall(e){return new r({...this._def,catchall:e})}pick(e){let t={};for(let n of N.objectKeys(e))e[n]&&this.shape[n]&&(t[n]=this.shape[n]);return new r({...this._def,shape:()=>t})}omit(e){let t={};for(let n of N.objectKeys(this.shape))e[n]||(t[n]=this.shape[n]);return new r({...this._def,shape:()=>t})}deepPartial(){return ye(this)}partial(e){let t={};for(let n of N.objectKeys(this.shape)){let s=this.shape[n];e&&!e[n]?t[n]=s:t[n]=s.optional()}return new r({...this._def,shape:()=>t})}required(e){let t={};for(let n of N.objectKeys(this.shape))if(e&&!e[n])t[n]=this.shape[n];else{let a=this.shape[n];for(;a instanceof L;)a=a._def.innerType;t[n]=a}return new r({...this._def,shape:()=>t})}keyof(){return Nt(N.objectKeys(this.shape))}};R.create=(r,e)=>new R({shape:()=>r,unknownKeys:"strip",catchall:$.create(),typeName:y.ZodObject,...E(e)});R.strictCreate=(r,e)=>new R({shape:()=>r,unknownKeys:"strict",catchall:$.create(),typeName:y.ZodObject,...E(e)});R.lazycreate=(r,e)=>new R({shape:r,unknownKeys:"strip",catchall:$.create(),typeName:y.ZodObject,...E(e)});var ie=class extends _{_parse(e){let{ctx:t}=this._processInputParams(e),n=this._def.options;function s(a){for(let o of a)if(o.result.status==="valid")return o.result;for(let o of a)if(o.result.status==="dirty")return t.common.issues.push(...o.ctx.common.issues),o.result;let i=a.map(o=>new A(o.ctx.common.issues));return m(t,{code:h.invalid_union,unionErrors:i}),f}if(t.common.async)return Promise.all(n.map(async a=>{let i={...t,common:{...t.common,issues:[]},parent:null};return{result:await a._parseAsync({data:t.data,path:t.path,parent:i}),ctx:i}})).then(s);{let a,i=[];for(let d of n){let u={...t,common:{...t.common,issues:[]},parent:null},l=d._parseSync({data:t.data,path:t.path,parent:u});if(l.status==="valid")return l;l.status==="dirty"&&!a&&(a={result:l,ctx:u}),u.common.issues.length&&i.push(u.common.issues)}if(a)return t.common.issues.push(...a.ctx.common.issues),a.result;let o=i.map(d=>new A(d));return m(t,{code:h.invalid_union,unionErrors:o}),f}}get options(){return this._def.options}};ie.create=(r,e)=>new ie({options:r,typeName:y.ZodUnion,...E(e)});var W=r=>r instanceof ce?W(r.schema):r instanceof P?W(r.innerType()):r instanceof ue?[r.value]:r instanceof de?r.options:r instanceof le?N.objectValues(r.enum):r instanceof he?W(r._def.innerType):r instanceof ae?[void 0]:r instanceof re?[null]:r instanceof L?[void 0,...W(r.unwrap())]:r instanceof U?[null,...W(r.unwrap())]:r instanceof Ie||r instanceof pe?W(r.unwrap()):r instanceof me?W(r._def.innerType):[],Ce=class r extends _{_parse(e){let{ctx:t}=this._processInputParams(e);if(t.parsedType!==p.object)return m(t,{code:h.invalid_type,expected:p.object,received:t.parsedType}),f;let n=this.discriminator,s=t.data[n],a=this.optionsMap.get(s);return a?t.common.async?a._parseAsync({data:t.data,path:t.path,parent:t}):a._parseSync({data:t.data,path:t.path,parent:t}):(m(t,{code:h.invalid_union_discriminator,options:Array.from(this.optionsMap.keys()),path:[n]}),f)}get discriminator(){return this._def.discriminator}get options(){return this._def.options}get optionsMap(){return this._def.optionsMap}static create(e,t,n){let s=new Map;for(let a of t){let i=W(a.shape[e]);if(!i.length)throw new Error(`A discriminator value for key \`${e}\` could not be extracted from all schema options`);for(let o of i){if(s.has(o))throw new Error(`Discriminator property ${String(e)} has duplicate value ${String(o)}`);s.set(o,a)}}return new r({typeName:y.ZodDiscriminatedUnion,discriminator:e,options:t,optionsMap:s,...E(n)})}};function nt(r,e){let t=B(r),n=B(e);if(r===e)return{valid:!0,data:r};if(t===p.object&&n===p.object){let s=N.objectKeys(e),a=N.objectKeys(r).filter(o=>s.indexOf(o)!==-1),i={...r,...e};for(let o of a){let d=nt(r[o],e[o]);if(!d.valid)return{valid:!1};i[o]=d.data}return{valid:!0,data:i}}else if(t===p.array&&n===p.array){if(r.length!==e.length)return{valid:!1};let s=[];for(let a=0;a<r.length;a++){let i=r[a],o=e[a],d=nt(i,o);if(!d.valid)return{valid:!1};s.push(d.data)}return{valid:!0,data:s}}else return t===p.date&&n===p.date&&+r==+e?{valid:!0,data:r}:{valid:!1}}var oe=class extends _{_parse(e){let{status:t,ctx:n}=this._processInputParams(e),s=(a,i)=>{if(Re(a)||Re(i))return f;let o=nt(a.value,i.value);return o.valid?((Ze(a)||Ze(i))&&t.dirty(),{status:t.value,value:o.data}):(m(n,{code:h.invalid_intersection_types}),f)};return n.common.async?Promise.all([this._def.left._parseAsync({data:n.data,path:n.path,parent:n}),this._def.right._parseAsync({data:n.data,path:n.path,parent:n})]).then(([a,i])=>s(a,i)):s(this._def.left._parseSync({data:n.data,path:n.path,parent:n}),this._def.right._parseSync({data:n.data,path:n.path,parent:n}))}};oe.create=(r,e,t)=>new oe({left:r,right:e,typeName:y.ZodIntersection,...E(t)});var H=class r extends _{_parse(e){let{status:t,ctx:n}=this._processInputParams(e);if(n.parsedType!==p.array)return m(n,{code:h.invalid_type,expected:p.array,received:n.parsedType}),f;if(n.data.length<this._def.items.length)return m(n,{code:h.too_small,minimum:this._def.items.length,inclusive:!0,exact:!1,type:"array"}),f;!this._def.rest&&n.data.length>this._def.items.length&&(m(n,{code:h.too_big,maximum:this._def.items.length,inclusive:!0,exact:!1,type:"array"}),t.dirty());let a=[...n.data].map((i,o)=>{let d=this._def.items[o]||this._def.rest;return d?d._parse(new k(n,i,n.path,o)):null}).filter(i=>!!i);return n.common.async?Promise.all(a).then(i=>I.mergeArray(t,i)):I.mergeArray(t,a)}get items(){return this._def.items}rest(e){return new r({...this._def,rest:e})}};H.create=(r,e)=>{if(!Array.isArray(r))throw new Error("You must pass an array of schemas to z.tuple([ ... ])");return new H({items:r,typeName:y.ZodTuple,rest:null,...E(e)})};var De=class r extends _{get keySchema(){return this._def.keyType}get valueSchema(){return this._def.valueType}_parse(e){let{status:t,ctx:n}=this._processInputParams(e);if(n.parsedType!==p.object)return m(n,{code:h.invalid_type,expected:p.object,received:n.parsedType}),f;let s=[],a=this._def.keyType,i=this._def.valueType;for(let o in n.data)s.push({key:a._parse(new k(n,o,n.path,o)),value:i._parse(new k(n,n.data[o],n.path,o)),alwaysSet:o in n.data});return n.common.async?I.mergeObjectAsync(t,s):I.mergeObjectSync(t,s)}get element(){return this._def.valueType}static create(e,t,n){return t instanceof _?new r({keyType:e,valueType:t,typeName:y.ZodRecord,...E(n)}):new r({keyType:X.create(),valueType:e,typeName:y.ZodRecord,...E(t)})}},be=class extends _{get keySchema(){return this._def.keyType}get valueSchema(){return this._def.valueType}_parse(e){let{status:t,ctx:n}=this._processInputParams(e);if(n.parsedType!==p.map)return m(n,{code:h.invalid_type,expected:p.map,received:n.parsedType}),f;let s=this._def.keyType,a=this._def.valueType,i=[...n.data.entries()].map(([o,d],u)=>({key:s._parse(new k(n,o,n.path,[u,"key"])),value:a._parse(new k(n,d,n.path,[u,"value"]))}));if(n.common.async){let o=new Map;return Promise.resolve().then(async()=>{for(let d of i){let u=await d.key,l=await d.value;if(u.status==="aborted"||l.status==="aborted")return f;(u.status==="dirty"||l.status==="dirty")&&t.dirty(),o.set(u.value,l.value)}return{status:t.value,value:o}})}else{let o=new Map;for(let d of i){let u=d.key,l=d.value;if(u.status==="aborted"||l.status==="aborted")return f;(u.status==="dirty"||l.status==="dirty")&&t.dirty(),o.set(u.value,l.value)}return{status:t.value,value:o}}}};be.create=(r,e,t)=>new be({valueType:e,keyType:r,typeName:y.ZodMap,...E(t)});var _e=class r extends _{_parse(e){let{status:t,ctx:n}=this._processInputParams(e);if(n.parsedType!==p.set)return m(n,{code:h.invalid_type,expected:p.set,received:n.parsedType}),f;let s=this._def;s.minSize!==null&&n.data.size<s.minSize.value&&(m(n,{code:h.too_small,minimum:s.minSize.value,type:"set",inclusive:!0,exact:!1,message:s.minSize.message}),t.dirty()),s.maxSize!==null&&n.data.size>s.maxSize.value&&(m(n,{code:h.too_big,maximum:s.maxSize.value,type:"set",inclusive:!0,exact:!1,message:s.maxSize.message}),t.dirty());let a=this._def.valueType;function i(d){let u=new Set;for(let l of d){if(l.status==="aborted")return f;l.status==="dirty"&&t.dirty(),u.add(l.value)}return{status:t.value,value:u}}let o=[...n.data.values()].map((d,u)=>a._parse(new k(n,d,n.path,u)));return n.common.async?Promise.all(o).then(d=>i(d)):i(o)}min(e,t){return new r({...this._def,minSize:{value:e,message:g.toString(t)}})}max(e,t){return new r({...this._def,maxSize:{value:e,message:g.toString(t)}})}size(e,t){return this.min(e,t).max(e,t)}nonempty(e){return this.min(1,e)}};_e.create=(r,e)=>new _e({valueType:r,minSize:null,maxSize:null,typeName:y.ZodSet,...E(e)});var Le=class r extends _{constructor(){super(...arguments),this.validate=this.implement}_parse(e){let{ctx:t}=this._processInputParams(e);if(t.parsedType!==p.function)return m(t,{code:h.invalid_type,expected:p.function,received:t.parsedType}),f;function n(o,d){return Se({data:o,path:t.path,errorMaps:[t.common.contextualErrorMap,t.schemaErrorMap,ge(),q].filter(u=>!!u),issueData:{code:h.invalid_arguments,argumentsError:d}})}function s(o,d){return Se({data:o,path:t.path,errorMaps:[t.common.contextualErrorMap,t.schemaErrorMap,ge(),q].filter(u=>!!u),issueData:{code:h.invalid_return_type,returnTypeError:d}})}let a={errorMap:t.common.contextualErrorMap},i=t.data;if(this._def.returns instanceof J){let o=this;return O(async function(...d){let u=new A([]),l=await o._def.args.parseAsync(d,a).catch(b=>{throw u.addIssue(n(d,b)),u}),T=await Reflect.apply(i,this,l);return await o._def.returns._def.type.parseAsync(T,a).catch(b=>{throw u.addIssue(s(T,b)),u})})}else{let o=this;return O(function(...d){let u=o._def.args.safeParse(d,a);if(!u.success)throw new A([n(d,u.error)]);let l=Reflect.apply(i,this,u.data),T=o._def.returns.safeParse(l,a);if(!T.success)throw new A([s(l,T.error)]);return T.data})}}parameters(){return this._def.args}returnType(){return this._def.returns}args(...e){return new r({...this._def,args:H.create(e).rest(K.create())})}returns(e){return new r({...this._def,returns:e})}implement(e){return this.parse(e)}strictImplement(e){return this.parse(e)}static create(e,t,n){return new r({args:e||H.create([]).rest(K.create()),returns:t||K.create(),typeName:y.ZodFunction,...E(n)})}},ce=class extends _{get schema(){return this._def.getter()}_parse(e){let{ctx:t}=this._processInputParams(e);return this._def.getter()._parse({data:t.data,path:t.path,parent:t})}};ce.create=(r,e)=>new ce({getter:r,typeName:y.ZodLazy,...E(e)});var ue=class extends _{_parse(e){if(e.data!==this._def.value){let t=this._getOrReturnCtx(e);return m(t,{received:t.data,code:h.invalid_literal,expected:this._def.value}),f}return{status:"valid",value:e.data}}get value(){return this._def.value}};ue.create=(r,e)=>new ue({value:r,typeName:y.ZodLiteral,...E(e)});function Nt(r,e){return new de({values:r,typeName:y.ZodEnum,...E(e)})}var de=class r extends _{_parse(e){if(typeof e.data!="string"){let t=this._getOrReturnCtx(e),n=this._def.values;return m(t,{expected:N.joinValues(n),received:t.parsedType,code:h.invalid_type}),f}if(this._cache||(this._cache=new Set(this._def.values)),!this._cache.has(e.data)){let t=this._getOrReturnCtx(e),n=this._def.values;return m(t,{received:t.data,code:h.invalid_enum_value,options:n}),f}return O(e.data)}get options(){return this._def.values}get enum(){let e={};for(let t of this._def.values)e[t]=t;return e}get Values(){let e={};for(let t of this._def.values)e[t]=t;return e}get Enum(){let e={};for(let t of this._def.values)e[t]=t;return e}extract(e,t=this._def){return r.create(e,{...this._def,...t})}exclude(e,t=this._def){return r.create(this.options.filter(n=>!e.includes(n)),{...this._def,...t})}};de.create=Nt;var le=class extends _{_parse(e){let t=N.getValidEnumValues(this._def.values),n=this._getOrReturnCtx(e);if(n.parsedType!==p.string&&n.parsedType!==p.number){let s=N.objectValues(t);return m(n,{expected:N.joinValues(s),received:n.parsedType,code:h.invalid_type}),f}if(this._cache||(this._cache=new Set(N.getValidEnumValues(this._def.values))),!this._cache.has(e.data)){let s=N.objectValues(t);return m(n,{received:n.data,code:h.invalid_enum_value,options:s}),f}return O(e.data)}get enum(){return this._def.values}};le.create=(r,e)=>new le({values:r,typeName:y.ZodNativeEnum,...E(e)});var J=class extends _{unwrap(){return this._def.type}_parse(e){let{ctx:t}=this._processInputParams(e);if(t.parsedType!==p.promise&&t.common.async===!1)return m(t,{code:h.invalid_type,expected:p.promise,received:t.parsedType}),f;let n=t.parsedType===p.promise?t.data:Promise.resolve(t.data);return O(n.then(s=>this._def.type.parseAsync(s,{path:t.path,errorMap:t.common.contextualErrorMap})))}};J.create=(r,e)=>new J({type:r,typeName:y.ZodPromise,...E(e)});var P=class extends _{innerType(){return this._def.schema}sourceType(){return this._def.schema._def.typeName===y.ZodEffects?this._def.schema.sourceType():this._def.schema}_parse(e){let{status:t,ctx:n}=this._processInputParams(e),s=this._def.effect||null,a={addIssue:i=>{m(n,i),i.fatal?t.abort():t.dirty()},get path(){return n.path}};if(a.addIssue=a.addIssue.bind(a),s.type==="preprocess"){let i=s.transform(n.data,a);if(n.common.async)return Promise.resolve(i).then(async o=>{if(t.value==="aborted")return f;let d=await this._def.schema._parseAsync({data:o,path:n.path,parent:n});return d.status==="aborted"?f:d.status==="dirty"?Q(d.value):t.value==="dirty"?Q(d.value):d});{if(t.value==="aborted")return f;let o=this._def.schema._parseSync({data:i,path:n.path,parent:n});return o.status==="aborted"?f:o.status==="dirty"?Q(o.value):t.value==="dirty"?Q(o.value):o}}if(s.type==="refinement"){let i=o=>{let d=s.refinement(o,a);if(n.common.async)return Promise.resolve(d);if(d instanceof Promise)throw new Error("Async refinement encountered during synchronous parse operation. Use .parseAsync instead.");return o};if(n.common.async===!1){let o=this._def.schema._parseSync({data:n.data,path:n.path,parent:n});return o.status==="aborted"?f:(o.status==="dirty"&&t.dirty(),i(o.value),{status:t.value,value:o.value})}else return this._def.schema._parseAsync({data:n.data,path:n.path,parent:n}).then(o=>o.status==="aborted"?f:(o.status==="dirty"&&t.dirty(),i(o.value).then(()=>({status:t.value,value:o.value}))))}if(s.type==="transform")if(n.common.async===!1){let i=this._def.schema._parseSync({data:n.data,path:n.path,parent:n});if(!V(i))return f;let o=s.transform(i.value,a);if(o instanceof Promise)throw new Error("Asynchronous transform encountered during synchronous parse operation. Use .parseAsync instead.");return{status:t.value,value:o}}else return this._def.schema._parseAsync({data:n.data,path:n.path,parent:n}).then(i=>V(i)?Promise.resolve(s.transform(i.value,a)).then(o=>({status:t.value,value:o})):f);N.assertNever(s)}};P.create=(r,e,t)=>new P({schema:r,typeName:y.ZodEffects,effect:e,...E(t)});P.createWithPreprocess=(r,e,t)=>new P({schema:e,effect:{type:"preprocess",transform:r},typeName:y.ZodEffects,...E(t)});var L=class extends _{_parse(e){return this._getType(e)===p.undefined?O(void 0):this._def.innerType._parse(e)}unwrap(){return this._def.innerType}};L.create=(r,e)=>new L({innerType:r,typeName:y.ZodOptional,...E(e)});var U=class extends _{_parse(e){return this._getType(e)===p.null?O(null):this._def.innerType._parse(e)}unwrap(){return this._def.innerType}};U.create=(r,e)=>new U({innerType:r,typeName:y.ZodNullable,...E(e)});var he=class extends _{_parse(e){let{ctx:t}=this._processInputParams(e),n=t.data;return t.parsedType===p.undefined&&(n=this._def.defaultValue()),this._def.innerType._parse({data:n,path:t.path,parent:t})}removeDefault(){return this._def.innerType}};he.create=(r,e)=>new he({innerType:r,typeName:y.ZodDefault,defaultValue:typeof e.default=="function"?e.default:()=>e.default,...E(e)});var me=class extends _{_parse(e){let{ctx:t}=this._processInputParams(e),n={...t,common:{...t.common,issues:[]}},s=this._def.innerType._parse({data:n.data,path:n.path,parent:{...n}});return fe(s)?s.then(a=>({status:"valid",value:a.status==="valid"?a.value:this._def.catchValue({get error(){return new A(n.common.issues)},input:n.data})})):{status:"valid",value:s.status==="valid"?s.value:this._def.catchValue({get error(){return new A(n.common.issues)},input:n.data})}}removeCatch(){return this._def.innerType}};me.create=(r,e)=>new me({innerType:r,typeName:y.ZodCatch,catchValue:typeof e.catch=="function"?e.catch:()=>e.catch,...E(e)});var Ne=class extends _{_parse(e){if(this._getType(e)!==p.nan){let n=this._getOrReturnCtx(e);return m(n,{code:h.invalid_type,expected:p.nan,received:n.parsedType}),f}return{status:"valid",value:e.data}}};Ne.create=r=>new Ne({typeName:y.ZodNaN,...E(r)});var vn=Symbol("zod_brand"),Ie=class extends _{_parse(e){let{ctx:t}=this._processInputParams(e),n=t.data;return this._def.type._parse({data:n,path:t.path,parent:t})}unwrap(){return this._def.type}},we=class r extends _{_parse(e){let{status:t,ctx:n}=this._processInputParams(e);if(n.common.async)return(async()=>{let a=await this._def.in._parseAsync({data:n.data,path:n.path,parent:n});return a.status==="aborted"?f:a.status==="dirty"?(t.dirty(),Q(a.value)):this._def.out._parseAsync({data:a.value,path:n.path,parent:n})})();{let s=this._def.in._parseSync({data:n.data,path:n.path,parent:n});return s.status==="aborted"?f:s.status==="dirty"?(t.dirty(),{status:"dirty",value:s.value}):this._def.out._parseSync({data:s.value,path:n.path,parent:n})}}static create(e,t){return new r({in:e,out:t,typeName:y.ZodPipeline})}},pe=class extends _{_parse(e){let t=this._def.innerType._parse(e),n=s=>(V(s)&&(s.value=Object.freeze(s.value)),s);return fe(t)?t.then(s=>n(s)):n(t)}unwrap(){return this._def.innerType}};pe.create=(r,e)=>new pe({innerType:r,typeName:y.ZodReadonly,...E(e)});function Tt(r,e){let t=typeof r=="function"?r(e):typeof r=="string"?{message:r}:r;return typeof t=="string"?{message:t}:t}function xt(r,e={},t){return r?Y.create().superRefine((n,s)=>{let a=r(n);if(a instanceof Promise)return a.then(i=>{if(!i){let o=Tt(e,n),d=o.fatal??t??!0;s.addIssue({code:"custom",...o,fatal:d})}});if(!a){let i=Tt(e,n),o=i.fatal??t??!0;s.addIssue({code:"custom",...i,fatal:o})}}):Y.create()}var Sn={object:R.lazycreate},y;(function(r){r.ZodString="ZodString",r.ZodNumber="ZodNumber",r.ZodNaN="ZodNaN",r.ZodBigInt="ZodBigInt",r.ZodBoolean="ZodBoolean",r.ZodDate="ZodDate",r.ZodSymbol="ZodSymbol",r.ZodUndefined="ZodUndefined",r.ZodNull="ZodNull",r.ZodAny="ZodAny",r.ZodUnknown="ZodUnknown",r.ZodNever="ZodNever",r.ZodVoid="ZodVoid",r.ZodArray="ZodArray",r.ZodObject="ZodObject",r.ZodUnion="ZodUnion",r.ZodDiscriminatedUnion="ZodDiscriminatedUnion",r.ZodIntersection="ZodIntersection",r.ZodTuple="ZodTuple",r.ZodRecord="ZodRecord",r.ZodMap="ZodMap",r.ZodSet="ZodSet",r.ZodFunction="ZodFunction",r.ZodLazy="ZodLazy",r.ZodLiteral="ZodLiteral",r.ZodEnum="ZodEnum",r.ZodEffects="ZodEffects",r.ZodNativeEnum="ZodNativeEnum",r.ZodOptional="ZodOptional",r.ZodNullable="ZodNullable",r.ZodDefault="ZodDefault",r.ZodCatch="ZodCatch",r.ZodPromise="ZodPromise",r.ZodBranded="ZodBranded",r.ZodPipeline="ZodPipeline",r.ZodReadonly="ZodReadonly"})(y||(y={}));var In=(r,e={message:`Input not instance of ${r.name}`})=>xt(t=>t instanceof r,e),vt=X.create,St=ee.create,wn=Ne.create,On=te.create,It=ne.create,An=se.create,Rn=Te.create,Zn=ae.create,Cn=re.create,Dn=Y.create,Ln=K.create,kn=$.create,Pn=Ee.create,Mn=G.create,$n=R.create,Fn=R.strictCreate,jn=ie.create,Bn=Ce.create,Hn=oe.create,Un=H.create,qn=De.create,Wn=be.create,Kn=_e.create,Gn=Le.create,zn=ce.create,Vn=ue.create,Xn=de.create,Yn=le.create,Jn=J.create,Qn=P.create,es=L.create,ts=U.create,ns=P.createWithPreprocess,ss=we.create,as=()=>vt().optional(),rs=()=>St().optional(),is=()=>It().optional(),os={string:r=>X.create({...r,coerce:!0}),number:r=>ee.create({...r,coerce:!0}),boolean:r=>ne.create({...r,coerce:!0}),bigint:r=>te.create({...r,coerce:!0}),date:r=>se.create({...r,coerce:!0})};var cs=f;var st="2024-11-05",wt=[st,"2024-10-07"],ke="2.0",Ot=c.union([c.string(),c.number().int()]),At=c.string(),F=c.object({_meta:c.optional(c.object({progressToken:c.optional(Ot)}).passthrough())}).passthrough(),D=c.object({method:c.string(),params:c.optional(F)}),z=c.object({method:c.string(),params:c.optional(c.object({_meta:c.optional(c.object({}).passthrough())}).passthrough())}),j=c.object({_meta:c.optional(c.object({}).passthrough())}).passthrough(),at=c.union([c.string(),c.number().int()]),us=c.object({jsonrpc:c.literal(ke),id:at}).merge(D).strict(),ds=c.object({jsonrpc:c.literal(ke)}).merge(z).strict(),ls=c.object({jsonrpc:c.literal(ke),id:at,result:j}).strict(),xe;(function(r){r[r.ConnectionClosed=-1]="ConnectionClosed",r[r.ParseError=-32700]="ParseError",r[r.InvalidRequest=-32600]="InvalidRequest",r[r.MethodNotFound=-32601]="MethodNotFound",r[r.InvalidParams=-32602]="InvalidParams",r[r.InternalError=-32603]="InternalError"})(xe||(xe={}));var hs=c.object({jsonrpc:c.literal(ke),id:at,error:c.object({code:c.number().int(),message:c.string(),data:c.optional(c.unknown())})}).strict(),Rt=c.union([us,ds,ls,hs]),Pe=j.strict(),Zt=c.object({name:c.string(),version:c.string()}).passthrough(),ms=c.object({experimental:c.optional(c.object({}).passthrough()),sampling:c.optional(c.object({}).passthrough()),roots:c.optional(c.object({listChanged:c.optional(c.boolean())}).passthrough())}).passthrough(),rt=D.extend({method:c.literal("initialize"),params:F.extend({protocolVersion:c.string(),capabilities:ms,clientInfo:Zt})}),ps=c.object({experimental:c.optional(c.object({}).passthrough()),logging:c.optional(c.object({}).passthrough()),prompts:c.optional(c.object({listChanged:c.optional(c.boolean())}).passthrough()),resources:c.optional(c.object({subscribe:c.optional(c.boolean()),listChanged:c.optional(c.boolean())}).passthrough()),tools:c.optional(c.object({listChanged:c.optional(c.boolean())}).passthrough())}).passthrough(),gs=j.extend({protocolVersion:c.string(),capabilities:ps,serverInfo:Zt}),it=z.extend({method:c.literal("notifications/initialized")}),Me=D.extend({method:c.literal("ping")}),fs=c.object({progress:c.number(),total:c.optional(c.number())}).passthrough(),$e=z.extend({method:c.literal("notifications/progress"),params:fs.extend({progressToken:Ot})}),Fe=D.extend({params:F.extend({cursor:c.optional(At)}).optional()}),je=j.extend({nextCursor:c.optional(At)}),Ct=c.object({uri:c.string(),mimeType:c.optional(c.string())}).passthrough(),Dt=Ct.extend({text:c.string()}),Lt=Ct.extend({blob:c.string().base64()}),ys=c.object({uri:c.string(),name:c.string(),description:c.optional(c.string()),mimeType:c.optional(c.string())}).passthrough(),Ts=c.object({uriTemplate:c.string(),name:c.string(),description:c.optional(c.string()),mimeType:c.optional(c.string())}).passthrough(),ot=Fe.extend({method:c.literal("resources/list")}),Es=je.extend({resources:c.array(ys)}),bs=Fe.extend({method:c.literal("resources/templates/list")}),_s=je.extend({resourceTemplates:c.array(Ts)}),Ns=D.extend({method:c.literal("resources/read"),params:F.extend({uri:c.string()})}),xs=j.extend({contents:c.array(c.union([Dt,Lt]))}),vs=z.extend({method:c.literal("notifications/resources/list_changed")}),Ss=D.extend({method:c.literal("resources/subscribe"),params:F.extend({uri:c.string()})}),Is=D.extend({method:c.literal("resources/unsubscribe"),params:F.extend({uri:c.string()})}),ws=z.extend({method:c.literal("notifications/resources/updated"),params:c.object({uri:c.string()}).passthrough()}),Os=c.object({name:c.string(),description:c.optional(c.string()),required:c.optional(c.boolean())}).passthrough(),As=c.object({name:c.string(),description:c.optional(c.string()),arguments:c.optional(c.array(Os))}).passthrough(),ct=Fe.extend({method:c.literal("prompts/list")}),Rs=je.extend({prompts:c.array(As)}),Zs=D.extend({method:c.literal("prompts/get"),params:F.extend({name:c.string(),arguments:c.optional(c.record(c.string()))})}),Be=c.object({type:c.literal("text"),text:c.string()}).passthrough(),He=c.object({type:c.literal("image"),data:c.string().base64(),mimeType:c.string()}).passthrough(),kt=c.object({type:c.literal("resource"),resource:c.union([Dt,Lt])}).passthrough(),Cs=c.object({role:c.enum(["user","assistant"]),content:c.union([Be,He,kt])}).passthrough(),Ds=j.extend({description:c.optional(c.string()),messages:c.array(Cs)}),Ls=z.extend({method:c.literal("notifications/prompts/list_changed")}),ks=c.object({name:c.string(),description:c.optional(c.string()),inputSchema:c.object({type:c.literal("object"),properties:c.optional(c.object({}).passthrough())}).passthrough()}).passthrough(),Ae=Fe.extend({method:c.literal("tools/list")}),Ps=je.extend({tools:c.array(ks)}),Pt=j.extend({content:c.array(c.union([Be,He,kt])),isError:c.boolean().default(!1)}),Ra=Pt.or(j.extend({toolResult:c.unknown()})),ut=D.extend({method:c.literal("tools/call"),params:F.extend({name:c.string(),arguments:c.optional(c.record(c.unknown()))})}),Ms=z.extend({method:c.literal("notifications/tools/list_changed")}),Mt=c.enum(["debug","info","notice","warning","error","critical","alert","emergency"]),dt=D.extend({method:c.literal("logging/setLevel"),params:F.extend({level:Mt})}),$s=z.extend({method:c.literal("notifications/message"),params:c.object({level:Mt,logger:c.optional(c.string()),data:c.unknown()}).passthrough()}),Fs=c.object({name:c.string().optional()}).passthrough(),js=c.object({hints:c.optional(c.array(Fs)),costPriority:c.optional(c.number().min(0).max(1)),speedPriority:c.optional(c.number().min(0).max(1)),intelligencePriority:c.optional(c.number().min(0).max(1))}).passthrough(),Bs=c.object({role:c.enum(["user","assistant"]),content:c.union([Be,He])}).passthrough(),Hs=D.extend({method:c.literal("sampling/createMessage"),params:F.extend({messages:c.array(Bs),systemPrompt:c.optional(c.string()),includeContext:c.optional(c.enum(["none","thisServer","allServers"])),temperature:c.optional(c.number()),maxTokens:c.number().int(),stopSequences:c.optional(c.array(c.string())),metadata:c.optional(c.object({}).passthrough()),modelPreferences:c.optional(js)})}),lt=j.extend({model:c.string(),stopReason:c.optional(c.enum(["endTurn","stopSequence","maxTokens"]).or(c.string())),role:c.enum(["user","assistant"]),content:c.discriminatedUnion("type",[Be,He])}),Us=c.object({type:c.literal("ref/resource"),uri:c.string()}).passthrough(),qs=c.object({type:c.literal("ref/prompt"),name:c.string()}).passthrough(),Ws=D.extend({method:c.literal("completion/complete"),params:F.extend({ref:c.union([qs,Us]),argument:c.object({name:c.string(),value:c.string()}).passthrough()})}),Ks=j.extend({completion:c.object({values:c.array(c.string()).max(100),total:c.optional(c.number().int()),hasMore:c.optional(c.boolean())}).passthrough()}),Gs=c.object({uri:c.string().startsWith("file://"),name:c.optional(c.string())}).passthrough(),zs=D.extend({method:c.literal("roots/list")}),ht=j.extend({roots:c.array(Gs)}),Vs=z.extend({method:c.literal("notifications/roots/list_changed")}),Za=c.union([Me,rt,Ws,dt,Zs,ct,ot,bs,Ns,Ss,Is,ut,Ae]),Ca=c.union([$e,it,Vs]),Da=c.union([Pe,lt,ht]),La=c.union([Me,Hs,zs]),ka=c.union([$e,$s,ws,vs,Ms,Ls]),Pa=c.union([Pe,gs,Ks,Ds,Rs,Es,_s,xs,Pt,Ps]),Oe=class extends Error{constructor(e,t,n){super(`MCP error ${e}: ${t}`),this.code=e,this.data=n}};var Ue=class{constructor(){this._requestMessageId=0,this._requestHandlers=new Map,this._notificationHandlers=new Map,this._responseHandlers=new Map,this._progressHandlers=new Map,this.setNotificationHandler($e,e=>{this._onprogress(e)}),this.setRequestHandler(Me,e=>({}))}async connect(e){this._transport=e,this._transport.onclose=()=>{this._onclose()},this._transport.onerror=t=>{this._onerror(t)},this._transport.onmessage=t=>{"method"in t?"id"in t?this._onrequest(t):this._onnotification(t):this._onresponse(t)},await this._transport.start()}_onclose(){var e;let t=this._responseHandlers;this._responseHandlers=new Map,this._progressHandlers.clear(),this._transport=void 0,(e=this.onclose)===null||e===void 0||e.call(this);let n=new Oe(xe.ConnectionClosed,"Connection closed");for(let s of t.values())s(n)}_onerror(e){var t;(t=this.onerror)===null||t===void 0||t.call(this,e)}_onnotification(e){var t;let n=(t=this._notificationHandlers.get(e.method))!==null&&t!==void 0?t:this.fallbackNotificationHandler;n!==void 0&&n(e).catch(s=>this._onerror(new Error(`Uncaught error in notification handler: ${s}`)))}_onrequest(e){var t,n;let s=(t=this._requestHandlers.get(e.method))!==null&&t!==void 0?t:this.fallbackRequestHandler;if(s===void 0){(n=this._transport)===null||n===void 0||n.send({jsonrpc:"2.0",id:e.id,error:{code:xe.MethodNotFound,message:"Method not found"}}).catch(a=>this._onerror(new Error(`Failed to send an error response: ${a}`)));return}s(e).then(a=>{var i;(i=this._transport)===null||i===void 0||i.send({result:a,jsonrpc:"2.0",id:e.id})},a=>{var i,o;return(i=this._transport)===null||i===void 0?void 0:i.send({jsonrpc:"2.0",id:e.id,error:{code:Number.isSafeInteger(a.code)?a.code:xe.InternalError,message:(o=a.message)!==null&&o!==void 0?o:"Internal error"}})}).catch(a=>this._onerror(new Error(`Failed to send response: ${a}`)))}_onprogress(e){let{progress:t,total:n,progressToken:s}=e.params,a=this._progressHandlers.get(Number(s));if(a===void 0){this._onerror(new Error(`Received a progress notification for an unknown token: ${JSON.stringify(e)}`));return}a({progress:t,total:n})}_onresponse(e){let t=e.id,n=this._responseHandlers.get(Number(t));if(n===void 0){this._onerror(new Error(`Received a response for an unknown message ID: ${JSON.stringify(e)}`));return}if(this._responseHandlers.delete(Number(t)),this._progressHandlers.delete(Number(t)),"result"in e)n(e);else{let s=new Oe(e.error.code,e.error.message,e.error.data);n(s)}}get transport(){return this._transport}async close(){var e;await((e=this._transport)===null||e===void 0?void 0:e.close())}request(e,t,n){return new Promise((s,a)=>{if(!this._transport){a(new Error("Not connected"));return}let i=this._requestMessageId++,o={...e,jsonrpc:"2.0",id:i};n&&(this._progressHandlers.set(i,n),o.params={...e.params,_meta:{progressToken:i}}),this._responseHandlers.set(i,d=>{if(d instanceof Error)return a(d);try{let u=t.parse(d.result);s(u)}catch(u){a(u)}}),this._transport.send(o).catch(a)})}async notification(e){if(!this._transport)throw new Error("Not connected");let t={...e,jsonrpc:"2.0"};await this._transport.send(t)}setRequestHandler(e,t){this._requestHandlers.set(e.shape.method.value,n=>Promise.resolve(t(e.parse(n))))}removeRequestHandler(e){this._requestHandlers.delete(e)}setNotificationHandler(e,t){this._notificationHandlers.set(e.shape.method.value,n=>Promise.resolve(t(e.parse(n))))}removeNotificationHandler(e){this._notificationHandlers.delete(e)}};var qe=class extends Ue{constructor(e){super(),this._serverInfo=e,this.setRequestHandler(rt,t=>this._oninitialize(t)),this.setNotificationHandler(it,()=>{var t;return(t=this.oninitialized)===null||t===void 0?void 0:t.call(this)})}async _oninitialize(e){let t=e.params.protocolVersion;return this._clientCapabilities=e.params.capabilities,this._clientVersion=e.params.clientInfo,{protocolVersion:wt.includes(t)?t:st,capabilities:this.getCapabilities(),serverInfo:this._serverInfo}}getClientCapabilities(){return this._clientCapabilities}getClientVersion(){return this._clientVersion}getCapabilities(){return{prompts:this._requestHandlers.has(ct.shape.method.value)?{}:void 0,resources:this._requestHandlers.has(ot.shape.method.value)?{}:void 0,tools:this._requestHandlers.has(Ae.shape.method.value)?{}:void 0,logging:this._requestHandlers.has(dt.shape.method.value)?{}:void 0}}async ping(){return this.request({method:"ping"},Pe)}async createMessage(e,t){return this.request({method:"sampling/createMessage",params:e},lt,t)}async listRoots(e,t){return this.request({method:"roots/list",params:e},ht,t)}async sendLoggingMessage(e){return this.notification({method:"notifications/message",params:e})}async sendResourceUpdated(e){return this.notification({method:"notifications/resources/updated",params:e})}async sendResourceListChanged(){return this.notification({method:"notifications/resources/list_changed"})}async sendToolListChanged(){return this.notification({method:"notifications/tools/list_changed"})}async sendPromptListChanged(){return this.notification({method:"notifications/prompts/list_changed"})}};var mt=C(require("node:process"),1);var We=class{append(e){this._buffer=this._buffer?Buffer.concat([this._buffer,e]):e}readMessage(){if(!this._buffer)return null;let e=this._buffer.indexOf(`
-`);if(e===-1)return null;let t=this._buffer.toString("utf8",0,e);return this._buffer=this._buffer.subarray(e+1),Xs(t)}clear(){this._buffer=void 0}};function Xs(r){return Rt.parse(JSON.parse(r))}function $t(r){return JSON.stringify(r)+`
-`}var Ke=class{constructor(e=mt.default.stdin,t=mt.default.stdout){this._stdin=e,this._stdout=t,this._readBuffer=new We,this._started=!1,this._ondata=n=>{this._readBuffer.append(n),this.processReadBuffer()},this._onerror=n=>{var s;(s=this.onerror)===null||s===void 0||s.call(this,n)}}async start(){if(this._started)throw new Error("StdioServerTransport already started! If using Server class, note that connect() calls start() automatically.");this._started=!0,this._stdin.on("data",this._ondata),this._stdin.on("error",this._onerror)}processReadBuffer(){for(var e,t;;)try{let n=this._readBuffer.readMessage();if(n===null)break;(e=this.onmessage)===null||e===void 0||e.call(this,n)}catch(n){(t=this.onerror)===null||t===void 0||t.call(this,n)}}async close(){var e;this._stdin.off("data",this._ondata),this._stdin.off("error",this._onerror),this._readBuffer.clear(),(e=this.onclose)===null||e===void 0||e.call(this)}send(e){return new Promise(t=>{let n=$t(e);this._stdout.write(n)?t():this._stdout.once("drain",t)})}};var ze=C(require("sqlite3"),1),jt=require("util"),M=require("fs/promises"),Bt=require("child_process"),Ve=C(require("path"),1),pt=C(require("os"),1);var Z=class extends Error{constructor(t,n){super(t);this.code=n;this.name="BearDatabaseError"}},Ge=class extends Error{constructor(e){super(e),this.name="BearSafetyError"}};var Ft=(0,jt.promisify)(Bt.exec),Xe=class{db=null;dbPath;backupDir;constructor(e){this.dbPath=e||Ve.default.join(pt.default.homedir(),"Library/Group Containers/9K33E3U3T4.net.shinyfrog.bear/Application Data/database.sqlite"),this.backupDir=Ve.default.join(pt.default.homedir(),"Documents","Bear MCP Backups")}async isBearRunning(){try{let{stdout:e}=await Ft(`osascript -e 'tell application "System Events" to get name of every process whose name is "Bear"'`);return e.trim().includes("Bear")}catch{try{let{stdout:t}=await Ft('pgrep -x "Bear"');return t.trim().length>0}catch{return!1}}}async verifyDatabaseAccess(){try{if(await(0,M.access)(this.dbPath,M.constants.R_OK|M.constants.W_OK),(await(0,M.stat)(this.dbPath)).size===0)throw new Z("Database file is empty")}catch(e){throw new Z(`Cannot access Bear database at ${this.dbPath}: ${e instanceof Error?e.message:"Unknown error"}`)}}async createBackup(){let e=new Date().toISOString().replace(/[:.]/g,"-"),t=Ve.default.join(this.backupDir,`bear_backup_${e}.sqlite`);try{await(0,M.mkdir)(this.backupDir,{recursive:!0}),await(0,M.copyFile)(this.dbPath,t);let n=await(0,M.stat)(t);return t}catch(n){throw new Z(`Failed to create backup: ${n instanceof Error?n.message:"Unknown error"}`)}}async performSafetyChecks(e=!1){if(e&&await this.isBearRunning())throw new Ge("Direct database writes are not allowed while Bear is running. Use sync-safe Bear API instead.");await this.verifyDatabaseAccess(),e&&await this.createBackup()}async connect(e=!0){if(!this.db)return await this.performSafetyChecks(!e),new Promise((t,n)=>{let s=e?ze.default.OPEN_READONLY:ze.default.OPEN_READWRITE;this.db=new ze.default.Database(this.dbPath,s,a=>{a?n(new Z(`Failed to connect to database: ${a.message}`)):t()})})}async disconnect(){if(this.db)return new Promise((e,t)=>{this.db.close(n=>{n?t(new Z(`Failed to close database: ${n.message}`)):(this.db=null,e())})})}async query(e,t=[]){if(!this.db)throw new Z("Database not connected");return new Promise((n,s)=>{this.db.all(e,t,(a,i)=>{a?s(new Z(`Query failed: ${a.message}
-SQL: ${e}`)):n(i)})})}async queryOne(e,t=[]){if(!this.db)throw new Z("Database not connected");return new Promise((n,s)=>{this.db.get(e,t,(a,i)=>{a?s(new Z(`Query failed: ${a.message}
-SQL: ${e}`)):n(i||null)})})}async execute(e,t=[]){if(!this.db)throw new Z("Database not connected");return new Promise((n,s)=>{this.db.run(e,t,function(a){a?s(new Z(`Execute failed: ${a.message}
-SQL: ${e}`)):n({changes:this.changes,lastID:this.lastID})})})}async beginTransaction(){await this.execute("BEGIN TRANSACTION")}async commitTransaction(){await this.execute("COMMIT")}async rollbackTransaction(){await this.execute("ROLLBACK")}async transaction(e){await this.beginTransaction();try{let t=await e();return await this.commitTransaction(),t}catch(t){throw await this.rollbackTransaction(),t}}async getSchema(){return this.query(`
-      SELECT name, sql 
-      FROM sqlite_master 
-      WHERE type = 'table' 
-      ORDER BY name
-    `)}async checkIntegrity(){return(await this.queryOne("PRAGMA integrity_check"))?.integrity_check==="ok"}},x=class{static CORE_DATA_EPOCH=new Date("2001-01-01T00:00:00Z").getTime();static toDate(e){return new Date(this.CORE_DATA_EPOCH+e*1e3)}static fromDate(e){return(e.getTime()-this.CORE_DATA_EPOCH)/1e3}static now(){return this.fromDate(new Date)}};var Ye=class{database;constructor(e){this.database=new Xe(e)}async getDatabaseStats(){await this.database.connect(!0);try{let[e,t,n,s,a,i,o]=await Promise.all([this.database.queryOne("SELECT COUNT(*) as count FROM ZSFNOTE"),this.database.queryOne("SELECT COUNT(*) as count FROM ZSFNOTE WHERE ZTRASHED = 0"),this.database.queryOne("SELECT COUNT(*) as count FROM ZSFNOTE WHERE ZTRASHED = 1"),this.database.queryOne("SELECT COUNT(*) as count FROM ZSFNOTE WHERE ZARCHIVED = 1"),this.database.queryOne("SELECT COUNT(*) as count FROM ZSFNOTE WHERE ZENCRYPTED = 1"),this.database.queryOne("SELECT COUNT(*) as count FROM ZSFNOTETAG"),this.database.queryOne("SELECT COUNT(*) as count FROM ZSFNOTEFILE")]),u=await(await import("fs/promises")).stat(this.database.dbPath);return{totalNotes:e?.count||0,activeNotes:t?.count||0,trashedNotes:n?.count||0,archivedNotes:s?.count||0,encryptedNotes:a?.count||0,totalTags:i?.count||0,totalAttachments:o?.count||0,databaseSize:u.size,lastModified:u.mtime}}finally{await this.database.disconnect()}}async getNotes(e={}){await this.database.connect(!0);try{let t=`
-        SELECT n.*, GROUP_CONCAT(t.ZTITLE) as tag_names
-        FROM ZSFNOTE n
-        LEFT JOIN Z_5TAGS nt ON n.Z_PK = nt.Z_5NOTES
-        LEFT JOIN ZSFNOTETAG t ON nt.Z_13TAGS = t.Z_PK
-        WHERE 1=1
-      `,n=[];if(e.includeTrashed||(t+=" AND n.ZTRASHED = 0"),e.includeArchived||(t+=" AND n.ZARCHIVED = 0"),e.query){t+=" AND (n.ZTITLE LIKE ? OR n.ZTEXT LIKE ?)";let a=`%${e.query}%`;n.push(a,a)}return e.dateFrom&&(t+=" AND n.ZCREATIONDATE >= ?",n.push(x.fromDate(e.dateFrom))),e.dateTo&&(t+=" AND n.ZCREATIONDATE <= ?",n.push(x.fromDate(e.dateTo))),t+=" GROUP BY n.Z_PK ORDER BY n.ZMODIFICATIONDATE DESC",e.limit&&(t+=" LIMIT ?",n.push(e.limit),e.offset&&(t+=" OFFSET ?",n.push(e.offset))),(await this.database.query(t,n)).map(a=>({...a,tags:a.tag_names?a.tag_names.split(",").filter(Boolean):[]}))}finally{await this.database.disconnect()}}async getNoteById(e){await this.database.connect(!0);try{let n=await this.database.queryOne(`
-        SELECT n.*, GROUP_CONCAT(t.ZTITLE) as tag_names
-        FROM ZSFNOTE n
-        LEFT JOIN Z_5TAGS nt ON n.Z_PK = nt.Z_5NOTES
-        LEFT JOIN ZSFNOTETAG t ON nt.Z_13TAGS = t.Z_PK
-        WHERE n.Z_PK = ?
-        GROUP BY n.Z_PK
-      `,[e]);return n?{...n,tags:n.tag_names?n.tag_names.split(",").filter(Boolean):[]}:null}finally{await this.database.disconnect()}}async getNoteByTitle(e){await this.database.connect(!0);try{let n=await this.database.queryOne(`
-        SELECT n.*, GROUP_CONCAT(t.ZTITLE) as tag_names
-        FROM ZSFNOTE n
-        LEFT JOIN Z_5TAGS nt ON n.Z_PK = nt.Z_5NOTES
-        LEFT JOIN ZSFNOTETAG t ON nt.Z_13TAGS = t.Z_PK
-        WHERE n.ZTITLE = ? AND n.ZTRASHED = 0
-        GROUP BY n.Z_PK
-        LIMIT 1
-      `,[e]);return n?{...n,tags:n.tag_names?n.tag_names.split(",").filter(Boolean):[]}:null}finally{await this.database.disconnect()}}async searchNotes(e,t={}){return this.getNotes({...t,query:e})}async getTags(){await this.database.connect(!0);try{return await this.database.query(`
-        SELECT t.*, COUNT(nt.Z_5NOTES) as noteCount
-        FROM ZSFNOTETAG t
-        LEFT JOIN Z_5TAGS nt ON t.Z_PK = nt.Z_13TAGS
-        LEFT JOIN ZSFNOTE n ON nt.Z_5NOTES = n.Z_PK AND n.ZTRASHED = 0
-        GROUP BY t.Z_PK
-        ORDER BY noteCount DESC, t.ZTITLE ASC
-      `)}finally{await this.database.disconnect()}}async getNotesByTag(e){await this.database.connect(!0);try{return(await this.database.query(`
-        SELECT n.*, GROUP_CONCAT(t2.ZTITLE) as tag_names
-        FROM ZSFNOTE n
-        JOIN Z_5TAGS nt ON n.Z_PK = nt.Z_5NOTES
-        JOIN ZSFNOTETAG t ON nt.Z_13TAGS = t.Z_PK
-        LEFT JOIN Z_5TAGS nt2 ON n.Z_PK = nt2.Z_5NOTES
-        LEFT JOIN ZSFNOTETAG t2 ON nt2.Z_13TAGS = t2.Z_PK
-        WHERE t.ZTITLE = ? AND n.ZTRASHED = 0
-        GROUP BY n.Z_PK
-        ORDER BY n.ZMODIFICATIONDATE DESC
-      `,[e])).map(s=>({...s,tags:s.tag_names?s.tag_names.split(",").filter(Boolean):[]}))}finally{await this.database.disconnect()}}async isBearRunning(){return this.database.isBearRunning()}async verifyDatabaseAccess(){await this.database.verifyDatabaseAccess()}async createBackup(){return this.database.createBackup()}async getSchema(){await this.database.connect(!0);try{return this.database.getSchema()}finally{await this.database.disconnect()}}async checkIntegrity(){await this.database.connect(!0);try{return this.database.checkIntegrity()}finally{await this.database.disconnect()}}async getRecentNotes(e=10){return this.getNotes({limit:e,includeArchived:!1,includeTrashed:!1})}async getNoteCountsByStatus(){let e=await this.getDatabaseStats();return{total:e.totalNotes,active:e.activeNotes,trashed:e.trashedNotes,archived:e.archivedNotes,encrypted:e.encryptedNotes}}async getNotesAdvanced(e={}){await this.database.connect(!0);try{let t=`
-        SELECT n.*, GROUP_CONCAT(DISTINCT t.ZTITLE) as tag_names,
-               LENGTH(n.ZTEXT) as content_length,
-               CASE 
-                 WHEN n.ZENCRYPTED = 1 THEN '[ENCRYPTED]'
-                 ELSE SUBSTR(n.ZTEXT, 1, 200)
-               END as preview
-        FROM ZSFNOTE n
-        LEFT JOIN Z_5TAGS nt ON n.Z_PK = nt.Z_5NOTES
-        LEFT JOIN ZSFNOTETAG t ON nt.Z_13TAGS = t.Z_PK
-        WHERE 1=1
-      `,n=[];if(e.includeTrashed||(t+=" AND n.ZTRASHED = 0"),e.includeArchived||(t+=" AND n.ZARCHIVED = 0"),e.includeEncrypted||(t+=" AND n.ZENCRYPTED = 0"),e.query){t+=" AND (n.ZTITLE LIKE ? OR n.ZTEXT LIKE ?)";let o=`%${e.query}%`;n.push(o,o)}if(e.dateFrom&&(t+=" AND n.ZCREATIONDATE >= ?",n.push(x.fromDate(e.dateFrom))),e.dateTo&&(t+=" AND n.ZCREATIONDATE <= ?",n.push(x.fromDate(e.dateTo))),e.modifiedAfter&&(t+=" AND n.ZMODIFICATIONDATE >= ?",n.push(x.fromDate(e.modifiedAfter))),e.modifiedBefore&&(t+=" AND n.ZMODIFICATIONDATE <= ?",n.push(x.fromDate(e.modifiedBefore))),t+=" GROUP BY n.Z_PK",e.tags&&e.tags.length>0){let o=e.tags.map(()=>"tag_names LIKE ?").join(" AND ");t+=` HAVING ${o}`,e.tags.forEach(d=>n.push(`%${d}%`))}if(e.excludeTags&&e.excludeTags.length>0){let o=e.excludeTags.map(()=>"tag_names NOT LIKE ? OR tag_names IS NULL").join(" AND ");t+=e.tags?` AND (${o})`:` HAVING (${o})`,e.excludeTags.forEach(d=>n.push(`%${d}%`))}let s=e.sortBy||"modified",a=e.sortOrder||"desc";switch(s){case"created":t+=` ORDER BY n.ZCREATIONDATE ${a.toUpperCase()}`;break;case"modified":t+=` ORDER BY n.ZMODIFICATIONDATE ${a.toUpperCase()}`;break;case"title":t+=` ORDER BY n.ZTITLE ${a.toUpperCase()}`;break;case"size":t+=` ORDER BY LENGTH(n.ZTEXT) ${a.toUpperCase()}`;break;default:t+=" ORDER BY n.ZMODIFICATIONDATE DESC"}return e.limit&&(t+=" LIMIT ?",n.push(e.limit),e.offset&&(t+=" OFFSET ?",n.push(e.offset))),(await this.database.query(t,n)).map(o=>({...o,tags:o.tag_names?o.tag_names.split(",").filter(Boolean):[],contentLength:o.content_length,preview:o.preview}))}finally{await this.database.disconnect()}}async getNotesWithCriteria(e){await this.database.connect(!0);try{let t=`
-        SELECT n.*, GROUP_CONCAT(DISTINCT t.ZTITLE) as tag_names,
-               LENGTH(n.ZTEXT) as content_length
-        FROM ZSFNOTE n
-        LEFT JOIN Z_5TAGS nt ON n.Z_PK = nt.Z_5NOTES
-        LEFT JOIN ZSFNOTETAG t ON nt.Z_13TAGS = t.Z_PK
-        WHERE 1=1
-      `,n=[];if(e.titleContains&&e.titleContains.length>0){let a=e.titleContains.map(()=>"n.ZTITLE LIKE ?").join(" OR ");t+=` AND (${a})`,e.titleContains.forEach(i=>n.push(`%${i}%`))}if(e.contentContains&&e.contentContains.length>0){let a=e.contentContains.map(()=>"n.ZTEXT LIKE ?").join(" OR ");t+=` AND (${a})`,e.contentContains.forEach(i=>n.push(`%${i}%`))}if(e.createdAfter&&(t+=" AND n.ZCREATIONDATE >= ?",n.push(x.fromDate(e.createdAfter))),e.createdBefore&&(t+=" AND n.ZCREATIONDATE <= ?",n.push(x.fromDate(e.createdBefore))),e.modifiedAfter&&(t+=" AND n.ZMODIFICATIONDATE >= ?",n.push(x.fromDate(e.modifiedAfter))),e.modifiedBefore&&(t+=" AND n.ZMODIFICATIONDATE <= ?",n.push(x.fromDate(e.modifiedBefore))),e.minLength&&(t+=" AND LENGTH(n.ZTEXT) >= ?",n.push(e.minLength)),e.maxLength&&(t+=" AND LENGTH(n.ZTEXT) <= ?",n.push(e.maxLength)),e.isPinned!==void 0&&(t+=" AND n.ZPINNED = ?",n.push(e.isPinned?1:0)),e.isArchived!==void 0&&(t+=" AND n.ZARCHIVED = ?",n.push(e.isArchived?1:0)),e.isTrashed!==void 0&&(t+=" AND n.ZTRASHED = ?",n.push(e.isTrashed?1:0)),e.isEncrypted!==void 0&&(t+=" AND n.ZENCRYPTED = ?",n.push(e.isEncrypted?1:0)),t+=" GROUP BY n.Z_PK",e.hasAllTags&&e.hasAllTags.length>0){let a=e.hasAllTags.map(()=>"tag_names LIKE ?").join(" AND ");t+=` HAVING ${a}`,e.hasAllTags.forEach(i=>n.push(`%${i}%`))}if(e.hasAnyTags&&e.hasAnyTags.length>0){let a=e.hasAnyTags.map(()=>"tag_names LIKE ?").join(" OR "),i=e.hasAllTags?` AND (${a})`:` HAVING (${a})`;t+=i,e.hasAnyTags.forEach(o=>n.push(`%${o}%`))}return t+=" ORDER BY n.ZMODIFICATIONDATE DESC",(await this.database.query(t,n)).map(a=>({...a,tags:a.tag_names?a.tag_names.split(",").filter(Boolean):[],contentLength:a.content_length}))}finally{await this.database.disconnect()}}async getNoteAnalytics(){await this.database.connect(!0);try{let[e,t,n,s,a,i]=await Promise.all([this.database.queryOne(`
-          SELECT COUNT(*) as count, AVG(LENGTH(ZTEXT)) as avgLength
-          FROM ZSFNOTE 
-          WHERE ZTRASHED = 0
-        `),this.database.queryOne(`
-          SELECT ZTITLE, LENGTH(ZTEXT) as length
-          FROM ZSFNOTE 
-          WHERE ZTRASHED = 0 AND ZTEXT IS NOT NULL
-          ORDER BY LENGTH(ZTEXT) DESC 
-          LIMIT 1
-        `),this.database.queryOne(`
-          SELECT ZTITLE, LENGTH(ZTEXT) as length
-          FROM ZSFNOTE 
-          WHERE ZTRASHED = 0 AND ZTEXT IS NOT NULL
-          ORDER BY LENGTH(ZTEXT) ASC 
-          LIMIT 1
-        `),this.database.queryOne(`
-          SELECT ZTITLE, ZMODIFICATIONDATE
-          FROM ZSFNOTE 
-          WHERE ZTRASHED = 0
-          ORDER BY ZMODIFICATIONDATE DESC 
-          LIMIT 1
-        `),this.database.queryOne(`
-          SELECT ZTITLE, ZCREATIONDATE
-          FROM ZSFNOTE 
-          WHERE ZTRASHED = 0
-          ORDER BY ZCREATIONDATE ASC 
-          LIMIT 1
-        `),this.database.queryOne(`
-          SELECT 
-            SUM(ZHASIMAGES) as hasImages,
-            SUM(ZHASFILES) as hasFiles,
-            SUM(ZHASSOURCECODE) as hasSourceCode,
-            SUM(ZTODOCOMPLETED + ZTODOINCOMPLETED) as todos
-          FROM ZSFNOTE 
-          WHERE ZTRASHED = 0
-        `)]),o=await this.database.query(`
-        SELECT 
-          strftime('%Y-%m', datetime(ZCREATIONDATE + 978307200, 'unixepoch')) as month,
-          COUNT(*) as count
-        FROM ZSFNOTE 
-        WHERE ZTRASHED = 0
-        GROUP BY month
-        ORDER BY month DESC
-        LIMIT 12
-      `),d=await this.database.query(`
-        SELECT t.ZTITLE, COUNT(nt.Z_5NOTES) as count
-        FROM ZSFNOTETAG t
-        JOIN Z_5TAGS nt ON t.Z_PK = nt.Z_13TAGS
-        JOIN ZSFNOTE n ON nt.Z_5NOTES = n.Z_PK AND n.ZTRASHED = 0
-        GROUP BY t.Z_PK, t.ZTITLE
-        ORDER BY count DESC
-        LIMIT 10
-      `);return{totalNotes:e?.count||0,averageLength:Math.round(e?.avgLength||0),longestNote:{title:t?.ZTITLE||"",length:t?.length||0},shortestNote:{title:n?.ZTITLE||"",length:n?.length||0},mostRecentNote:{title:s?.ZTITLE||"",date:s?x.toDate(s.ZMODIFICATIONDATE):new Date},oldestNote:{title:a?.ZTITLE||"",date:a?x.toDate(a.ZCREATIONDATE):new Date},notesPerMonth:o.map(u=>({month:u.month,count:u.count})),topTags:d.map(u=>({tag:u.ZTITLE,count:u.count})),contentStats:{hasImages:i?.hasImages||0,hasFiles:i?.hasFiles||0,hasSourceCode:i?.hasSourceCode||0,hasTodos:i?.todos||0}}}finally{await this.database.disconnect()}}async getRelatedNotes(e,t=5){await this.database.connect(!0);try{let n=await this.getNoteById(e);if(!n)return{byTags:[],byContent:[]};let s=n.tags.length>0?await this.database.query(`
-        SELECT n.*, GROUP_CONCAT(DISTINCT t.ZTITLE) as tag_names,
-               COUNT(DISTINCT CASE WHEN t.ZTITLE IN (${n.tags.map(()=>"?").join(",")}) THEN t.ZTITLE END) as shared_tags
-        FROM ZSFNOTE n
-        JOIN Z_5TAGS nt ON n.Z_PK = nt.Z_5NOTES
-        JOIN ZSFNOTETAG t ON nt.Z_13TAGS = t.Z_PK
-        WHERE n.Z_PK != ? AND n.ZTRASHED = 0
-        GROUP BY n.Z_PK
-        HAVING shared_tags > 0
-        ORDER BY shared_tags DESC, n.ZMODIFICATIONDATE DESC
-        LIMIT ?
-      `,[...n.tags,e,t]):[],a=this.extractKeywords(n.ZTEXT||""),i=a.length>0?await this.database.query(`
-        SELECT n.*, GROUP_CONCAT(DISTINCT t.ZTITLE) as tag_names
-        FROM ZSFNOTE n
-        LEFT JOIN Z_5TAGS nt ON n.Z_PK = nt.Z_5NOTES
-        LEFT JOIN ZSFNOTETAG t ON nt.Z_13TAGS = t.Z_PK
-        WHERE n.Z_PK != ? AND n.ZTRASHED = 0
-          AND (${a.map(()=>"n.ZTEXT LIKE ?").join(" OR ")})
-        GROUP BY n.Z_PK
-        ORDER BY n.ZMODIFICATIONDATE DESC
-        LIMIT ?
-      `,[e,...a.map(o=>`%${o}%`),t]):[];return{byTags:s.map(o=>({...o,tags:o.tag_names?o.tag_names.split(",").filter(Boolean):[]})),byContent:i.map(o=>({...o,tags:o.tag_names?o.tag_names.split(",").filter(Boolean):[]}))}}finally{await this.database.disconnect()}}extractKeywords(e){if(!e)return[];let t=new Set(["the","a","an","and","or","but","in","on","at","to","for","of","with","by","is","are","was","were","be","been","have","has","had","do","does","did","will","would","could","should","this","that","these","those"]);return e.toLowerCase().replace(/[^\w\s]/g," ").split(/\s+/).filter(n=>n.length>3&&!t.has(n)).slice(0,10)}async searchNotesFullText(e,t={}){await this.database.connect(!0);try{let n=this.extractSearchTerms(e,t.fuzzyMatch),s=t.searchFields||["both"],a=`
-        SELECT n.*, GROUP_CONCAT(DISTINCT t.ZTITLE) as tag_names,
-               LENGTH(n.ZTEXT) as content_length
-        FROM ZSFNOTE n
-        LEFT JOIN Z_5TAGS nt ON n.Z_PK = nt.Z_5NOTES
-        LEFT JOIN ZSFNOTETAG t ON nt.Z_13TAGS = t.Z_PK
-        WHERE 1=1
-      `,i=[];t.includeTrashed||(a+=" AND n.ZTRASHED = 0"),t.includeArchived||(a+=" AND n.ZARCHIVED = 0");let o=[];if(s.includes("title")||s.includes("both")){let u=n.map(()=>t.caseSensitive?"n.ZTITLE LIKE ?":"LOWER(n.ZTITLE) LIKE LOWER(?)");u.length>0&&(o.push(`(${u.join(" OR ")})`),n.forEach(l=>i.push(`%${l}%`)))}if(s.includes("content")||s.includes("both")){let u=n.map(()=>t.caseSensitive?"n.ZTEXT LIKE ?":"LOWER(n.ZTEXT) LIKE LOWER(?)");u.length>0&&(o.push(`(${u.join(" OR ")})`),n.forEach(l=>i.push(`%${l}%`)))}if(o.length>0&&(a+=` AND (${o.join(" OR ")})`),t.tags&&t.tags.length>0){a+=" GROUP BY n.Z_PK HAVING ";let u=t.tags.map(()=>"tag_names LIKE ?").join(" AND ");a+=u,t.tags.forEach(l=>i.push(`%${l}%`))}else a+=" GROUP BY n.Z_PK";return t.dateFrom&&(a+=" AND n.ZCREATIONDATE >= ?",i.push(x.fromDate(t.dateFrom))),t.dateTo&&(a+=" AND n.ZCREATIONDATE <= ?",i.push(x.fromDate(t.dateTo))),a+=" ORDER BY n.ZMODIFICATIONDATE DESC",t.limit&&(a+=" LIMIT ?",i.push(t.limit)),(await this.database.query(a,i)).map(u=>{let l={...u,tags:u.tag_names?u.tag_names.split(",").filter(Boolean):[],contentLength:u.content_length},T=this.analyzeSearchMatches(l,n,t);return{...l,relevanceScore:T.relevanceScore,matchedTerms:T.matchedTerms,snippets:t.includeSnippets?T.snippets:[],titleMatches:T.titleMatches,contentMatches:T.contentMatches}}).sort((u,l)=>l.relevanceScore-u.relevanceScore)}finally{await this.database.disconnect()}}async getSearchSuggestions(e,t=10){await this.database.connect(!0);try{let[n,s,a]=await Promise.all([this.database.query(`
-          WITH RECURSIVE split(word, str) AS (
-            SELECT '', LOWER(ZTEXT) || ' ' FROM ZSFNOTE WHERE ZTRASHED = 0 AND ZTEXT IS NOT NULL
-            UNION ALL
-            SELECT substr(str, 0, instr(str, ' ')), 
-                   substr(str, instr(str, ' ') + 1)
-            FROM split WHERE str != ''
-          )
-          SELECT word as term, COUNT(*) as frequency
-          FROM split 
-          WHERE word LIKE ? AND LENGTH(word) > 2
-          GROUP BY word
-          ORDER BY frequency DESC
-          LIMIT ?
-        `,[`${e.toLowerCase()}%`,t]),this.database.query(`
-          SELECT DISTINCT ZTITLE as title
-          FROM ZSFNOTE 
-          WHERE ZTITLE LIKE ? AND ZTRASHED = 0 AND ZTITLE IS NOT NULL
-          ORDER BY ZMODIFICATIONDATE DESC
-          LIMIT ?
-        `,[`%${e}%`,t]),this.database.query(`
-          SELECT DISTINCT ZTITLE as tag
-          FROM ZSFNOTETAG 
-          WHERE ZTITLE LIKE ?
-          ORDER BY ZTITLE
-          LIMIT ?
-        `,[`${e}%`,t])]);return{terms:n.map(i=>i.term),titles:s.map(i=>i.title),tags:a.map(i=>i.tag)}}finally{await this.database.disconnect()}}async findSimilarNotes(e,t={}){await this.database.connect(!0);try{let n=this.extractKeywords(e);if(n.length===0)return[];let s=`
-        SELECT n.*, GROUP_CONCAT(DISTINCT t.ZTITLE) as tag_names,
-               LENGTH(n.ZTEXT) as content_length
-        FROM ZSFNOTE n
-        LEFT JOIN Z_5TAGS nt ON n.Z_PK = nt.Z_5NOTES
-        LEFT JOIN ZSFNOTETAG t ON nt.Z_13TAGS = t.Z_PK
-        WHERE n.ZTRASHED = 0 AND n.ZTEXT IS NOT NULL
-      `,a=[];t.excludeNoteId&&(s+=" AND n.Z_PK != ?",a.push(t.excludeNoteId));let i=n.map(()=>"LOWER(n.ZTEXT) LIKE LOWER(?)").join(" OR ");return s+=` AND (${i})`,n.forEach(u=>a.push(`%${u}%`)),s+=" GROUP BY n.Z_PK ORDER BY n.ZMODIFICATIONDATE DESC",t.limit&&(s+=" LIMIT ?",a.push(t.limit*3)),(await this.database.query(s,a)).map(u=>{let l={...u,tags:u.tag_names?u.tag_names.split(",").filter(Boolean):[],contentLength:u.content_length},T=this.extractKeywords(l.ZTEXT||""),v=n.filter(S=>T.some(w=>w.includes(S)||S.includes(w))),b=v.length/Math.max(n.length,T.length);return{...l,similarityScore:b,commonKeywords:v}}).filter(u=>u.similarityScore>=(t.minSimilarity||.1)).sort((u,l)=>l.similarityScore-u.similarityScore).slice(0,t.limit||10)}finally{await this.database.disconnect()}}extractSearchTerms(e,t=!1){let n=e.toLowerCase().replace(/[^\w\s]/g," ").split(/\s+/).filter(s=>s.length>1);if(t){let s=[];return n.forEach(a=>{if(s.push(a),a.length>3)for(let i=0;i<a.length;i++)s.push(a.substring(0,i)+a.substring(i+1))}),[...new Set(s)]}return n}analyzeSearchMatches(e,t,n){let s=e.ZTITLE?.toLowerCase()||"",a=e.ZTEXT?.toLowerCase()||"",i=0,o=0,d=[],u=[];t.forEach(b=>{let S=b.toLowerCase(),w=(s.match(new RegExp(S,"g"))||[]).length;w>0&&(i+=w,d.push(b));let ve=(a.match(new RegExp(S,"g"))||[]).length;if(ve>0){o+=ve,d.includes(b)||d.push(b);let Je=a.indexOf(S);if(Je!==-1&&u.length<3){let Ht=Math.max(0,Je-50),Ut=Math.min(a.length,Je+100),qt=a.substring(Ht,Ut);u.push(`...${qt}...`)}}});let l=0;l+=i*10,l+=o*2;let T=t.join(" ").toLowerCase();s.includes(T)&&(l+=20),a.includes(T)&&(l+=5);let v=e.tags.filter(b=>t.some(S=>b.toLowerCase().includes(S.toLowerCase()))).length;return l+=v*15,e.contentLength&&e.contentLength>0&&(l=l/Math.log(e.contentLength+1)),{relevanceScore:l,matchedTerms:d,snippets:u,titleMatches:i,contentMatches:o}}async getFileAttachments(e={}){await this.database.connect(!0);try{let t=`
-        SELECT f.*, n.ZTITLE as note_title, n.Z_PK as note_id
-        FROM ZSFNOTEFILE f
-        INNER JOIN ZSFNOTE n ON f.ZNOTE = n.Z_PK
-        WHERE n.ZTRASHED = 0
-      `,n=[];e.noteId&&(t+=" AND f.ZNOTE = ?",n.push(e.noteId)),e.fileType&&(t+=" AND LOWER(f.ZFILENAME) LIKE LOWER(?)",n.push(`%.${e.fileType}`)),t+=" ORDER BY f.ZCREATIONDATE DESC",e.limit&&(t+=" LIMIT ?",n.push(e.limit));let s=await this.database.query(t,n),a=await this.database.query(`
-        SELECT 
-          CASE 
-            WHEN LOWER(f.ZFILENAME) LIKE '%.jpg' OR LOWER(f.ZFILENAME) LIKE '%.jpeg' OR 
-                 LOWER(f.ZFILENAME) LIKE '%.png' OR LOWER(f.ZFILENAME) LIKE '%.gif' OR
-                 LOWER(f.ZFILENAME) LIKE '%.webp' THEN 'image'
-            WHEN LOWER(f.ZFILENAME) LIKE '%.pdf' THEN 'pdf'
-            WHEN LOWER(f.ZFILENAME) LIKE '%.doc' OR LOWER(f.ZFILENAME) LIKE '%.docx' OR
-                 LOWER(f.ZFILENAME) LIKE '%.txt' OR LOWER(f.ZFILENAME) LIKE '%.md' THEN 'document'
-            WHEN LOWER(f.ZFILENAME) LIKE '%.mp4' OR LOWER(f.ZFILENAME) LIKE '%.mov' OR
-                 LOWER(f.ZFILENAME) LIKE '%.avi' THEN 'video'
-            WHEN LOWER(f.ZFILENAME) LIKE '%.mp3' OR LOWER(f.ZFILENAME) LIKE '%.wav' OR
-                 LOWER(f.ZFILENAME) LIKE '%.m4a' THEN 'audio'
-            ELSE 'other'
-          END as type,
-          COUNT(*) as count,
-          COALESCE(SUM(f.ZFILESIZE), 0) as total_size
-        FROM ZSFNOTEFILE f
-        INNER JOIN ZSFNOTE n ON f.ZNOTE = n.Z_PK
-        WHERE n.ZTRASHED = 0
-        GROUP BY type
-        ORDER BY count DESC
-      `),i=s.map(o=>{let d=o.ZFILENAME||"unknown",u=d.split(".").pop()?.toLowerCase()||"",l="application/octet-stream",T="other";return["jpg","jpeg","png","gif","webp"].includes(u)?(l=`image/${u==="jpg"?"jpeg":u}`,T="image"):u==="pdf"?(l="application/pdf",T="pdf"):["doc","docx"].includes(u)?(l="application/msword",T="document"):["txt","md"].includes(u)?(l="text/plain",T="document"):["mp4","mov","avi"].includes(u)?(l=`video/${u}`,T="video"):["mp3","wav","m4a"].includes(u)&&(l=`audio/${u}`,T="audio"),{id:o.Z_PK,filename:d,fileType:T,fileSize:o.ZFILESIZE||0,createdAt:x.toDate(o.ZCREATIONDATE),modifiedAt:x.toDate(o.ZMODIFICATIONDATE),noteId:o.note_id,noteTitle:o.note_title||"Untitled",filePath:o.ZFILEPATH||"",contentType:l,metadata:e.includeMetadata?this.extractFileMetadata(o):void 0}});return{totalAttachments:s.length,attachments:i,attachmentsByType:a.map(o=>({type:o.type,count:o.count,totalSize:o.total_size}))}}finally{await this.database.disconnect()}}async analyzeNoteMetadata(e={}){await this.database.connect(!0);try{let[t]=await this.database.query(`
-        SELECT 
-          COUNT(*) as total_notes,
-          AVG(LENGTH(ZTEXT)) as avg_length
-        FROM ZSFNOTE 
-        WHERE ZTRASHED = 0 AND ZTEXT IS NOT NULL
-      `),n=await this.database.query(`
-        SELECT 
-          CASE 
-            WHEN LENGTH(ZTEXT) < 100 THEN '0-100'
-            WHEN LENGTH(ZTEXT) < 500 THEN '100-500'
-            WHEN LENGTH(ZTEXT) < 1000 THEN '500-1K'
-            WHEN LENGTH(ZTEXT) < 5000 THEN '1K-5K'
-            WHEN LENGTH(ZTEXT) < 10000 THEN '5K-10K'
-            ELSE '10K+'
-          END as range,
-          COUNT(*) as count
-        FROM ZSFNOTE 
-        WHERE ZTRASHED = 0 AND ZTEXT IS NOT NULL
-        GROUP BY range
-        ORDER BY 
-          CASE range
-            WHEN '0-100' THEN 1
-            WHEN '100-500' THEN 2
-            WHEN '500-1K' THEN 3
-            WHEN '1K-5K' THEN 4
-            WHEN '5K-10K' THEN 5
-            ELSE 6
-          END
-      `),s=await this.database.query(`
-        SELECT 
-          CAST(strftime('%H', datetime(ZCREATIONDATE + 978307200, 'unixepoch', 'localtime')) AS INTEGER) as hour,
-          COUNT(*) as count
-        FROM ZSFNOTE 
-        WHERE ZTRASHED = 0
-        GROUP BY hour
-        ORDER BY hour
-      `),a=await this.database.query(`
-        SELECT 
-          CAST(strftime('%H', datetime(ZMODIFICATIONDATE + 978307200, 'unixepoch', 'localtime')) AS INTEGER) as hour,
-          COUNT(*) as count
-        FROM ZSFNOTE 
-        WHERE ZTRASHED = 0
-        GROUP BY hour
-        ORDER BY hour
-      `),i={overview:{totalNotes:t.total_notes,averageLength:Math.round(t.avg_length||0),lengthDistribution:n,creationPatterns:s,modificationPatterns:a}};if(e.includeContentAnalysis){let o=await this.database.query(`
-          SELECT ZTEXT as text FROM ZSFNOTE 
-          WHERE ZTRASHED = 0 AND ZTEXT IS NOT NULL
-          LIMIT 1000
-        `),d=this.analyzeContent(o.map(u=>u.text));i.contentAnalysis=d}if(e.includeLinkAnalysis){let o=await this.database.query(`
-          SELECT ZTEXT as text FROM ZSFNOTE 
-          WHERE ZTRASHED = 0 AND ZTEXT IS NOT NULL
-          AND (ZTEXT LIKE '%http%' OR ZTEXT LIKE '%www.%' OR ZTEXT LIKE '%[%](%')
-          LIMIT 1000
-        `),d=this.analyzeLinks(o.map(u=>u.text));i.linkAnalysis=d}if(e.includeStructureAnalysis){let o=await this.database.query(`
-          SELECT ZTITLE as title, ZTEXT as text FROM ZSFNOTE 
-          WHERE ZTRASHED = 0 AND ZTEXT IS NOT NULL
-          LIMIT 1000
-        `),d=this.analyzeStructure(o);i.structureAnalysis=d}return i}finally{await this.database.disconnect()}}async getNotesWithMetadata(e){await this.database.connect(!0);try{let t=`
-        SELECT n.*, 
-               GROUP_CONCAT(DISTINCT t.ZTITLE) as tag_names,
-               COUNT(DISTINCT f.Z_PK) as attachment_count
-        FROM ZSFNOTE n
-        LEFT JOIN Z_5TAGS nt ON n.Z_PK = nt.Z_5NOTES
-        LEFT JOIN ZSFNOTETAG t ON nt.Z_13TAGS = t.Z_PK
-        LEFT JOIN ZSFNOTEFILE f ON n.Z_PK = f.ZNOTE
-        WHERE n.ZTRASHED = 0
-      `,n=[];return e.createdAfter&&(t+=" AND n.ZCREATIONDATE >= ?",n.push(x.fromDate(e.createdAfter))),e.createdBefore&&(t+=" AND n.ZCREATIONDATE <= ?",n.push(x.fromDate(e.createdBefore))),e.modifiedAfter&&(t+=" AND n.ZMODIFICATIONDATE >= ?",n.push(x.fromDate(e.modifiedAfter))),e.modifiedBefore&&(t+=" AND n.ZMODIFICATIONDATE <= ?",n.push(x.fromDate(e.modifiedBefore))),e.hasAttachments===!0?t+=" AND f.Z_PK IS NOT NULL":e.hasAttachments===!1&&(t+=" AND f.Z_PK IS NULL"),t+=" GROUP BY n.Z_PK ORDER BY n.ZMODIFICATIONDATE DESC",e.limit&&(t+=" LIMIT ?",n.push(e.limit)),(await this.database.query(t,n)).map(i=>{let o={...i,tags:i.tag_names?i.tag_names.split(",").filter(Boolean):[]},d=o.ZTEXT||"",u=d.split(/\s+/).filter(w=>w.length>0).length,l=(d.match(/https?:\/\/[^\s\)]+/g)||[]).length,T=(d.match(/!\[.*?\]\(.*?\)/g)||[]).length,v=(d.match(/- \[[ x]\]/g)||[]).length,b=(d.match(/```/g)||[]).length/2,S=(d.match(/\|.*\|/g)||[]).length;return e.minWordCount&&u<e.minWordCount||e.maxWordCount&&u>e.maxWordCount||e.hasLinks===!0&&l===0||e.hasLinks===!1&&l>0||e.hasImages===!0&&T===0||e.hasImages===!1&&T>0||e.hasTodos===!0&&v===0||e.hasTodos===!1&&v>0||e.hasCodeBlocks===!0&&b===0||e.hasCodeBlocks===!1&&b>0||e.hasTables===!0&&S===0||e.hasTables===!1&&S>0?null:{...o,wordCount:u,attachmentCount:i.attachment_count,linkCount:l,imageCount:T,todoCount:v,codeBlockCount:b,tableCount:S,metadata:{hasAttachments:i.attachment_count>0,hasLinks:l>0,hasImages:T>0,hasTodos:v>0,hasCodeBlocks:b>0,hasTables:S>0}}}).filter(Boolean)}finally{await this.database.disconnect()}}extractFileMetadata(e){return{creationDate:x.toDate(e.ZCREATIONDATE),modificationDate:x.toDate(e.ZMODIFICATIONDATE),fileSize:e.ZFILESIZE||0,filePath:e.ZFILEPATH||"",originalFilename:e.ZFILENAME||""}}analyzeContent(e){let t={markdownUsage:{headings:0,lists:0,codeBlocks:0,links:0,images:0,tables:0},languagePatterns:[],commonPatterns:[]},n=new Map,s={emails:0,urls:0,phoneNumbers:0,dates:0,times:0,hashtags:0};return e.forEach(a=>{t.markdownUsage.headings+=(a.match(/^#+\s/gm)||[]).length,t.markdownUsage.lists+=(a.match(/^[\s]*[-*+]\s/gm)||[]).length,t.markdownUsage.codeBlocks+=(a.match(/```/g)||[]).length/2,t.markdownUsage.links+=(a.match(/\[.*?\]\(.*?\)/g)||[]).length,t.markdownUsage.images+=(a.match(/!\[.*?\]\(.*?\)/g)||[]).length,t.markdownUsage.tables+=(a.match(/\|.*\|/g)||[]).length,(a.match(/```(\w+)?\n([\s\S]*?)```/g)||[]).forEach(o=>{let d=o.match(/```(\w+)/);if(d&&d[1]){let u=d[1].toLowerCase();n.set(u,(n.get(u)||0)+1)}}),s.emails+=(a.match(/\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b/g)||[]).length,s.urls+=(a.match(/https?:\/\/[^\s\)]+/g)||[]).length,s.phoneNumbers+=(a.match(/\b\d{3}[-.]?\d{3}[-.]?\d{4}\b/g)||[]).length,s.dates+=(a.match(/\b\d{1,2}[\/\-]\d{1,2}[\/\-]\d{2,4}\b/g)||[]).length,s.times+=(a.match(/\b\d{1,2}:\d{2}(?::\d{2})?\s?(?:AM|PM|am|pm)?\b/g)||[]).length,s.hashtags+=(a.match(/#\w+/g)||[]).length}),t.languagePatterns=Array.from(n.entries()).map(([a,i])=>({language:a,count:i})).sort((a,i)=>i.count-a.count).slice(0,10),t.commonPatterns=[{pattern:"emails",description:"Email addresses",count:s.emails},{pattern:"urls",description:"Web URLs",count:s.urls},{pattern:"phoneNumbers",description:"Phone numbers",count:s.phoneNumbers},{pattern:"dates",description:"Date patterns",count:s.dates},{pattern:"times",description:"Time patterns",count:s.times},{pattern:"hashtags",description:"Hashtags",count:s.hashtags}].filter(a=>a.count>0).sort((a,i)=>i.count-a.count),t}analyzeLinks(e){let t={internalLinks:0,externalLinks:0,brokenLinks:0,topDomains:[],linkTypes:[]},n=new Map,s=new Map;return e.forEach(a=>{(a.match(/https?:\/\/[^\s\)\]]+/g)||[]).forEach(d=>{try{let l=new URL(d).hostname;n.set(l,(n.get(l)||0)+1),l.includes("github.com")?s.set("GitHub",(s.get("GitHub")||0)+1):l.includes("stackoverflow.com")?s.set("Stack Overflow",(s.get("Stack Overflow")||0)+1):l.includes("wikipedia.org")?s.set("Wikipedia",(s.get("Wikipedia")||0)+1):l.includes("youtube.com")||l.includes("youtu.be")?s.set("YouTube",(s.get("YouTube")||0)+1):l.includes("medium.com")?s.set("Medium",(s.get("Medium")||0)+1):s.set("Other",(s.get("Other")||0)+1),t.externalLinks++}catch{t.brokenLinks++}});let o=a.match(/(?:bear:\/\/|x-callback-url:\/\/bear|bear-callback:\/\/|\[\[.*?\]\])/g)||[];t.internalLinks+=o.length}),t.topDomains=Array.from(n.entries()).map(([a,i])=>({domain:a,count:i})).sort((a,i)=>i.count-a.count).slice(0,10),t.linkTypes=Array.from(s.entries()).map(([a,i])=>({type:a,count:i})).sort((a,i)=>i.count-a.count),t}analyzeStructure(e){let t={titlePatterns:[],averageWordsPerNote:0,averageParagraphsPerNote:0,notesWithTodos:0,notesWithDates:0,notesWithNumbers:0},n=new Map,s=0,a=0;return e.forEach(i=>{let{title:o,text:d}=i;o&&this.extractTitlePatterns(o).forEach(v=>{n.has(v)||n.set(v,{count:0,examples:[]});let b=n.get(v);b.count++,b.examples.length<3&&b.examples.push(o)});let u=d.split(/\s+/).filter(T=>T.length>0);s+=u.length;let l=d.split(/\n\s*\n/).filter(T=>T.trim().length>0);a+=l.length,d.match(/- \[[ x]\]/)&&t.notesWithTodos++,d.match(/\b\d{1,2}[\/\-]\d{1,2}[\/\-]\d{2,4}\b/)&&t.notesWithDates++,d.match(/\b\d+\b/)&&t.notesWithNumbers++}),t.titlePatterns=Array.from(n.entries()).map(([i,o])=>({pattern:i,count:o.count,examples:o.examples})).sort((i,o)=>o.count-i.count).slice(0,10),t.averageWordsPerNote=Math.round(s/e.length),t.averageParagraphsPerNote=Math.round(a/e.length*100)/100,t}extractTitlePatterns(e){let t=[];return e.match(/\d{4}-\d{2}-\d{2}/)&&t.push("ISO Date (YYYY-MM-DD)"),e.match(/\d{1,2}\/\d{1,2}\/\d{2,4}/)&&t.push("US Date (MM/DD/YYYY)"),e.match(/\d{1,2}-\d{1,2}-\d{2,4}/)&&t.push("Dash Date (MM-DD-YYYY)"),e.toLowerCase().includes("meeting")&&t.push("Meeting Notes"),e.toLowerCase().includes("standup")&&t.push("Standup Notes"),e.toLowerCase().includes("interview")&&t.push("Interview Notes"),e.toLowerCase().includes("project")&&t.push("Project Notes"),(e.toLowerCase().includes("todo")||e.toLowerCase().includes("task"))&&t.push("Task Lists"),(e.toLowerCase().includes("notes on")||e.toLowerCase().includes("learning"))&&t.push("Learning Notes"),(e.toLowerCase().includes("tutorial")||e.toLowerCase().includes("guide"))&&t.push("Tutorials/Guides"),(e.startsWith("How to")||e.startsWith("Why")||e.startsWith("What"))&&t.push("Question Format"),e.match(/^\d+\.?\s/)&&t.push("Numbered Title"),e===e.toUpperCase()&&t.push("ALL CAPS"),e.split(" ").every(n=>n[0]===n[0].toUpperCase())&&t.push("Title Case"),t.length>0?t:["No Pattern"]}async createNote(e){let t=this.validateAndSanitizeTags(e.tags||[]),n=t.sanitized,s=t.warnings;try{let{exec:a}=await import("child_process"),{promisify:i}=await import("util"),o=i(a),d="";if(e.content){d=e.content;let S=new RegExp(`^#\\s+${e.title.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")}\\s*\\n+`,"i");S.test(d)&&(d=d.replace(S,""))}let u=encodeURIComponent(e.title),l=encodeURIComponent(d),T=encodeURIComponent(n.join(",")),v=`bear://x-callback-url/create?title=${u}`;d&&(v+=`&text=${l}`),n.length>0&&(v+=`&tags=${T}`),e.isPinned&&(v+="&pin=yes"),await o(`open "${v}"`),await new Promise(S=>setTimeout(S,1e3));let b="created-via-api";return e.isArchived,{noteId:b,success:!0,tagWarnings:s.length>0?s:void 0}}catch(a){throw new Error(`Failed to create note via sync-safe Bear API: ${a instanceof Error?a.message:"Unknown error"}`)}}async updateNote(e,t){let n,s=[];if(t.tags!==void 0){let a=this.validateAndSanitizeTags(t.tags);n=a.sanitized,s=a.warnings}try{await this.database.connect(!0);let[a]=await this.database.query(`
-        SELECT ZUNIQUEIDENTIFIER, ZMODIFICATIONDATE, ZTITLE, ZTEXT 
-        FROM ZSFNOTE 
-        WHERE Z_PK = ? AND ZTRASHED = 0
-      `,[e]);if(!a)throw new Error(`Note with ID ${e} not found or is trashed`);if(t.expectedModificationDate){let b=x.toDate(a.ZMODIFICATIONDATE);if(Math.abs(b.getTime()-t.expectedModificationDate.getTime())>1e3)return{success:!1,conflictDetected:!0,tagWarnings:s.length>0?s:void 0}}await this.database.disconnect();let{exec:i}=await import("child_process"),{promisify:o}=await import("util"),d=o(i),u="";if(t.title!==void 0||t.content!==void 0)if(t.content!==void 0){u=t.content;let b=t.title!==void 0?t.title:a.ZTITLE;if(b){let S=new RegExp(`^#\\s+${b.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")}\\s*\\n+`,"i");S.test(u)&&(u=u.replace(S,""))}}else u=(a.ZTEXT||"").replace(/^# .+?\n\n?/m,"");else if(u=a.ZTEXT||"",a.ZTITLE){let b=new RegExp(`^#\\s+${a.ZTITLE.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")}\\s*\\n+`,"i");b.test(u)&&(u=u.replace(b,""))}let l=encodeURIComponent(a.ZUNIQUEIDENTIFIER),T=encodeURIComponent(u),v=`bear://x-callback-url/add-text?id=${l}&mode=replace&text=${T}`;if(t.title!==void 0){let b=encodeURIComponent(t.title);v+=`&title=${b}`}if(n!==void 0&&n.length>0){let b=encodeURIComponent(n.join(","));v+=`&tags=${b}`}return t.isPinned!==void 0&&(v+=`&pin=${t.isPinned?"yes":"no"}`),await d(`open "${v}"`),await new Promise(b=>setTimeout(b,1e3)),t.isArchived,{success:!0,tagWarnings:s.length>0?s:void 0}}catch(a){throw await this.database.disconnect(),new Error(`Failed to update note via sync-safe Bear API: ${a instanceof Error?a.message:"Unknown error"}`)}}async duplicateNote(e,t={}){await this.database.connect(!0);try{let[n]=await this.database.query(`
-        SELECT * FROM ZSFNOTE WHERE Z_PK = ? AND ZTRASHED = 0
-      `,[e]);if(!n)throw new Error(`Note with ID ${e} not found or is trashed`);let s=[];t.copyTags!==!1&&(s=(await this.database.query(`
-          SELECT t.ZTITLE
-          FROM ZSFNOTETAG t
-          INNER JOIN Z_5TAGS nt ON t.Z_PK = nt.Z_13TAGS
-          WHERE nt.Z_5NOTES = ?
-        `,[e])).map(d=>d.ZTITLE)),await this.database.disconnect();let a=n.ZTITLE+(t.titleSuffix||" (Copy)"),i=await this.createNote({title:a,content:n.ZTEXT||"",tags:s,isArchived:n.ZARCHIVED===1,isPinned:n.ZPINNED===1});return{newNoteId:i.noteId,success:i.success}}catch(n){throw await this.database.disconnect(),new Error(`Failed to duplicate note: ${n instanceof Error?n.message:"Unknown error"}`)}}async archiveNote(e,t){return{success:(await this.updateNote(e,{isArchived:t})).success}}generateUUID(){return"xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g,e=>{let t=Math.random()*16|0;return(e=="x"?t:t&3|8).toString(16).toUpperCase()})}async clearBearCache(){try{await this.database.query("DELETE FROM Z_MODELCACHE")}catch{}}async triggerBearReparse(e){try{let t=await this.database.queryOne(`
-        SELECT ZTEXT FROM ZSFNOTE WHERE Z_PK = ?
-      `,[e]);if(!t)return;let n=t.ZTEXT||"",s=`${n} `,a=x.fromDate(new Date);await this.database.query(`
-        UPDATE ZSFNOTE 
-        SET ZTEXT = ?, ZMODIFICATIONDATE = ?, ZVERSION = COALESCE(ZVERSION, 0) + 1
-        WHERE Z_PK = ?
-      `,[s,a,e]),await new Promise(i=>setTimeout(i,50)),a=x.fromDate(new Date),await this.database.query(`
-        UPDATE ZSFNOTE 
-        SET ZTEXT = ?, ZMODIFICATIONDATE = ?, ZVERSION = COALESCE(ZVERSION, 0) + 1
-        WHERE Z_PK = ?
-      `,[n,a,e])}catch{}}validateAndSanitizeTags(e){let t=[],n=[];for(let s of e){let a=s.trim();if(!a){n.push("Empty tag ignored");continue}let i=a,o=!1;if(i!==i.toLowerCase()&&(i=i.toLowerCase(),o=!0),i.includes("-")&&(i=i.replace(/-/g,""),o=!0),i.includes(" ")&&(i=i.replace(/\s+/g,""),o=!0),i.includes(",")&&(i=i.replace(/,/g,""),o=!0),i=i.replace(/\/+/g,"/").replace(/^\/+|\/+$/g,""),!i){n.push(`Tag "${s}" became empty after sanitization and was ignored`);continue}t.push(i),o&&n.push(`Tag "${s}" was sanitized to "${i}"`)}return{sanitized:t,warnings:n}}sanitizeTagName(e){return this.validateAndSanitizeTags([e]).sanitized[0]||""}async triggerBearParseEffectively(e,t,n){try{let{exec:s}=await import("child_process"),{promisify:a}=await import("util"),i=a(s),o=t;if(n){let l=new RegExp(`^#\\s+${n.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")}\\s*\\n+`,"i");l.test(o)&&(o=o.replace(l,""))}let d=encodeURIComponent(o),u=`bear://x-callback-url/add-text?id=${e}&mode=replace&text=${d}&show_window=no`;await i(`open "${u}"`),await new Promise(l=>setTimeout(l,1e3))}catch(s){throw new Error(`Failed to trigger effective Bear parsing: ${s instanceof Error?s.message:"Unknown error"}`)}}async triggerHashtagParsing(e,t){if(!e&&!t)throw new Error("Either noteId or noteTitle is required");if(!await this.isBearRunning())return"Bear is not running. Please start Bear first, then the hashtags will be parsed automatically. Alternatively, restart Bear to trigger parsing for all notes.";try{await this.database.connect(!0);let s,a;e?(s="SELECT Z_PK, ZUNIQUEIDENTIFIER, ZTITLE, ZTEXT FROM ZSFNOTE WHERE ZUNIQUEIDENTIFIER = ? AND ZTRASHED = 0",a=[e]):(s="SELECT Z_PK, ZUNIQUEIDENTIFIER, ZTITLE, ZTEXT FROM ZSFNOTE WHERE ZTITLE = ? AND ZTRASHED = 0",a=[t]);let i=await this.database.queryOne(s,a);if(!i)throw new Error(`Note not found: ${e||t}`);return await this.triggerBearParseEffectively(i.ZUNIQUEIDENTIFIER,i.ZTEXT,i.ZTITLE),`Hashtag parsing triggered for note: ${e||t}. Bear should update the sidebar within a few seconds.`}catch(s){throw new Error(`Failed to trigger hashtag parsing: ${s instanceof Error?s.message:"Unknown error"}`)}finally{await this.database.disconnect()}}async createNoteViaBearAPI(e,t,n){try{let{exec:s}=await import("child_process"),{promisify:a}=await import("util"),i=a(s),d=this.validateAndSanitizeTags(n).sanitized,u=d.map(w=>`#${w}`).join(" "),l="";if(u&&(l+=`${u}
+/**
+ * Bear MCP Server
+ * Copyright (c) 2024 Bear MCP Server
+ * MIT License - see LICENSE file for details
+ */
+import { Server } from '@modelcontextprotocol/sdk/server/index.js';
+import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
+import { CallToolRequestSchema, ListToolsRequestSchema, } from '@modelcontextprotocol/sdk/types.js';
+import { BearService } from './services/bear-service.js';
+/**
+ * Bear MCP Server
+ * Provides MCP tools for interfacing with Bear's SQLite database
+ */
+class BearMCPServer {
+    server;
+    bearService;
+    constructor() {
+        this.server = new Server({
+            name: 'bear-mcp-server',
+            version: '1.0.0',
+        });
+        this.bearService = new BearService();
+        this.setupHandlers();
+    }
+    setupHandlers() {
+        // List available tools
+        this.server.setRequestHandler(ListToolsRequestSchema, async () => {
+            return {
+                tools: this.getAvailableTools(),
+            };
+        });
+        // Handle tool calls
+        this.server.setRequestHandler(CallToolRequestSchema, async (request) => {
+            const { name, arguments: args } = request.params;
+            try {
+                switch (name) {
+                    case 'get_database_stats':
+                        return await this.getDatabaseStats();
+                    case 'get_database_schema':
+                        return await this.getDatabaseSchema();
+                    case 'check_bear_status':
+                        return await this.checkBearStatus();
+                    case 'verify_database_access':
+                        return await this.verifyDatabaseAccess();
+                    case 'create_backup':
+                        return await this.createBackup();
+                    case 'get_recent_notes':
+                        return await this.getRecentNotes(args);
+                    case 'search_notes':
+                        return await this.searchNotes(args);
+                    case 'get_note_by_id':
+                        return await this.getNoteById(args);
+                    case 'get_note_by_title':
+                        return await this.getNoteByTitle(args);
+                    case 'get_all_tags':
+                        return await this.getAllTags();
+                    case 'get_notes_by_tag':
+                        return await this.getNotesByTag(args);
+                    case 'get_notes_advanced':
+                        return await this.getNotesAdvanced(args);
+                    case 'get_notes_with_criteria':
+                        return await this.getNotesWithCriteria(args);
+                    case 'get_note_analytics':
+                        return await this.getNoteAnalytics();
+                    case 'get_related_notes':
+                        return await this.getRelatedNotes(args);
+                    case 'search_notes_fulltext':
+                        return await this.searchNotesFullText(args);
+                    case 'get_search_suggestions':
+                        return await this.getSearchSuggestions(args);
+                    case 'find_similar_notes':
+                        return await this.findSimilarNotes(args);
+                    // case 'search_notes_regex':
+                    //   return await this.searchNotesRegex(args);
+                    // TODO: Implement tag management methods in BearService
+                    // case 'get_tag_hierarchy':
+                    //   return await this.getTagHierarchy(args);
+                    // case 'get_tag_analytics':
+                    //   return await this.getTagAnalytics(args);
+                    // case 'analyze_tag_relationships':
+                    //   return await this.analyzeTagRelationships(args);
+                    // case 'get_tag_usage_trends':
+                    //   return await this.getTagUsageTrends(args);
+                    case 'get_file_attachments':
+                        return await this.getFileAttachments(args);
+                    case 'analyze_note_metadata':
+                        return await this.analyzeNoteMetadata(args);
+                    case 'get_notes_with_metadata':
+                        return await this.getNotesWithMetadata(args);
+                    case 'create_note':
+                        return await this.createNote(args);
+                    case 'update_note':
+                        return await this.updateNote(args);
+                    case 'duplicate_note':
+                        return await this.duplicateNote(args);
+                    case 'archive_note':
+                        return await this.archiveNote(args);
+                    case 'trigger_hashtag_parsing':
+                        return await this.triggerHashtagParsing(args);
+                    case 'batch_trigger_hashtag_parsing':
+                        return await this.batchTriggerHashtagParsing(args);
+                    default:
+                        throw new Error(`Unknown tool: ${name}`);
+                }
+            }
+            catch (error) {
+                return {
+                    content: [
+                        {
+                            type: 'text',
+                            text: `Error: ${error instanceof Error ? error.message : 'Unknown error'}`,
+                        },
+                    ],
+                };
+            }
+        });
+    }
+    getAvailableTools() {
+        return [
+            {
+                name: 'get_database_stats',
+                description: 'Get comprehensive statistics about the Bear database including note counts, tags, and database health',
+                inputSchema: {
+                    type: 'object',
+                    properties: {},
+                    required: [],
+                },
+            },
+            {
+                name: 'get_database_schema',
+                description: 'Retrieve the complete database schema showing all tables and their structure',
+                inputSchema: {
+                    type: 'object',
+                    properties: {},
+                    required: [],
+                },
+            },
+            {
+                name: 'check_bear_status',
+                description: 'Check if Bear app is currently running (informational - write operations now use sync-safe Bear API)',
+                inputSchema: {
+                    type: 'object',
+                    properties: {},
+                    required: [],
+                },
+            },
+            {
+                name: 'verify_database_access',
+                description: 'Verify that the Bear database is accessible and readable',
+                inputSchema: {
+                    type: 'object',
+                    properties: {},
+                    required: [],
+                },
+            },
+            {
+                name: 'create_backup',
+                description: 'Create a timestamped backup of the Bear database',
+                inputSchema: {
+                    type: 'object',
+                    properties: {},
+                    required: [],
+                },
+            },
+            {
+                name: 'get_recent_notes',
+                description: 'Get the most recently modified notes',
+                inputSchema: {
+                    type: 'object',
+                    properties: {
+                        limit: {
+                            type: 'number',
+                            description: 'Number of notes to retrieve (default: 10)',
+                            minimum: 1,
+                            maximum: 100,
+                        },
+                    },
+                    required: [],
+                },
+            },
+            {
+                name: 'search_notes',
+                description: 'Search notes by title and content',
+                inputSchema: {
+                    type: 'object',
+                    properties: {
+                        query: {
+                            type: 'string',
+                            description: 'Search query to match against note titles and content',
+                        },
+                        limit: {
+                            type: 'number',
+                            description: 'Maximum number of results (default: 20)',
+                            minimum: 1,
+                            maximum: 100,
+                        },
+                    },
+                    required: ['query'],
+                },
+            },
+            {
+                name: 'get_note_by_id',
+                description: 'Get a specific note by its database ID',
+                inputSchema: {
+                    type: 'object',
+                    properties: {
+                        id: {
+                            type: 'number',
+                            description: 'The database ID of the note',
+                        },
+                    },
+                    required: ['id'],
+                },
+            },
+            {
+                name: 'get_note_by_title',
+                description: 'Get a specific note by its title',
+                inputSchema: {
+                    type: 'object',
+                    properties: {
+                        title: {
+                            type: 'string',
+                            description: 'The exact title of the note',
+                        },
+                    },
+                    required: ['title'],
+                },
+            },
+            {
+                name: 'get_all_tags',
+                description: 'Get all tags with their usage counts',
+                inputSchema: {
+                    type: 'object',
+                    properties: {},
+                    required: [],
+                },
+            },
+            {
+                name: 'get_notes_by_tag',
+                description: 'Get all notes that have a specific tag',
+                inputSchema: {
+                    type: 'object',
+                    properties: {
+                        tag: {
+                            type: 'string',
+                            description: 'The tag name to search for',
+                        },
+                    },
+                    required: ['tag'],
+                },
+            },
+            {
+                name: 'get_notes_advanced',
+                description: 'Advanced note search with filtering, sorting, and pagination',
+                inputSchema: {
+                    type: 'object',
+                    properties: {
+                        query: {
+                            type: 'string',
+                            description: 'Search query for title and content',
+                        },
+                        tags: {
+                            type: 'array',
+                            items: { type: 'string' },
+                            description: 'Tags that notes must have (AND logic)',
+                        },
+                        excludeTags: {
+                            type: 'array',
+                            items: { type: 'string' },
+                            description: 'Tags to exclude from results',
+                        },
+                        sortBy: {
+                            type: 'string',
+                            enum: ['created', 'modified', 'title', 'size'],
+                            description: 'Sort notes by field',
+                        },
+                        sortOrder: {
+                            type: 'string',
+                            enum: ['asc', 'desc'],
+                            description: 'Sort order',
+                        },
+                        limit: {
+                            type: 'number',
+                            description: 'Maximum number of results',
+                            minimum: 1,
+                            maximum: 100,
+                        },
+                    },
+                    required: [],
+                },
+            },
+            {
+                name: 'get_notes_with_criteria',
+                description: 'Find notes using complex criteria with AND/OR logic',
+                inputSchema: {
+                    type: 'object',
+                    properties: {
+                        titleContains: {
+                            type: 'array',
+                            items: { type: 'string' },
+                            description: 'Terms that must appear in title (OR logic)',
+                        },
+                        contentContains: {
+                            type: 'array',
+                            items: { type: 'string' },
+                            description: 'Terms that must appear in content (OR logic)',
+                        },
+                        hasAllTags: {
+                            type: 'array',
+                            items: { type: 'string' },
+                            description: 'Tags that notes must have (AND logic)',
+                        },
+                        hasAnyTags: {
+                            type: 'array',
+                            items: { type: 'string' },
+                            description: 'Tags that notes can have (OR logic)',
+                        },
+                        isPinned: {
+                            type: 'boolean',
+                            description: 'Filter by pinned status',
+                        },
+                        isArchived: {
+                            type: 'boolean',
+                            description: 'Filter by archived status',
+                        },
+                        minLength: {
+                            type: 'number',
+                            description: 'Minimum content length',
+                        },
+                        maxLength: {
+                            type: 'number',
+                            description: 'Maximum content length',
+                        },
+                    },
+                    required: [],
+                },
+            },
+            {
+                name: 'get_note_analytics',
+                description: 'Get comprehensive analytics and statistics about notes',
+                inputSchema: {
+                    type: 'object',
+                    properties: {},
+                    required: [],
+                },
+            },
+            {
+                name: 'get_related_notes',
+                description: 'Find notes related to a specific note by tags and content',
+                inputSchema: {
+                    type: 'object',
+                    properties: {
+                        noteId: {
+                            type: 'number',
+                            description: 'The ID of the note to find related notes for',
+                        },
+                        limit: {
+                            type: 'number',
+                            description: 'Maximum number of related notes to return',
+                            minimum: 1,
+                            maximum: 20,
+                        },
+                    },
+                    required: ['noteId'],
+                },
+            },
+            {
+                name: 'search_notes_fulltext',
+                description: 'Advanced full-text search with relevance scoring and snippets',
+                inputSchema: {
+                    type: 'object',
+                    properties: {
+                        query: {
+                            type: 'string',
+                            description: 'Search query string',
+                        },
+                        limit: {
+                            type: 'number',
+                            description: 'Maximum number of results',
+                            minimum: 1,
+                            maximum: 50,
+                        },
+                        includeSnippets: {
+                            type: 'boolean',
+                            description: 'Include content snippets around matches',
+                        },
+                        searchFields: {
+                            type: 'array',
+                            items: { type: 'string', enum: ['title', 'content', 'both'] },
+                            description: 'Fields to search in',
+                        },
+                        fuzzyMatch: {
+                            type: 'boolean',
+                            description: 'Enable fuzzy matching for typos',
+                        },
+                        caseSensitive: {
+                            type: 'boolean',
+                            description: 'Case sensitive search',
+                        },
+                    },
+                    required: ['query'],
+                },
+            },
+            {
+                name: 'get_search_suggestions',
+                description: 'Get auto-complete suggestions for search queries',
+                inputSchema: {
+                    type: 'object',
+                    properties: {
+                        partialQuery: {
+                            type: 'string',
+                            description: 'Partial search query for suggestions',
+                        },
+                        limit: {
+                            type: 'number',
+                            description: 'Maximum number of suggestions',
+                            minimum: 1,
+                            maximum: 20,
+                        },
+                    },
+                    required: ['partialQuery'],
+                },
+            },
+            {
+                name: 'find_similar_notes',
+                description: 'Find notes similar to given text using content analysis',
+                inputSchema: {
+                    type: 'object',
+                    properties: {
+                        referenceText: {
+                            type: 'string',
+                            description: 'Text to find similar notes for',
+                        },
+                        limit: {
+                            type: 'number',
+                            description: 'Maximum number of similar notes',
+                            minimum: 1,
+                            maximum: 20,
+                        },
+                        minSimilarity: {
+                            type: 'number',
+                            description: 'Minimum similarity score (0.0 to 1.0)',
+                            minimum: 0,
+                            maximum: 1,
+                        },
+                        excludeNoteId: {
+                            type: 'number',
+                            description: 'Note ID to exclude from results',
+                        },
+                    },
+                    required: ['referenceText'],
+                },
+            },
+            {
+                name: 'search_notes_regex',
+                description: 'Search notes using regular expressions',
+                inputSchema: {
+                    type: 'object',
+                    properties: {
+                        pattern: {
+                            type: 'string',
+                            description: 'Regular expression pattern',
+                        },
+                        flags: {
+                            type: 'string',
+                            description: 'Regex flags (e.g., "gi" for global case-insensitive)',
+                        },
+                        searchIn: {
+                            type: 'string',
+                            enum: ['title', 'content', 'both'],
+                            description: 'Where to search for the pattern',
+                        },
+                        limit: {
+                            type: 'number',
+                            description: 'Maximum number of results',
+                            minimum: 1,
+                            maximum: 50,
+                        },
+                        includeContext: {
+                            type: 'boolean',
+                            description: 'Include context around matches',
+                        },
+                    },
+                    required: ['pattern'],
+                },
+            },
+            {
+                name: 'get_tag_hierarchy',
+                description: 'Get comprehensive tag hierarchy and relationships',
+                inputSchema: {
+                    type: 'object',
+                    properties: {},
+                },
+            },
+            {
+                name: 'get_tag_analytics',
+                description: 'Get detailed tag statistics and usage patterns',
+                inputSchema: {
+                    type: 'object',
+                    properties: {},
+                },
+            },
+            {
+                name: 'analyze_tag_relationships',
+                description: 'Analyze tag relationships and suggest improvements',
+                inputSchema: {
+                    type: 'object',
+                    properties: {},
+                },
+            },
+            {
+                name: 'get_tag_usage_trends',
+                description: 'Get tag usage timeline and trends',
+                inputSchema: {
+                    type: 'object',
+                    properties: {
+                        tagName: {
+                            type: 'string',
+                            description: 'Specific tag to analyze (optional)',
+                        },
+                        months: {
+                            type: 'number',
+                            description: 'Number of months to analyze',
+                            minimum: 1,
+                            maximum: 24,
+                        },
+                    },
+                },
+            },
+            {
+                name: 'get_file_attachments',
+                description: 'Get comprehensive file attachment information',
+                inputSchema: {
+                    type: 'object',
+                    properties: {
+                        noteId: {
+                            type: 'number',
+                            description: 'Specific note ID to get attachments for',
+                        },
+                        fileType: {
+                            type: 'string',
+                            description: 'Filter by file extension (e.g., "jpg", "pdf")',
+                        },
+                        includeMetadata: {
+                            type: 'boolean',
+                            description: 'Include detailed file metadata',
+                        },
+                        limit: {
+                            type: 'number',
+                            description: 'Maximum number of attachments to return',
+                            minimum: 1,
+                            maximum: 100,
+                        },
+                    },
+                },
+            },
+            {
+                name: 'analyze_note_metadata',
+                description: 'Analyze note metadata and content patterns',
+                inputSchema: {
+                    type: 'object',
+                    properties: {
+                        includeContentAnalysis: {
+                            type: 'boolean',
+                            description: 'Include markdown and content pattern analysis',
+                        },
+                        includeLinkAnalysis: {
+                            type: 'boolean',
+                            description: 'Include link analysis and domain statistics',
+                        },
+                        includeStructureAnalysis: {
+                            type: 'boolean',
+                            description: 'Include note structure and title pattern analysis',
+                        },
+                    },
+                },
+            },
+            {
+                name: 'get_notes_with_metadata',
+                description: 'Get notes filtered by metadata characteristics',
+                inputSchema: {
+                    type: 'object',
+                    properties: {
+                        hasAttachments: {
+                            type: 'boolean',
+                            description: 'Filter notes with/without attachments',
+                        },
+                        hasLinks: {
+                            type: 'boolean',
+                            description: 'Filter notes with/without external links',
+                        },
+                        hasImages: {
+                            type: 'boolean',
+                            description: 'Filter notes with/without images',
+                        },
+                        hasTodos: {
+                            type: 'boolean',
+                            description: 'Filter notes with/without todo items',
+                        },
+                        hasCodeBlocks: {
+                            type: 'boolean',
+                            description: 'Filter notes with/without code blocks',
+                        },
+                        hasTables: {
+                            type: 'boolean',
+                            description: 'Filter notes with/without tables',
+                        },
+                        minWordCount: {
+                            type: 'number',
+                            description: 'Minimum word count',
+                            minimum: 1,
+                        },
+                        maxWordCount: {
+                            type: 'number',
+                            description: 'Maximum word count',
+                            minimum: 1,
+                        },
+                        limit: {
+                            type: 'number',
+                            description: 'Maximum number of results',
+                            minimum: 1,
+                            maximum: 100,
+                        },
+                    },
+                },
+            },
+            {
+                name: 'create_note',
+                description: 'Create a new note with title, content, and tags using sync-safe Bear API',
+                inputSchema: {
+                    type: 'object',
+                    properties: {
+                        title: {
+                            type: 'string',
+                            description: 'Title of the new note',
+                        },
+                        content: {
+                            type: 'string',
+                            description: 'Content/body of the note (optional)',
+                        },
+                        tags: {
+                            type: 'array',
+                            items: { type: 'string' },
+                            description: 'Array of tag names to apply to the note. Tags are automatically sanitized: lowercase only, no spaces/hyphens (underscores allowed, use forward slashes for nested tags like "work/project")',
+                        },
+                        isArchived: {
+                            type: 'boolean',
+                            description: 'Whether the note should be archived',
+                        },
+                        isPinned: {
+                            type: 'boolean',
+                            description: 'Whether the note should be pinned',
+                        },
+                    },
+                    required: ['title'],
+                },
+            },
+            {
+                name: 'update_note',
+                description: 'Update an existing note using sync-safe Bear API',
+                inputSchema: {
+                    type: 'object',
+                    properties: {
+                        noteId: {
+                            type: 'number',
+                            description: 'ID of the note to update',
+                        },
+                        title: {
+                            type: 'string',
+                            description: 'New title for the note',
+                        },
+                        content: {
+                            type: 'string',
+                            description: 'New content for the note',
+                        },
+                        tags: {
+                            type: 'array',
+                            items: { type: 'string' },
+                            description: 'New array of tag names (replaces existing tags). Tags are automatically sanitized: lowercase only, no spaces/hyphens (underscores allowed, use forward slashes for nested tags like "work/project")',
+                        },
+                        isArchived: {
+                            type: 'boolean',
+                            description: 'Whether the note should be archived',
+                        },
+                        isPinned: {
+                            type: 'boolean',
+                            description: 'Whether the note should be pinned',
+                        },
+                    },
+                    required: ['noteId'],
+                },
+            },
+            {
+                name: 'duplicate_note',
+                description: 'Create a duplicate of an existing note using sync-safe Bear API',
+                inputSchema: {
+                    type: 'object',
+                    properties: {
+                        noteId: {
+                            type: 'number',
+                            description: 'ID of the note to duplicate',
+                        },
+                        titleSuffix: {
+                            type: 'string',
+                            description: 'Suffix to add to the duplicated note title (default: " (Copy)")',
+                        },
+                        copyTags: {
+                            type: 'boolean',
+                            description: 'Whether to copy tags from the original note (default: true)',
+                        },
+                    },
+                    required: ['noteId'],
+                },
+            },
+            {
+                name: 'archive_note',
+                description: 'Archive or unarchive a note using sync-safe Bear API',
+                inputSchema: {
+                    type: 'object',
+                    properties: {
+                        noteId: {
+                            type: 'number',
+                            description: 'ID of the note to archive/unarchive',
+                        },
+                        archived: {
+                            type: 'boolean',
+                            description: 'True to archive, false to unarchive',
+                        },
+                    },
+                    required: ['noteId', 'archived'],
+                },
+            },
+            {
+                name: 'trigger_hashtag_parsing',
+                description: 'Trigger Bear to reparse hashtags in a note using sync-safe API',
+                inputSchema: {
+                    type: 'object',
+                    properties: {
+                        note_id: {
+                            type: 'string',
+                            description: 'Note ID to trigger parsing for',
+                        },
+                        note_title: {
+                            type: 'string',
+                            description: 'Note title to trigger parsing for (alternative to note_id)',
+                        },
+                    },
+                    oneOf: [{ required: ['note_id'] }, { required: ['note_title'] }],
+                },
+            },
+            {
+                name: 'batch_trigger_hashtag_parsing',
+                description: 'Trigger hashtag parsing for multiple notes using sync-safe API',
+                inputSchema: {
+                    type: 'object',
+                    properties: {
+                        tag_filter: {
+                            type: 'string',
+                            description: 'Filter notes by tag name',
+                        },
+                        title_pattern: {
+                            type: 'string',
+                            description: 'Filter notes by title pattern',
+                        },
+                        limit: {
+                            type: 'number',
+                            description: 'Maximum number of notes to process',
+                        },
+                        created_after: {
+                            type: 'string',
+                            description: 'Filter notes created after this date (ISO string)',
+                        },
+                    },
+                },
+            },
+        ];
+    }
+    async getDatabaseStats() {
+        try {
+            const stats = await this.bearService.getDatabaseStats();
+            const integrity = await this.bearService.checkIntegrity();
+            return {
+                content: [
+                    {
+                        type: 'text',
+                        text: `Bear Database Statistics:
+📊 Notes: ${stats.totalNotes} total (${stats.activeNotes} active, ${stats.trashedNotes} trashed, ${stats.archivedNotes} archived)
+🔒 Encrypted Notes: ${stats.encryptedNotes}
+🏷️  Tags: ${stats.totalTags}
+📎 Attachments: ${stats.totalAttachments}
+💾 Database Size: ${(stats.databaseSize / 1024 / 1024).toFixed(2)} MB
+📅 Last Modified: ${stats.lastModified.toLocaleString()}
+✅ Database Integrity: ${integrity ? 'OK' : 'FAILED'}`,
+                    },
+                ],
+            };
+        }
+        catch (error) {
+            return {
+                content: [
+                    {
+                        type: 'text',
+                        text: `❌ Error getting database stats: ${error instanceof Error ? error.message : 'Unknown error'}`,
+                    },
+                ],
+            };
+        }
+    }
+    async getDatabaseSchema() {
+        try {
+            const schema = await this.bearService.getSchema();
+            const schemaText = schema
+                .map((table) => `Table: ${table.name}\n${table.sql || 'No schema available'}\n`)
+                .join('\n');
+            return {
+                content: [
+                    {
+                        type: 'text',
+                        text: `Bear Database Schema:\n\n${schemaText}`,
+                    },
+                ],
+            };
+        }
+        catch (error) {
+            return {
+                content: [
+                    {
+                        type: 'text',
+                        text: `❌ Error getting schema: ${error instanceof Error ? error.message : 'Unknown error'}`,
+                    },
+                ],
+            };
+        }
+    }
+    async checkBearStatus() {
+        try {
+            const isRunning = await this.bearService.isBearRunning();
+            return {
+                content: [
+                    {
+                        type: 'text',
+                        text: `Bear App Status: ${isRunning ? '🔴 RUNNING' : '🟢 NOT RUNNING'}
+${isRunning ? '✅ Write operations use sync-safe Bear API' : '✅ All database operations available'}`,
+                    },
+                ],
+            };
+        }
+        catch (error) {
+            return {
+                content: [
+                    {
+                        type: 'text',
+                        text: `❌ Error checking Bear status: ${error instanceof Error ? error.message : 'Unknown error'}`,
+                    },
+                ],
+            };
+        }
+    }
+    async verifyDatabaseAccess() {
+        try {
+            await this.bearService.verifyDatabaseAccess();
+            return {
+                content: [
+                    {
+                        type: 'text',
+                        text: '✅ Database access verified successfully',
+                    },
+                ],
+            };
+        }
+        catch (error) {
+            return {
+                content: [
+                    {
+                        type: 'text',
+                        text: `❌ Database access failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
+                    },
+                ],
+            };
+        }
+    }
+    async createBackup() {
+        try {
+            const backupPath = await this.bearService.createBackup();
+            return {
+                content: [
+                    {
+                        type: 'text',
+                        text: `✅ Backup created successfully: ${backupPath}`,
+                    },
+                ],
+            };
+        }
+        catch (error) {
+            return {
+                content: [
+                    {
+                        type: 'text',
+                        text: `❌ Backup failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
+                    },
+                ],
+            };
+        }
+    }
+    async getRecentNotes(args) {
+        try {
+            const limit = args?.limit || 10;
+            const notes = await this.bearService.getRecentNotes(limit);
+            if (notes.length === 0) {
+                return {
+                    content: [
+                        {
+                            type: 'text',
+                            text: 'No notes found.',
+                        },
+                    ],
+                };
+            }
+            const notesList = notes
+                .map(note => {
+                const preview = note.ZTEXT ? `${note.ZTEXT.substring(0, 100)}...` : '';
+                const tags = note.tags.length > 0 ? ` [${note.tags.join(', ')}]` : '';
+                return `📝 **${note.ZTITLE || 'Untitled'}**${tags}\n   ${preview}`;
+            })
+                .join('\n\n');
+            return {
+                content: [
+                    {
+                        type: 'text',
+                        text: `Recent Notes (${notes.length}):\n\n${notesList}`,
+                    },
+                ],
+            };
+        }
+        catch (error) {
+            return {
+                content: [
+                    {
+                        type: 'text',
+                        text: `❌ Error getting recent notes: ${error instanceof Error ? error.message : 'Unknown error'}`,
+                    },
+                ],
+            };
+        }
+    }
+    async searchNotes(args) {
+        try {
+            const query = args?.query;
+            const limit = args?.limit || 20;
+            if (!query) {
+                throw new Error('Search query is required');
+            }
+            const notes = await this.bearService.searchNotes(query, { limit });
+            if (notes.length === 0) {
+                return {
+                    content: [
+                        {
+                            type: 'text',
+                            text: `No notes found matching "${query}".`,
+                        },
+                    ],
+                };
+            }
+            const notesList = notes
+                .map(note => {
+                const preview = note.ZTEXT ? `${note.ZTEXT.substring(0, 100)}...` : '';
+                const tags = note.tags.length > 0 ? ` [${note.tags.join(', ')}]` : '';
+                return `📝 **${note.ZTITLE || 'Untitled'}** (ID: ${note.Z_PK})${tags}\n   ${preview}`;
+            })
+                .join('\n\n');
+            return {
+                content: [
+                    {
+                        type: 'text',
+                        text: `Search Results for "${query}" (${notes.length}):\n\n${notesList}`,
+                    },
+                ],
+            };
+        }
+        catch (error) {
+            return {
+                content: [
+                    {
+                        type: 'text',
+                        text: `❌ Error searching notes: ${error instanceof Error ? error.message : 'Unknown error'}`,
+                    },
+                ],
+            };
+        }
+    }
+    async getNoteById(args) {
+        try {
+            const id = args?.id;
+            if (!id) {
+                throw new Error('Note ID is required');
+            }
+            const note = await this.bearService.getNoteById(id);
+            if (!note) {
+                return {
+                    content: [
+                        {
+                            type: 'text',
+                            text: `No note found with ID ${id}.`,
+                        },
+                    ],
+                };
+            }
+            const tags = note.tags.length > 0 ? `\n🏷️ Tags: ${note.tags.join(', ')}` : '';
+            const content = note.ZTEXT || 'No content';
+            return {
+                content: [
+                    {
+                        type: 'text',
+                        text: `📝 **${note.ZTITLE || 'Untitled'}** (ID: ${note.Z_PK})${tags}\n\n${content}`,
+                    },
+                ],
+            };
+        }
+        catch (error) {
+            return {
+                content: [
+                    {
+                        type: 'text',
+                        text: `❌ Error getting note: ${error instanceof Error ? error.message : 'Unknown error'}`,
+                    },
+                ],
+            };
+        }
+    }
+    async getNoteByTitle(args) {
+        try {
+            const title = args?.title;
+            if (!title) {
+                throw new Error('Note title is required');
+            }
+            const note = await this.bearService.getNoteByTitle(title);
+            if (!note) {
+                return {
+                    content: [
+                        {
+                            type: 'text',
+                            text: `No note found with title "${title}".`,
+                        },
+                    ],
+                };
+            }
+            const tags = note.tags.length > 0 ? `\n🏷️ Tags: ${note.tags.join(', ')}` : '';
+            const content = note.ZTEXT || 'No content';
+            return {
+                content: [
+                    {
+                        type: 'text',
+                        text: `📝 **${note.ZTITLE || 'Untitled'}** (ID: ${note.Z_PK})${tags}\n\n${content}`,
+                    },
+                ],
+            };
+        }
+        catch (error) {
+            return {
+                content: [
+                    {
+                        type: 'text',
+                        text: `❌ Error getting note: ${error instanceof Error ? error.message : 'Unknown error'}`,
+                    },
+                ],
+            };
+        }
+    }
+    async getAllTags() {
+        try {
+            const tags = await this.bearService.getTags();
+            if (tags.length === 0) {
+                return {
+                    content: [
+                        {
+                            type: 'text',
+                            text: 'No tags found.',
+                        },
+                    ],
+                };
+            }
+            const tagsList = tags.map(tag => `🏷️ **${tag.ZTITLE}** (${tag.noteCount} notes)`).join('\n');
+            return {
+                content: [
+                    {
+                        type: 'text',
+                        text: `All Tags (${tags.length}):\n\n${tagsList}`,
+                    },
+                ],
+            };
+        }
+        catch (error) {
+            return {
+                content: [
+                    {
+                        type: 'text',
+                        text: `❌ Error getting tags: ${error instanceof Error ? error.message : 'Unknown error'}`,
+                    },
+                ],
+            };
+        }
+    }
+    async getNotesByTag(args) {
+        try {
+            const tag = args?.tag;
+            if (!tag) {
+                throw new Error('Tag name is required');
+            }
+            const notes = await this.bearService.getNotesByTag(tag);
+            if (notes.length === 0) {
+                return {
+                    content: [
+                        {
+                            type: 'text',
+                            text: `No notes found with tag "${tag}".`,
+                        },
+                    ],
+                };
+            }
+            const notesList = notes
+                .map(note => {
+                const preview = note.ZTEXT ? `${note.ZTEXT.substring(0, 100)}...` : '';
+                const otherTags = note.tags.filter(t => t !== tag);
+                const tagInfo = otherTags.length > 0 ? ` [+${otherTags.join(', ')}]` : '';
+                return `📝 **${note.ZTITLE || 'Untitled'}** (ID: ${note.Z_PK})${tagInfo}\n   ${preview}`;
+            })
+                .join('\n\n');
+            return {
+                content: [
+                    {
+                        type: 'text',
+                        text: `Notes with tag "${tag}" (${notes.length}):\n\n${notesList}`,
+                    },
+                ],
+            };
+        }
+        catch (error) {
+            return {
+                content: [
+                    {
+                        type: 'text',
+                        text: `❌ Error getting notes by tag: ${error instanceof Error ? error.message : 'Unknown error'}`,
+                    },
+                ],
+            };
+        }
+    }
+    async getNotesAdvanced(args) {
+        try {
+            const options = {
+                query: args?.query,
+                tags: args?.tags,
+                excludeTags: args?.excludeTags,
+                sortBy: args?.sortBy || 'modified',
+                sortOrder: args?.sortOrder || 'desc',
+                limit: args?.limit || 20,
+            };
+            const notes = await this.bearService.getNotesAdvanced(options);
+            if (notes.length === 0) {
+                return {
+                    content: [
+                        {
+                            type: 'text',
+                            text: 'No notes found matching the specified criteria.',
+                        },
+                    ],
+                };
+            }
+            const notesList = notes
+                .map(note => {
+                const preview = note.preview || (note.ZTEXT ? `${note.ZTEXT.substring(0, 100)}...` : '');
+                const tags = note.tags.length > 0 ? ` [${note.tags.join(', ')}]` : '';
+                const length = note.contentLength ? ` (${note.contentLength} chars)` : '';
+                return `📝 **${note.ZTITLE || 'Untitled'}** (ID: ${note.Z_PK})${tags}${length}\n   ${preview}`;
+            })
+                .join('\n\n');
+            return {
+                content: [
+                    {
+                        type: 'text',
+                        text: `Advanced Search Results (${notes.length}):\n\n${notesList}`,
+                    },
+                ],
+            };
+        }
+        catch (error) {
+            return {
+                content: [
+                    {
+                        type: 'text',
+                        text: `❌ Error in advanced search: ${error instanceof Error ? error.message : 'Unknown error'}`,
+                    },
+                ],
+            };
+        }
+    }
+    async getNotesWithCriteria(args) {
+        try {
+            const criteria = {
+                titleContains: args?.titleContains,
+                contentContains: args?.contentContains,
+                hasAllTags: args?.hasAllTags,
+                hasAnyTags: args?.hasAnyTags,
+                isPinned: args?.isPinned,
+                isArchived: args?.isArchived,
+                minLength: args?.minLength,
+                maxLength: args?.maxLength,
+            };
+            const notes = await this.bearService.getNotesWithCriteria(criteria);
+            if (notes.length === 0) {
+                return {
+                    content: [
+                        {
+                            type: 'text',
+                            text: 'No notes found matching the specified criteria.',
+                        },
+                    ],
+                };
+            }
+            const notesList = notes
+                .map(note => {
+                const preview = note.ZTEXT ? `${note.ZTEXT.substring(0, 100)}...` : '';
+                const tags = note.tags.length > 0 ? ` [${note.tags.join(', ')}]` : '';
+                const length = note.contentLength ? ` (${note.contentLength} chars)` : '';
+                const status = [];
+                if (note.ZPINNED) {
+                    status.push('📌');
+                }
+                if (note.ZARCHIVED) {
+                    status.push('📦');
+                }
+                if (note.ZENCRYPTED) {
+                    status.push('🔒');
+                }
+                const statusStr = status.length > 0 ? ` ${status.join('')}` : '';
+                return `📝 **${note.ZTITLE || 'Untitled'}** (ID: ${note.Z_PK})${tags}${length}${statusStr}\n   ${preview}`;
+            })
+                .join('\n\n');
+            return {
+                content: [
+                    {
+                        type: 'text',
+                        text: `Criteria Search Results (${notes.length}):\n\n${notesList}`,
+                    },
+                ],
+            };
+        }
+        catch (error) {
+            return {
+                content: [
+                    {
+                        type: 'text',
+                        text: `❌ Error in criteria search: ${error instanceof Error ? error.message : 'Unknown error'}`,
+                    },
+                ],
+            };
+        }
+    }
+    async getNoteAnalytics() {
+        try {
+            const analytics = await this.bearService.getNoteAnalytics();
+            const monthlyData = analytics.notesPerMonth
+                .slice(0, 6)
+                .map(stat => `   ${stat.month}: ${stat.count} notes`)
+                .join('\n');
+            const topTagsData = analytics.topTags
+                .slice(0, 8)
+                .map(tag => `   ${tag.tag}: ${tag.count} notes`)
+                .join('\n');
+            return {
+                content: [
+                    {
+                        type: 'text',
+                        text: `📊 **Bear Notes Analytics**
 
-`),t){let w=t,ve=new RegExp(`^#\\s+${e.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")}\\s*\\n+`,"i");ve.test(w)&&(w=w.replace(ve,"")),l+=w}let T=encodeURIComponent(e),v=encodeURIComponent(l),b=encodeURIComponent(d.join(",")),S=`bear://x-callback-url/create?title=${T}&text=${v}&tags=${b}&edit=yes&show_window=no`;return await i(`open "${S}"`),await new Promise(w=>setTimeout(w,1e3)),`Note "${e}" created via Bear API with tags: ${d.join(", ")}`}catch(s){throw new Error(`Failed to create note via Bear API: ${s instanceof Error?s.message:"Unknown error"}`)}}async batchTriggerHashtagParsing(e){try{await this.database.connect(!0);let t="SELECT Z_PK, ZUNIQUEIDENTIFIER, ZTITLE FROM ZSFNOTE WHERE ZTRASHED = 0",n=[];if(e.title_pattern&&(t+=" AND ZTITLE LIKE ?",n.push(`%${e.title_pattern}%`)),e.created_after){let i=new Date(e.created_after);t+=" AND ZCREATIONDATE > ?",n.push(x.fromDate(i))}t+=" ORDER BY ZMODIFICATIONDATE DESC",e.limit&&(t+=" LIMIT ?",n.push(e.limit));let s=await this.database.query(t,n);if(s.length===0)return await this.database.disconnect(),"No notes found matching the criteria";let a=0;for(let i of s)try{let o=await this.database.queryOne(`
-            SELECT ZTEXT FROM ZSFNOTE WHERE Z_PK = ?
-          `,[i.Z_PK]);o?.ZTEXT&&(await this.triggerBearParseEffectively(i.ZUNIQUEIDENTIFIER,o.ZTEXT,i.ZTITLE),a++),await new Promise(d=>setTimeout(d,200))}catch{}return await this.database.disconnect(),`Triggered hashtag parsing for ${a}/${s.length} notes. Check Bear's sidebar in a few seconds.`}catch(t){throw new Error(`Failed to batch trigger hashtag parsing: ${t instanceof Error?t.message:"Unknown error"}`)}}};var gt=class{server;bearService;constructor(){this.server=new qe({name:"bear-mcp-server",version:"1.0.0"}),this.bearService=new Ye,this.setupHandlers()}setupHandlers(){this.server.setRequestHandler(Ae,async()=>({tools:this.getAvailableTools()})),this.server.setRequestHandler(ut,async e=>{let{name:t,arguments:n}=e.params;try{switch(t){case"get_database_stats":return await this.getDatabaseStats();case"get_database_schema":return await this.getDatabaseSchema();case"check_bear_status":return await this.checkBearStatus();case"verify_database_access":return await this.verifyDatabaseAccess();case"create_backup":return await this.createBackup();case"get_recent_notes":return await this.getRecentNotes(n);case"search_notes":return await this.searchNotes(n);case"get_note_by_id":return await this.getNoteById(n);case"get_note_by_title":return await this.getNoteByTitle(n);case"get_all_tags":return await this.getAllTags();case"get_notes_by_tag":return await this.getNotesByTag(n);case"get_notes_advanced":return await this.getNotesAdvanced(n);case"get_notes_with_criteria":return await this.getNotesWithCriteria(n);case"get_note_analytics":return await this.getNoteAnalytics();case"get_related_notes":return await this.getRelatedNotes(n);case"search_notes_fulltext":return await this.searchNotesFullText(n);case"get_search_suggestions":return await this.getSearchSuggestions(n);case"find_similar_notes":return await this.findSimilarNotes(n);case"get_file_attachments":return await this.getFileAttachments(n);case"analyze_note_metadata":return await this.analyzeNoteMetadata(n);case"get_notes_with_metadata":return await this.getNotesWithMetadata(n);case"create_note":return await this.createNote(n);case"update_note":return await this.updateNote(n);case"duplicate_note":return await this.duplicateNote(n);case"archive_note":return await this.archiveNote(n);case"trigger_hashtag_parsing":return await this.triggerHashtagParsing(n);case"batch_trigger_hashtag_parsing":return await this.batchTriggerHashtagParsing(n);default:throw new Error(`Unknown tool: ${t}`)}}catch(s){return{content:[{type:"text",text:`Error: ${s instanceof Error?s.message:"Unknown error"}`}]}}})}getAvailableTools(){return[{name:"get_database_stats",description:"Get comprehensive statistics about the Bear database including note counts, tags, and database health",inputSchema:{type:"object",properties:{},required:[]}},{name:"get_database_schema",description:"Retrieve the complete database schema showing all tables and their structure",inputSchema:{type:"object",properties:{},required:[]}},{name:"check_bear_status",description:"Check if Bear app is currently running (informational - write operations now use sync-safe Bear API)",inputSchema:{type:"object",properties:{},required:[]}},{name:"verify_database_access",description:"Verify that the Bear database is accessible and readable",inputSchema:{type:"object",properties:{},required:[]}},{name:"create_backup",description:"Create a timestamped backup of the Bear database",inputSchema:{type:"object",properties:{},required:[]}},{name:"get_recent_notes",description:"Get the most recently modified notes",inputSchema:{type:"object",properties:{limit:{type:"number",description:"Number of notes to retrieve (default: 10)",minimum:1,maximum:100}},required:[]}},{name:"search_notes",description:"Search notes by title and content",inputSchema:{type:"object",properties:{query:{type:"string",description:"Search query to match against note titles and content"},limit:{type:"number",description:"Maximum number of results (default: 20)",minimum:1,maximum:100}},required:["query"]}},{name:"get_note_by_id",description:"Get a specific note by its database ID",inputSchema:{type:"object",properties:{id:{type:"number",description:"The database ID of the note"}},required:["id"]}},{name:"get_note_by_title",description:"Get a specific note by its title",inputSchema:{type:"object",properties:{title:{type:"string",description:"The exact title of the note"}},required:["title"]}},{name:"get_all_tags",description:"Get all tags with their usage counts",inputSchema:{type:"object",properties:{},required:[]}},{name:"get_notes_by_tag",description:"Get all notes that have a specific tag",inputSchema:{type:"object",properties:{tag:{type:"string",description:"The tag name to search for"}},required:["tag"]}},{name:"get_notes_advanced",description:"Advanced note search with filtering, sorting, and pagination",inputSchema:{type:"object",properties:{query:{type:"string",description:"Search query for title and content"},tags:{type:"array",items:{type:"string"},description:"Tags that notes must have (AND logic)"},excludeTags:{type:"array",items:{type:"string"},description:"Tags to exclude from results"},sortBy:{type:"string",enum:["created","modified","title","size"],description:"Sort notes by field"},sortOrder:{type:"string",enum:["asc","desc"],description:"Sort order"},limit:{type:"number",description:"Maximum number of results",minimum:1,maximum:100}},required:[]}},{name:"get_notes_with_criteria",description:"Find notes using complex criteria with AND/OR logic",inputSchema:{type:"object",properties:{titleContains:{type:"array",items:{type:"string"},description:"Terms that must appear in title (OR logic)"},contentContains:{type:"array",items:{type:"string"},description:"Terms that must appear in content (OR logic)"},hasAllTags:{type:"array",items:{type:"string"},description:"Tags that notes must have (AND logic)"},hasAnyTags:{type:"array",items:{type:"string"},description:"Tags that notes can have (OR logic)"},isPinned:{type:"boolean",description:"Filter by pinned status"},isArchived:{type:"boolean",description:"Filter by archived status"},minLength:{type:"number",description:"Minimum content length"},maxLength:{type:"number",description:"Maximum content length"}},required:[]}},{name:"get_note_analytics",description:"Get comprehensive analytics and statistics about notes",inputSchema:{type:"object",properties:{},required:[]}},{name:"get_related_notes",description:"Find notes related to a specific note by tags and content",inputSchema:{type:"object",properties:{noteId:{type:"number",description:"The ID of the note to find related notes for"},limit:{type:"number",description:"Maximum number of related notes to return",minimum:1,maximum:20}},required:["noteId"]}},{name:"search_notes_fulltext",description:"Advanced full-text search with relevance scoring and snippets",inputSchema:{type:"object",properties:{query:{type:"string",description:"Search query string"},limit:{type:"number",description:"Maximum number of results",minimum:1,maximum:50},includeSnippets:{type:"boolean",description:"Include content snippets around matches"},searchFields:{type:"array",items:{type:"string",enum:["title","content","both"]},description:"Fields to search in"},fuzzyMatch:{type:"boolean",description:"Enable fuzzy matching for typos"},caseSensitive:{type:"boolean",description:"Case sensitive search"}},required:["query"]}},{name:"get_search_suggestions",description:"Get auto-complete suggestions for search queries",inputSchema:{type:"object",properties:{partialQuery:{type:"string",description:"Partial search query for suggestions"},limit:{type:"number",description:"Maximum number of suggestions",minimum:1,maximum:20}},required:["partialQuery"]}},{name:"find_similar_notes",description:"Find notes similar to given text using content analysis",inputSchema:{type:"object",properties:{referenceText:{type:"string",description:"Text to find similar notes for"},limit:{type:"number",description:"Maximum number of similar notes",minimum:1,maximum:20},minSimilarity:{type:"number",description:"Minimum similarity score (0.0 to 1.0)",minimum:0,maximum:1},excludeNoteId:{type:"number",description:"Note ID to exclude from results"}},required:["referenceText"]}},{name:"search_notes_regex",description:"Search notes using regular expressions",inputSchema:{type:"object",properties:{pattern:{type:"string",description:"Regular expression pattern"},flags:{type:"string",description:'Regex flags (e.g., "gi" for global case-insensitive)'},searchIn:{type:"string",enum:["title","content","both"],description:"Where to search for the pattern"},limit:{type:"number",description:"Maximum number of results",minimum:1,maximum:50},includeContext:{type:"boolean",description:"Include context around matches"}},required:["pattern"]}},{name:"get_tag_hierarchy",description:"Get comprehensive tag hierarchy and relationships",inputSchema:{type:"object",properties:{}}},{name:"get_tag_analytics",description:"Get detailed tag statistics and usage patterns",inputSchema:{type:"object",properties:{}}},{name:"analyze_tag_relationships",description:"Analyze tag relationships and suggest improvements",inputSchema:{type:"object",properties:{}}},{name:"get_tag_usage_trends",description:"Get tag usage timeline and trends",inputSchema:{type:"object",properties:{tagName:{type:"string",description:"Specific tag to analyze (optional)"},months:{type:"number",description:"Number of months to analyze",minimum:1,maximum:24}}}},{name:"get_file_attachments",description:"Get comprehensive file attachment information",inputSchema:{type:"object",properties:{noteId:{type:"number",description:"Specific note ID to get attachments for"},fileType:{type:"string",description:'Filter by file extension (e.g., "jpg", "pdf")'},includeMetadata:{type:"boolean",description:"Include detailed file metadata"},limit:{type:"number",description:"Maximum number of attachments to return",minimum:1,maximum:100}}}},{name:"analyze_note_metadata",description:"Analyze note metadata and content patterns",inputSchema:{type:"object",properties:{includeContentAnalysis:{type:"boolean",description:"Include markdown and content pattern analysis"},includeLinkAnalysis:{type:"boolean",description:"Include link analysis and domain statistics"},includeStructureAnalysis:{type:"boolean",description:"Include note structure and title pattern analysis"}}}},{name:"get_notes_with_metadata",description:"Get notes filtered by metadata characteristics",inputSchema:{type:"object",properties:{hasAttachments:{type:"boolean",description:"Filter notes with/without attachments"},hasLinks:{type:"boolean",description:"Filter notes with/without external links"},hasImages:{type:"boolean",description:"Filter notes with/without images"},hasTodos:{type:"boolean",description:"Filter notes with/without todo items"},hasCodeBlocks:{type:"boolean",description:"Filter notes with/without code blocks"},hasTables:{type:"boolean",description:"Filter notes with/without tables"},minWordCount:{type:"number",description:"Minimum word count",minimum:1},maxWordCount:{type:"number",description:"Maximum word count",minimum:1},limit:{type:"number",description:"Maximum number of results",minimum:1,maximum:100}}}},{name:"create_note",description:"Create a new note with title, content, and tags using sync-safe Bear API",inputSchema:{type:"object",properties:{title:{type:"string",description:"Title of the new note"},content:{type:"string",description:"Content/body of the note (optional)"},tags:{type:"array",items:{type:"string"},description:'Array of tag names to apply to the note. Tags are automatically sanitized: lowercase only, no spaces/hyphens (underscores allowed, use forward slashes for nested tags like "work/project")'},isArchived:{type:"boolean",description:"Whether the note should be archived"},isPinned:{type:"boolean",description:"Whether the note should be pinned"}},required:["title"]}},{name:"update_note",description:"Update an existing note using sync-safe Bear API",inputSchema:{type:"object",properties:{noteId:{type:"number",description:"ID of the note to update"},title:{type:"string",description:"New title for the note"},content:{type:"string",description:"New content for the note"},tags:{type:"array",items:{type:"string"},description:'New array of tag names (replaces existing tags). Tags are automatically sanitized: lowercase only, no spaces/hyphens (underscores allowed, use forward slashes for nested tags like "work/project")'},isArchived:{type:"boolean",description:"Whether the note should be archived"},isPinned:{type:"boolean",description:"Whether the note should be pinned"}},required:["noteId"]}},{name:"duplicate_note",description:"Create a duplicate of an existing note using sync-safe Bear API",inputSchema:{type:"object",properties:{noteId:{type:"number",description:"ID of the note to duplicate"},titleSuffix:{type:"string",description:'Suffix to add to the duplicated note title (default: " (Copy)")'},copyTags:{type:"boolean",description:"Whether to copy tags from the original note (default: true)"}},required:["noteId"]}},{name:"archive_note",description:"Archive or unarchive a note using sync-safe Bear API",inputSchema:{type:"object",properties:{noteId:{type:"number",description:"ID of the note to archive/unarchive"},archived:{type:"boolean",description:"True to archive, false to unarchive"}},required:["noteId","archived"]}},{name:"trigger_hashtag_parsing",description:"Trigger Bear to reparse hashtags in a note using sync-safe API",inputSchema:{type:"object",properties:{note_id:{type:"string",description:"Note ID to trigger parsing for"},note_title:{type:"string",description:"Note title to trigger parsing for (alternative to note_id)"}},oneOf:[{required:["note_id"]},{required:["note_title"]}]}},{name:"batch_trigger_hashtag_parsing",description:"Trigger hashtag parsing for multiple notes using sync-safe API",inputSchema:{type:"object",properties:{tag_filter:{type:"string",description:"Filter notes by tag name"},title_pattern:{type:"string",description:"Filter notes by title pattern"},limit:{type:"number",description:"Maximum number of notes to process"},created_after:{type:"string",description:"Filter notes created after this date (ISO string)"}}}}]}async getDatabaseStats(){try{let e=await this.bearService.getDatabaseStats(),t=await this.bearService.checkIntegrity();return{content:[{type:"text",text:`Bear Database Statistics:
-\u{1F4CA} Notes: ${e.totalNotes} total (${e.activeNotes} active, ${e.trashedNotes} trashed, ${e.archivedNotes} archived)
-\u{1F512} Encrypted Notes: ${e.encryptedNotes}
-\u{1F3F7}\uFE0F  Tags: ${e.totalTags}
-\u{1F4CE} Attachments: ${e.totalAttachments}
-\u{1F4BE} Database Size: ${(e.databaseSize/1024/1024).toFixed(2)} MB
-\u{1F4C5} Last Modified: ${e.lastModified.toLocaleString()}
-\u2705 Database Integrity: ${t?"OK":"FAILED"}`}]}}catch(e){return{content:[{type:"text",text:`\u274C Error getting database stats: ${e instanceof Error?e.message:"Unknown error"}`}]}}}async getDatabaseSchema(){try{return{content:[{type:"text",text:`Bear Database Schema:
+**📈 Overview:**
+• Total Notes: ${analytics.totalNotes}
+• Average Length: ${analytics.averageLength} characters
+• Longest Note: "${analytics.longestNote.title}" (${analytics.longestNote.length} chars)
+• Shortest Note: "${analytics.shortestNote.title}" (${analytics.shortestNote.length} chars)
 
-${(await this.bearService.getSchema()).map(n=>`Table: ${n.name}
-${n.sql||"No schema available"}
-`).join(`
-`)}`}]}}catch(e){return{content:[{type:"text",text:`\u274C Error getting schema: ${e instanceof Error?e.message:"Unknown error"}`}]}}}async checkBearStatus(){try{let e=await this.bearService.isBearRunning();return{content:[{type:"text",text:`Bear App Status: ${e?"\u{1F534} RUNNING":"\u{1F7E2} NOT RUNNING"}
-${e?"\u2705 Write operations use sync-safe Bear API":"\u2705 All database operations available"}`}]}}catch(e){return{content:[{type:"text",text:`\u274C Error checking Bear status: ${e instanceof Error?e.message:"Unknown error"}`}]}}}async verifyDatabaseAccess(){try{return await this.bearService.verifyDatabaseAccess(),{content:[{type:"text",text:"\u2705 Database access verified successfully"}]}}catch(e){return{content:[{type:"text",text:`\u274C Database access failed: ${e instanceof Error?e.message:"Unknown error"}`}]}}}async createBackup(){try{return{content:[{type:"text",text:`\u2705 Backup created successfully: ${await this.bearService.createBackup()}`}]}}catch(e){return{content:[{type:"text",text:`\u274C Backup failed: ${e instanceof Error?e.message:"Unknown error"}`}]}}}async getRecentNotes(e){try{let t=e?.limit||10,n=await this.bearService.getRecentNotes(t);if(n.length===0)return{content:[{type:"text",text:"No notes found."}]};let s=n.map(a=>{let i=a.ZTEXT?`${a.ZTEXT.substring(0,100)}...`:"",o=a.tags.length>0?` [${a.tags.join(", ")}]`:"";return`\u{1F4DD} **${a.ZTITLE||"Untitled"}**${o}
-   ${i}`}).join(`
+**📅 Timeline:**
+• Most Recent: "${analytics.mostRecentNote.title}" (${analytics.mostRecentNote.date.toLocaleDateString()})
+• Oldest Note: "${analytics.oldestNote.title}" (${analytics.oldestNote.date.toLocaleDateString()})
 
-`);return{content:[{type:"text",text:`Recent Notes (${n.length}):
+**📊 Content Analysis:**
+• Notes with Images: ${analytics.contentStats.hasImages}
+• Notes with Files: ${analytics.contentStats.hasFiles}  
+• Notes with Code: ${analytics.contentStats.hasSourceCode}
+• Notes with TODOs: ${analytics.contentStats.hasTodos}
 
-${s}`}]}}catch(t){return{content:[{type:"text",text:`\u274C Error getting recent notes: ${t instanceof Error?t.message:"Unknown error"}`}]}}}async searchNotes(e){try{let t=e?.query,n=e?.limit||20;if(!t)throw new Error("Search query is required");let s=await this.bearService.searchNotes(t,{limit:n});if(s.length===0)return{content:[{type:"text",text:`No notes found matching "${t}".`}]};let a=s.map(i=>{let o=i.ZTEXT?`${i.ZTEXT.substring(0,100)}...`:"",d=i.tags.length>0?` [${i.tags.join(", ")}]`:"";return`\u{1F4DD} **${i.ZTITLE||"Untitled"}** (ID: ${i.Z_PK})${d}
-   ${o}`}).join(`
+**📈 Recent Activity (Notes per Month):**
+${monthlyData}
 
-`);return{content:[{type:"text",text:`Search Results for "${t}" (${s.length}):
-
-${a}`}]}}catch(t){return{content:[{type:"text",text:`\u274C Error searching notes: ${t instanceof Error?t.message:"Unknown error"}`}]}}}async getNoteById(e){try{let t=e?.id;if(!t)throw new Error("Note ID is required");let n=await this.bearService.getNoteById(t);if(!n)return{content:[{type:"text",text:`No note found with ID ${t}.`}]};let s=n.tags.length>0?`
-\u{1F3F7}\uFE0F Tags: ${n.tags.join(", ")}`:"",a=n.ZTEXT||"No content";return{content:[{type:"text",text:`\u{1F4DD} **${n.ZTITLE||"Untitled"}** (ID: ${n.Z_PK})${s}
-
-${a}`}]}}catch(t){return{content:[{type:"text",text:`\u274C Error getting note: ${t instanceof Error?t.message:"Unknown error"}`}]}}}async getNoteByTitle(e){try{let t=e?.title;if(!t)throw new Error("Note title is required");let n=await this.bearService.getNoteByTitle(t);if(!n)return{content:[{type:"text",text:`No note found with title "${t}".`}]};let s=n.tags.length>0?`
-\u{1F3F7}\uFE0F Tags: ${n.tags.join(", ")}`:"",a=n.ZTEXT||"No content";return{content:[{type:"text",text:`\u{1F4DD} **${n.ZTITLE||"Untitled"}** (ID: ${n.Z_PK})${s}
-
-${a}`}]}}catch(t){return{content:[{type:"text",text:`\u274C Error getting note: ${t instanceof Error?t.message:"Unknown error"}`}]}}}async getAllTags(){try{let e=await this.bearService.getTags();if(e.length===0)return{content:[{type:"text",text:"No tags found."}]};let t=e.map(n=>`\u{1F3F7}\uFE0F **${n.ZTITLE}** (${n.noteCount} notes)`).join(`
-`);return{content:[{type:"text",text:`All Tags (${e.length}):
-
-${t}`}]}}catch(e){return{content:[{type:"text",text:`\u274C Error getting tags: ${e instanceof Error?e.message:"Unknown error"}`}]}}}async getNotesByTag(e){try{let t=e?.tag;if(!t)throw new Error("Tag name is required");let n=await this.bearService.getNotesByTag(t);if(n.length===0)return{content:[{type:"text",text:`No notes found with tag "${t}".`}]};let s=n.map(a=>{let i=a.ZTEXT?`${a.ZTEXT.substring(0,100)}...`:"",o=a.tags.filter(u=>u!==t),d=o.length>0?` [+${o.join(", ")}]`:"";return`\u{1F4DD} **${a.ZTITLE||"Untitled"}** (ID: ${a.Z_PK})${d}
-   ${i}`}).join(`
-
-`);return{content:[{type:"text",text:`Notes with tag "${t}" (${n.length}):
-
-${s}`}]}}catch(t){return{content:[{type:"text",text:`\u274C Error getting notes by tag: ${t instanceof Error?t.message:"Unknown error"}`}]}}}async getNotesAdvanced(e){try{let t={query:e?.query,tags:e?.tags,excludeTags:e?.excludeTags,sortBy:e?.sortBy||"modified",sortOrder:e?.sortOrder||"desc",limit:e?.limit||20},n=await this.bearService.getNotesAdvanced(t);if(n.length===0)return{content:[{type:"text",text:"No notes found matching the specified criteria."}]};let s=n.map(a=>{let i=a.preview||(a.ZTEXT?`${a.ZTEXT.substring(0,100)}...`:""),o=a.tags.length>0?` [${a.tags.join(", ")}]`:"",d=a.contentLength?` (${a.contentLength} chars)`:"";return`\u{1F4DD} **${a.ZTITLE||"Untitled"}** (ID: ${a.Z_PK})${o}${d}
-   ${i}`}).join(`
-
-`);return{content:[{type:"text",text:`Advanced Search Results (${n.length}):
-
-${s}`}]}}catch(t){return{content:[{type:"text",text:`\u274C Error in advanced search: ${t instanceof Error?t.message:"Unknown error"}`}]}}}async getNotesWithCriteria(e){try{let t={titleContains:e?.titleContains,contentContains:e?.contentContains,hasAllTags:e?.hasAllTags,hasAnyTags:e?.hasAnyTags,isPinned:e?.isPinned,isArchived:e?.isArchived,minLength:e?.minLength,maxLength:e?.maxLength},n=await this.bearService.getNotesWithCriteria(t);if(n.length===0)return{content:[{type:"text",text:"No notes found matching the specified criteria."}]};let s=n.map(a=>{let i=a.ZTEXT?`${a.ZTEXT.substring(0,100)}...`:"",o=a.tags.length>0?` [${a.tags.join(", ")}]`:"",d=a.contentLength?` (${a.contentLength} chars)`:"",u=[];a.ZPINNED&&u.push("\u{1F4CC}"),a.ZARCHIVED&&u.push("\u{1F4E6}"),a.ZENCRYPTED&&u.push("\u{1F512}");let l=u.length>0?` ${u.join("")}`:"";return`\u{1F4DD} **${a.ZTITLE||"Untitled"}** (ID: ${a.Z_PK})${o}${d}${l}
-   ${i}`}).join(`
-
-`);return{content:[{type:"text",text:`Criteria Search Results (${n.length}):
-
-${s}`}]}}catch(t){return{content:[{type:"text",text:`\u274C Error in criteria search: ${t instanceof Error?t.message:"Unknown error"}`}]}}}async getNoteAnalytics(){try{let e=await this.bearService.getNoteAnalytics(),t=e.notesPerMonth.slice(0,6).map(s=>`   ${s.month}: ${s.count} notes`).join(`
-`),n=e.topTags.slice(0,8).map(s=>`   ${s.tag}: ${s.count} notes`).join(`
-`);return{content:[{type:"text",text:`\u{1F4CA} **Bear Notes Analytics**
-
-**\u{1F4C8} Overview:**
-\u2022 Total Notes: ${e.totalNotes}
-\u2022 Average Length: ${e.averageLength} characters
-\u2022 Longest Note: "${e.longestNote.title}" (${e.longestNote.length} chars)
-\u2022 Shortest Note: "${e.shortestNote.title}" (${e.shortestNote.length} chars)
-
-**\u{1F4C5} Timeline:**
-\u2022 Most Recent: "${e.mostRecentNote.title}" (${e.mostRecentNote.date.toLocaleDateString()})
-\u2022 Oldest Note: "${e.oldestNote.title}" (${e.oldestNote.date.toLocaleDateString()})
-
-**\u{1F4CA} Content Analysis:**
-\u2022 Notes with Images: ${e.contentStats.hasImages}
-\u2022 Notes with Files: ${e.contentStats.hasFiles}  
-\u2022 Notes with Code: ${e.contentStats.hasSourceCode}
-\u2022 Notes with TODOs: ${e.contentStats.hasTodos}
-
-**\u{1F4C8} Recent Activity (Notes per Month):**
-${t}
-
-**\u{1F3F7}\uFE0F Top Tags:**
-${n}`}]}}catch(e){return{content:[{type:"text",text:`\u274C Error getting analytics: ${e instanceof Error?e.message:"Unknown error"}`}]}}}async getRelatedNotes(e){try{let t=e?.noteId,n=e?.limit||5;if(!t)throw new Error("Note ID is required");let s=await this.bearService.getRelatedNotes(t,n);if(s.byTags.length===0&&s.byContent.length===0)return{content:[{type:"text",text:`No related notes found for note ID ${t}.`}]};let a=`\u{1F517} **Related Notes for ID ${t}**
-
-`;return s.byTags.length>0&&(a+=`**\u{1F4CC} Related by Tags (${s.byTags.length}):**
-`,s.byTags.forEach(i=>{let o=i.tags.length>0?` [${i.tags.join(", ")}]`:"";a+=`\u2022 **${i.ZTITLE||"Untitled"}** (ID: ${i.Z_PK})${o}
-`}),a+=`
-`),s.byContent.length>0&&(a+=`**\u{1F4C4} Related by Content (${s.byContent.length}):**
-`,s.byContent.forEach(i=>{let o=i.tags.length>0?` [${i.tags.join(", ")}]`:"";a+=`\u2022 **${i.ZTITLE||"Untitled"}** (ID: ${i.Z_PK})${o}
-`})),{content:[{type:"text",text:a}]}}catch(t){return{content:[{type:"text",text:`\u274C Error finding related notes: ${t instanceof Error?t.message:"Unknown error"}`}]}}}async searchNotesFullText(e){try{let{query:t,limit:n=20,includeSnippets:s=!0,searchFields:a=["both"],fuzzyMatch:i=!1,caseSensitive:o=!1}=e,d=await this.bearService.searchNotesFullText(t,{limit:n,includeSnippets:s,searchFields:a,fuzzyMatch:i,caseSensitive:o});return{content:[{type:"text",text:JSON.stringify({success:!0,data:{query:t,totalFound:d.length,results:d.map(u=>({id:u.Z_PK,title:u.ZTITLE,content:u.ZTEXT?.substring(0,500)+(u.ZTEXT&&u.ZTEXT.length>500?"...":""),tags:u.tags,createdAt:u.ZCREATIONDATE,modifiedAt:u.ZMODIFICATIONDATE,relevanceScore:u.relevanceScore,matchedTerms:u.matchedTerms,snippets:u.snippets,titleMatches:u.titleMatches,contentMatches:u.contentMatches}))}},null,2)}]}}catch(t){return{content:[{type:"text",text:JSON.stringify({success:!1,error:t instanceof Error?t.message:"Unknown error occurred"},null,2)}]}}}async getSearchSuggestions(e){try{let{partialQuery:t,limit:n=10}=e,s=await this.bearService.getSearchSuggestions(t,n);return{content:[{type:"text",text:JSON.stringify({success:!0,data:{partialQuery:t,suggestions:s}},null,2)}]}}catch(t){return{content:[{type:"text",text:JSON.stringify({success:!1,error:t instanceof Error?t.message:"Unknown error occurred"},null,2)}]}}}async findSimilarNotes(e){try{let{referenceText:t,limit:n=10,minSimilarity:s=.1,excludeNoteId:a}=e,i=await this.bearService.findSimilarNotes(t,{limit:n,minSimilarity:s,excludeNoteId:a});return{content:[{type:"text",text:JSON.stringify({success:!0,data:{referenceText:t.substring(0,200)+(t.length>200?"...":""),totalFound:i.length,similarNotes:i.map(o=>({id:o.Z_PK,title:o.ZTITLE,content:o.ZTEXT?.substring(0,300)+(o.ZTEXT&&o.ZTEXT.length>300?"...":""),tags:o.tags,createdAt:o.ZCREATIONDATE,modifiedAt:o.ZMODIFICATIONDATE,similarityScore:o.similarityScore,commonKeywords:o.commonKeywords}))}},null,2)}]}}catch(t){return{content:[{type:"text",text:JSON.stringify({success:!1,error:t instanceof Error?t.message:"Unknown error occurred"},null,2)}]}}}async getFileAttachments(e){try{let{noteId:t,fileType:n,includeMetadata:s=!1,limit:a}=e,i=await this.bearService.getFileAttachments({noteId:t,fileType:n,includeMetadata:s,limit:a});return{content:[{type:"text",text:JSON.stringify({success:!0,data:i},null,2)}]}}catch(t){return{content:[{type:"text",text:JSON.stringify({success:!1,error:t instanceof Error?t.message:"Unknown error occurred"},null,2)}]}}}async analyzeNoteMetadata(e){try{let{includeContentAnalysis:t=!1,includeLinkAnalysis:n=!1,includeStructureAnalysis:s=!1}=e,a=await this.bearService.analyzeNoteMetadata({includeContentAnalysis:t,includeLinkAnalysis:n,includeStructureAnalysis:s});return{content:[{type:"text",text:JSON.stringify({success:!0,data:a},null,2)}]}}catch(t){return{content:[{type:"text",text:JSON.stringify({success:!1,error:t instanceof Error?t.message:"Unknown error occurred"},null,2)}]}}}async getNotesWithMetadata(e){try{let t={hasAttachments:e.hasAttachments,hasLinks:e.hasLinks,hasImages:e.hasImages,hasTodos:e.hasTodos,hasCodeBlocks:e.hasCodeBlocks,hasTables:e.hasTables,minWordCount:e.minWordCount,maxWordCount:e.maxWordCount,limit:e.limit||20},n=await this.bearService.getNotesWithMetadata(t);return{content:[{type:"text",text:JSON.stringify({success:!0,data:{totalFound:n.length,notes:n.map(s=>({id:s.Z_PK,title:s.ZTITLE,content:s.ZTEXT?.substring(0,300)+(s.ZTEXT&&s.ZTEXT.length>300?"...":""),tags:s.tags,createdAt:s.ZCREATIONDATE,modifiedAt:s.ZMODIFICATIONDATE,wordCount:s.wordCount,attachmentCount:s.attachmentCount,linkCount:s.linkCount,imageCount:s.imageCount,todoCount:s.todoCount,codeBlockCount:s.codeBlockCount,tableCount:s.tableCount,metadata:s.metadata}))}},null,2)}]}}catch(t){return{content:[{type:"text",text:JSON.stringify({success:!1,error:t instanceof Error?t.message:"Unknown error occurred"},null,2)}]}}}async createNote(e){try{let{title:t,content:n,tags:s,isArchived:a=!1,isPinned:i=!1}=e;if(!t||t.trim().length===0)throw new Error("Title is required and cannot be empty");let o=await this.bearService.createNote({title:t.trim(),content:n||"",tags:s||[],isArchived:a,isPinned:i});return{content:[{type:"text",text:JSON.stringify({success:!0,data:{noteId:o.noteId,title:t.trim(),message:`Note created successfully with ID ${o.noteId}`,tagWarnings:o.tagWarnings}},null,2)}]}}catch(t){return{content:[{type:"text",text:JSON.stringify({success:!1,error:t instanceof Error?t.message:"Unknown error occurred"},null,2)}]}}}async updateNote(e){try{let{noteId:t,title:n,content:s,tags:a,isArchived:i,isPinned:o,expectedModificationDate:d}=e;if(!t||typeof t!="number")throw new Error("Valid noteId is required");let u={};n!==void 0&&(u.title=n),s!==void 0&&(u.content=s),a!==void 0&&(u.tags=a),i!==void 0&&(u.isArchived=i),o!==void 0&&(u.isPinned=o),d&&(u.expectedModificationDate=new Date(d));let l=await this.bearService.updateNote(t,u);return l.conflictDetected?{content:[{type:"text",text:JSON.stringify({success:!1,error:"Conflict detected: Note was modified by another process",conflictDetected:!0},null,2)}]}:{content:[{type:"text",text:JSON.stringify({success:!0,data:{noteId:t,message:`Note ${t} updated successfully`,tagWarnings:l.tagWarnings}},null,2)}]}}catch(t){return{content:[{type:"text",text:JSON.stringify({success:!1,error:t instanceof Error?t.message:"Unknown error occurred"},null,2)}]}}}async duplicateNote(e){try{let{noteId:t,titleSuffix:n,copyTags:s=!0}=e;if(!t||typeof t!="number")throw new Error("Valid noteId is required");let a=await this.bearService.duplicateNote(t,{titleSuffix:n,copyTags:s});return{content:[{type:"text",text:JSON.stringify({success:!0,data:{originalNoteId:t,newNoteId:a.newNoteId,message:`Note ${t} duplicated successfully as note ${a.newNoteId}`}},null,2)}]}}catch(t){return{content:[{type:"text",text:JSON.stringify({success:!1,error:t instanceof Error?t.message:"Unknown error occurred"},null,2)}]}}}async archiveNote(e){try{let{noteId:t,archived:n}=e;if(!t||typeof t!="number")throw new Error("Valid noteId is required");if(typeof n!="boolean")throw new Error("archived parameter must be a boolean");let s=await this.bearService.archiveNote(t,n);return{content:[{type:"text",text:JSON.stringify({success:!0,data:{noteId:t,archived:n,message:`Note ${t} ${n?"archived":"unarchived"} successfully`}},null,2)}]}}catch(t){return{content:[{type:"text",text:JSON.stringify({success:!1,error:t instanceof Error?t.message:"Unknown error occurred"},null,2)}]}}}async triggerHashtagParsing(e){try{let{note_id:t,note_title:n}=e;if(!t&&!n)throw new Error("Either note_id or note_title is required");let s=await this.bearService.triggerHashtagParsing(t,n);return{content:[{type:"text",text:JSON.stringify({success:!0,data:{message:s}},null,2)}]}}catch(t){return{content:[{type:"text",text:JSON.stringify({success:!1,error:t instanceof Error?t.message:"Unknown error occurred"},null,2)}]}}}async batchTriggerHashtagParsing(e){try{let{tag_filter:t,title_pattern:n,limit:s=10,created_after:a}=e,i=await this.bearService.batchTriggerHashtagParsing({tag_filter:t,title_pattern:n,limit:s,created_after:a});return{content:[{type:"text",text:JSON.stringify({success:!0,data:{message:i}},null,2)}]}}catch(t){return{content:[{type:"text",text:JSON.stringify({success:!1,error:t instanceof Error?t.message:"Unknown error occurred"},null,2)}]}}}async run(){let e=new Ke;await this.server.connect(e)}},Ys=new gt;Ys.run().catch(r=>{process.exit(1)});
+**🏷️ Top Tags:**
+${topTagsData}`,
+                    },
+                ],
+            };
+        }
+        catch (error) {
+            return {
+                content: [
+                    {
+                        type: 'text',
+                        text: `❌ Error getting analytics: ${error instanceof Error ? error.message : 'Unknown error'}`,
+                    },
+                ],
+            };
+        }
+    }
+    async getRelatedNotes(args) {
+        try {
+            const noteId = args?.noteId;
+            const limit = args?.limit || 5;
+            if (!noteId) {
+                throw new Error('Note ID is required');
+            }
+            const related = await this.bearService.getRelatedNotes(noteId, limit);
+            if (related.byTags.length === 0 && related.byContent.length === 0) {
+                return {
+                    content: [
+                        {
+                            type: 'text',
+                            text: `No related notes found for note ID ${noteId}.`,
+                        },
+                    ],
+                };
+            }
+            let result = `🔗 **Related Notes for ID ${noteId}**\n\n`;
+            if (related.byTags.length > 0) {
+                result += `**📌 Related by Tags (${related.byTags.length}):**\n`;
+                related.byTags.forEach(note => {
+                    const tags = note.tags.length > 0 ? ` [${note.tags.join(', ')}]` : '';
+                    result += `• **${note.ZTITLE || 'Untitled'}** (ID: ${note.Z_PK})${tags}\n`;
+                });
+                result += '\n';
+            }
+            if (related.byContent.length > 0) {
+                result += `**📄 Related by Content (${related.byContent.length}):**\n`;
+                related.byContent.forEach(note => {
+                    const tags = note.tags.length > 0 ? ` [${note.tags.join(', ')}]` : '';
+                    result += `• **${note.ZTITLE || 'Untitled'}** (ID: ${note.Z_PK})${tags}\n`;
+                });
+            }
+            return {
+                content: [
+                    {
+                        type: 'text',
+                        text: result,
+                    },
+                ],
+            };
+        }
+        catch (error) {
+            return {
+                content: [
+                    {
+                        type: 'text',
+                        text: `❌ Error finding related notes: ${error instanceof Error ? error.message : 'Unknown error'}`,
+                    },
+                ],
+            };
+        }
+    }
+    async searchNotesFullText(args) {
+        try {
+            const { query, limit = 20, includeSnippets = true, searchFields = ['both'], fuzzyMatch = false, caseSensitive = false, } = args;
+            const results = await this.bearService.searchNotesFullText(query, {
+                limit,
+                includeSnippets,
+                searchFields,
+                fuzzyMatch,
+                caseSensitive,
+            });
+            return {
+                content: [
+                    {
+                        type: 'text',
+                        text: JSON.stringify({
+                            success: true,
+                            data: {
+                                query,
+                                totalFound: results.length,
+                                results: results.map(result => ({
+                                    id: result.Z_PK,
+                                    title: result.ZTITLE,
+                                    content: result.ZTEXT?.substring(0, 500) +
+                                        (result.ZTEXT && result.ZTEXT.length > 500 ? '...' : ''),
+                                    tags: result.tags,
+                                    createdAt: result.ZCREATIONDATE,
+                                    modifiedAt: result.ZMODIFICATIONDATE,
+                                    relevanceScore: result.relevanceScore,
+                                    matchedTerms: result.matchedTerms,
+                                    snippets: result.snippets,
+                                    titleMatches: result.titleMatches,
+                                    contentMatches: result.contentMatches,
+                                })),
+                            },
+                        }, null, 2),
+                    },
+                ],
+            };
+        }
+        catch (error) {
+            return {
+                content: [
+                    {
+                        type: 'text',
+                        text: JSON.stringify({
+                            success: false,
+                            error: error instanceof Error ? error.message : 'Unknown error occurred',
+                        }, null, 2),
+                    },
+                ],
+            };
+        }
+    }
+    async getSearchSuggestions(args) {
+        try {
+            const { partialQuery, limit = 10 } = args;
+            const suggestions = await this.bearService.getSearchSuggestions(partialQuery, limit);
+            return {
+                content: [
+                    {
+                        type: 'text',
+                        text: JSON.stringify({
+                            success: true,
+                            data: {
+                                partialQuery,
+                                suggestions,
+                            },
+                        }, null, 2),
+                    },
+                ],
+            };
+        }
+        catch (error) {
+            return {
+                content: [
+                    {
+                        type: 'text',
+                        text: JSON.stringify({
+                            success: false,
+                            error: error instanceof Error ? error.message : 'Unknown error occurred',
+                        }, null, 2),
+                    },
+                ],
+            };
+        }
+    }
+    async findSimilarNotes(args) {
+        try {
+            const { referenceText, limit = 10, minSimilarity = 0.1, excludeNoteId } = args;
+            const results = await this.bearService.findSimilarNotes(referenceText, {
+                limit,
+                minSimilarity,
+                excludeNoteId,
+            });
+            return {
+                content: [
+                    {
+                        type: 'text',
+                        text: JSON.stringify({
+                            success: true,
+                            data: {
+                                referenceText: referenceText.substring(0, 200) + (referenceText.length > 200 ? '...' : ''),
+                                totalFound: results.length,
+                                similarNotes: results.map(result => ({
+                                    id: result.Z_PK,
+                                    title: result.ZTITLE,
+                                    content: result.ZTEXT?.substring(0, 300) +
+                                        (result.ZTEXT && result.ZTEXT.length > 300 ? '...' : ''),
+                                    tags: result.tags,
+                                    createdAt: result.ZCREATIONDATE,
+                                    modifiedAt: result.ZMODIFICATIONDATE,
+                                    similarityScore: result.similarityScore,
+                                    commonKeywords: result.commonKeywords,
+                                })),
+                            },
+                        }, null, 2),
+                    },
+                ],
+            };
+        }
+        catch (error) {
+            return {
+                content: [
+                    {
+                        type: 'text',
+                        text: JSON.stringify({
+                            success: false,
+                            error: error instanceof Error ? error.message : 'Unknown error occurred',
+                        }, null, 2),
+                    },
+                ],
+            };
+        }
+    }
+    async getFileAttachments(args) {
+        try {
+            const { noteId, fileType, includeMetadata = false, limit } = args;
+            const attachments = await this.bearService.getFileAttachments({
+                noteId,
+                fileType,
+                includeMetadata,
+                limit,
+            });
+            return {
+                content: [
+                    {
+                        type: 'text',
+                        text: JSON.stringify({
+                            success: true,
+                            data: attachments,
+                        }, null, 2),
+                    },
+                ],
+            };
+        }
+        catch (error) {
+            return {
+                content: [
+                    {
+                        type: 'text',
+                        text: JSON.stringify({
+                            success: false,
+                            error: error instanceof Error ? error.message : 'Unknown error occurred',
+                        }, null, 2),
+                    },
+                ],
+            };
+        }
+    }
+    async analyzeNoteMetadata(args) {
+        try {
+            const { includeContentAnalysis = false, includeLinkAnalysis = false, includeStructureAnalysis = false, } = args;
+            const analysis = await this.bearService.analyzeNoteMetadata({
+                includeContentAnalysis,
+                includeLinkAnalysis,
+                includeStructureAnalysis,
+            });
+            return {
+                content: [
+                    {
+                        type: 'text',
+                        text: JSON.stringify({
+                            success: true,
+                            data: analysis,
+                        }, null, 2),
+                    },
+                ],
+            };
+        }
+        catch (error) {
+            return {
+                content: [
+                    {
+                        type: 'text',
+                        text: JSON.stringify({
+                            success: false,
+                            error: error instanceof Error ? error.message : 'Unknown error occurred',
+                        }, null, 2),
+                    },
+                ],
+            };
+        }
+    }
+    async getNotesWithMetadata(args) {
+        try {
+            const criteria = {
+                hasAttachments: args.hasAttachments,
+                hasLinks: args.hasLinks,
+                hasImages: args.hasImages,
+                hasTodos: args.hasTodos,
+                hasCodeBlocks: args.hasCodeBlocks,
+                hasTables: args.hasTables,
+                minWordCount: args.minWordCount,
+                maxWordCount: args.maxWordCount,
+                limit: args.limit || 20,
+            };
+            const notes = await this.bearService.getNotesWithMetadata(criteria);
+            return {
+                content: [
+                    {
+                        type: 'text',
+                        text: JSON.stringify({
+                            success: true,
+                            data: {
+                                totalFound: notes.length,
+                                notes: notes.map(note => ({
+                                    id: note.Z_PK,
+                                    title: note.ZTITLE,
+                                    content: note.ZTEXT?.substring(0, 300) +
+                                        (note.ZTEXT && note.ZTEXT.length > 300 ? '...' : ''),
+                                    tags: note.tags,
+                                    createdAt: note.ZCREATIONDATE,
+                                    modifiedAt: note.ZMODIFICATIONDATE,
+                                    wordCount: note.wordCount,
+                                    attachmentCount: note.attachmentCount,
+                                    linkCount: note.linkCount,
+                                    imageCount: note.imageCount,
+                                    todoCount: note.todoCount,
+                                    codeBlockCount: note.codeBlockCount,
+                                    tableCount: note.tableCount,
+                                    metadata: note.metadata,
+                                })),
+                            },
+                        }, null, 2),
+                    },
+                ],
+            };
+        }
+        catch (error) {
+            return {
+                content: [
+                    {
+                        type: 'text',
+                        text: JSON.stringify({
+                            success: false,
+                            error: error instanceof Error ? error.message : 'Unknown error occurred',
+                        }, null, 2),
+                    },
+                ],
+            };
+        }
+    }
+    async createNote(args) {
+        try {
+            const { title, content, tags, isArchived = false, isPinned = false } = args;
+            if (!title || title.trim().length === 0) {
+                throw new Error('Title is required and cannot be empty');
+            }
+            const result = await this.bearService.createNote({
+                title: title.trim(),
+                content: content || '',
+                tags: tags || [],
+                isArchived,
+                isPinned,
+            });
+            return {
+                content: [
+                    {
+                        type: 'text',
+                        text: JSON.stringify({
+                            success: true,
+                            data: {
+                                noteId: result.noteId,
+                                title: title.trim(),
+                                message: `Note created successfully with ID ${result.noteId}`,
+                                tagWarnings: result.tagWarnings,
+                            },
+                        }, null, 2),
+                    },
+                ],
+            };
+        }
+        catch (error) {
+            return {
+                content: [
+                    {
+                        type: 'text',
+                        text: JSON.stringify({
+                            success: false,
+                            error: error instanceof Error ? error.message : 'Unknown error occurred',
+                        }, null, 2),
+                    },
+                ],
+            };
+        }
+    }
+    async updateNote(args) {
+        try {
+            const { noteId, title, content, tags, isArchived, isPinned, expectedModificationDate } = args;
+            if (!noteId || typeof noteId !== 'number') {
+                throw new Error('Valid noteId is required');
+            }
+            const options = {};
+            if (title !== undefined) {
+                options.title = title;
+            }
+            if (content !== undefined) {
+                options.content = content;
+            }
+            if (tags !== undefined) {
+                options.tags = tags;
+            }
+            if (isArchived !== undefined) {
+                options.isArchived = isArchived;
+            }
+            if (isPinned !== undefined) {
+                options.isPinned = isPinned;
+            }
+            if (expectedModificationDate) {
+                options.expectedModificationDate = new Date(expectedModificationDate);
+            }
+            const result = await this.bearService.updateNote(noteId, options);
+            if (result.conflictDetected) {
+                return {
+                    content: [
+                        {
+                            type: 'text',
+                            text: JSON.stringify({
+                                success: false,
+                                error: 'Conflict detected: Note was modified by another process',
+                                conflictDetected: true,
+                            }, null, 2),
+                        },
+                    ],
+                };
+            }
+            return {
+                content: [
+                    {
+                        type: 'text',
+                        text: JSON.stringify({
+                            success: true,
+                            data: {
+                                noteId,
+                                message: `Note ${noteId} updated successfully`,
+                                tagWarnings: result.tagWarnings,
+                            },
+                        }, null, 2),
+                    },
+                ],
+            };
+        }
+        catch (error) {
+            return {
+                content: [
+                    {
+                        type: 'text',
+                        text: JSON.stringify({
+                            success: false,
+                            error: error instanceof Error ? error.message : 'Unknown error occurred',
+                        }, null, 2),
+                    },
+                ],
+            };
+        }
+    }
+    async duplicateNote(args) {
+        try {
+            const { noteId, titleSuffix, copyTags = true } = args;
+            if (!noteId || typeof noteId !== 'number') {
+                throw new Error('Valid noteId is required');
+            }
+            const result = await this.bearService.duplicateNote(noteId, {
+                titleSuffix,
+                copyTags,
+            });
+            return {
+                content: [
+                    {
+                        type: 'text',
+                        text: JSON.stringify({
+                            success: true,
+                            data: {
+                                originalNoteId: noteId,
+                                newNoteId: result.newNoteId,
+                                message: `Note ${noteId} duplicated successfully as note ${result.newNoteId}`,
+                            },
+                        }, null, 2),
+                    },
+                ],
+            };
+        }
+        catch (error) {
+            return {
+                content: [
+                    {
+                        type: 'text',
+                        text: JSON.stringify({
+                            success: false,
+                            error: error instanceof Error ? error.message : 'Unknown error occurred',
+                        }, null, 2),
+                    },
+                ],
+            };
+        }
+    }
+    async archiveNote(args) {
+        try {
+            const { noteId, archived } = args;
+            if (!noteId || typeof noteId !== 'number') {
+                throw new Error('Valid noteId is required');
+            }
+            if (typeof archived !== 'boolean') {
+                throw new Error('archived parameter must be a boolean');
+            }
+            const result = await this.bearService.archiveNote(noteId, archived);
+            return {
+                content: [
+                    {
+                        type: 'text',
+                        text: JSON.stringify({
+                            success: true,
+                            data: {
+                                noteId,
+                                archived,
+                                message: `Note ${noteId} ${archived ? 'archived' : 'unarchived'} successfully`,
+                            },
+                        }, null, 2),
+                    },
+                ],
+            };
+        }
+        catch (error) {
+            return {
+                content: [
+                    {
+                        type: 'text',
+                        text: JSON.stringify({
+                            success: false,
+                            error: error instanceof Error ? error.message : 'Unknown error occurred',
+                        }, null, 2),
+                    },
+                ],
+            };
+        }
+    }
+    async triggerHashtagParsing(args) {
+        try {
+            const { note_id, note_title } = args;
+            if (!note_id && !note_title) {
+                throw new Error('Either note_id or note_title is required');
+            }
+            const result = await this.bearService.triggerHashtagParsing(note_id, note_title);
+            return {
+                content: [
+                    {
+                        type: 'text',
+                        text: JSON.stringify({
+                            success: true,
+                            data: {
+                                message: result,
+                            },
+                        }, null, 2),
+                    },
+                ],
+            };
+        }
+        catch (error) {
+            return {
+                content: [
+                    {
+                        type: 'text',
+                        text: JSON.stringify({
+                            success: false,
+                            error: error instanceof Error ? error.message : 'Unknown error occurred',
+                        }, null, 2),
+                    },
+                ],
+            };
+        }
+    }
+    async batchTriggerHashtagParsing(args) {
+        try {
+            const { tag_filter, title_pattern, limit = 10, created_after } = args;
+            const result = await this.bearService.batchTriggerHashtagParsing({
+                tag_filter,
+                title_pattern,
+                limit,
+                created_after,
+            });
+            return {
+                content: [
+                    {
+                        type: 'text',
+                        text: JSON.stringify({
+                            success: true,
+                            data: {
+                                message: result,
+                            },
+                        }, null, 2),
+                    },
+                ],
+            };
+        }
+        catch (error) {
+            return {
+                content: [
+                    {
+                        type: 'text',
+                        text: JSON.stringify({
+                            success: false,
+                            error: error instanceof Error ? error.message : 'Unknown error occurred',
+                        }, null, 2),
+                    },
+                ],
+            };
+        }
+    }
+    async run() {
+        const transport = new StdioServerTransport();
+        await this.server.connect(transport);
+        // Server running on stdio (no console output to avoid JSON-RPC interference)
+    }
+}
+// Start the server
+const server = new BearMCPServer();
+server.run().catch(error => {
+    // Silent error handling to avoid JSON-RPC interference
+    process.exit(1);
+});
 //# sourceMappingURL=index.js.map
