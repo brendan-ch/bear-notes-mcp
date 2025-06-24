@@ -19,18 +19,18 @@ const mockFSStat = {
 export class MockBearDatabase {
   private connected = false;
   private readOnly = true;
-  public dbPath = '/tmp/test_database.sqlite'; // Add mock dbPath
+  public dbPath = '/tmp/test_database.sqlite';
 
-  async connect(readOnly: boolean = true): Promise<void> {
+  connect = jest.fn(async (readOnly: boolean = true): Promise<void> => {
     this.connected = true;
     this.readOnly = readOnly;
-  }
+  });
 
-  async disconnect(): Promise<void> {
+  disconnect = jest.fn(async (): Promise<void> => {
     this.connected = false;
-  }
+  });
 
-  async query<T = any>(sql: string, params: any[] = []): Promise<T[]> {
+  query = jest.fn(async (sql: string, params: any[] = []): Promise<any[]> => {
     if (!this.connected) {
       throw new Error('Database not connected');
     }
@@ -45,12 +45,12 @@ export class MockBearDatabase {
         ...tag,
         noteCount: index + 1,
       }));
-      return tagsWithCounts as T[];
+      return tagsWithCounts;
     }
 
     // Mock responses based on SQL patterns
     if (sql.includes('ZSFNOTE') && sql.includes('COUNT')) {
-      return [{ count: mockBearNotes.length }] as T[];
+      return [{ count: mockBearNotes.length }];
     }
 
     if (sql.includes('ZSFNOTE') && !sql.includes('COUNT')) {
@@ -94,11 +94,11 @@ export class MockBearDatabase {
                   : 'quick,untitled',
       }));
 
-      return notesWithTags as T[];
+      return notesWithTags;
     }
 
     if (sql.includes('ZSFNOTETAG') && sql.includes('COUNT')) {
-      return [{ count: mockBearTags.length }] as T[];
+      return [{ count: mockBearTags.length }];
     }
 
     if (sql.includes('ZSFNOTETAG')) {
@@ -109,18 +109,22 @@ export class MockBearDatabase {
           ...tag,
           noteCount: index + 1,
         }));
-        return tagsWithCounts as T[];
+        return tagsWithCounts;
       }
       // Return count for simple COUNT queries
       if (sql.includes('COUNT')) {
-        return [{ count: mockBearTags.length }] as T[];
+        return [{ count: mockBearTags.length }];
       }
       // Regular tag query
-      return mockBearTags as T[];
+      return mockBearTags;
     }
 
     if (sql.includes('sqlite_master')) {
-      return mockDatabaseSchema as T[];
+      return mockDatabaseSchema;
+    }
+
+    if (sql.includes('integrity_check')) {
+      return [{ integrity_check: 'ok' }];
     }
 
     // Handle tag-based note queries
@@ -155,43 +159,43 @@ export class MockBearDatabase {
                   : 'quick,untitled',
       }));
 
-      return notesWithTags as T[];
+      return notesWithTags;
     }
 
-    return [] as T[];
-  }
+    return [];
+  });
 
-  async queryOne<T = any>(sql: string, params: any[] = []): Promise<T | null> {
-    const results = await this.query<T>(sql, params);
+  queryOne = jest.fn(async (sql: string, params: any[] = []): Promise<any | null> => {
+    const results = await this.query(sql, params);
     return results.length > 0 ? results[0] : null;
-  }
+  });
 
-  async execute(sql: string, params: any[] = []): Promise<{ changes: number; lastID: number }> {
+  execute = jest.fn(async (sql: string, params: any[] = []): Promise<{ changes: number; lastID: number }> => {
     if (!this.connected || this.readOnly) {
       throw new Error('Database not writable');
     }
     return { changes: 1, lastID: 1 };
-  }
+  });
 
-  async isBearRunning(): Promise<boolean> {
+  isBearRunning = jest.fn(async (): Promise<boolean> => {
     return false; // Always return false in tests
-  }
+  });
 
-  async verifyDatabaseAccess(): Promise<void> {
+  verifyDatabaseAccess = jest.fn(async (): Promise<void> => {
     // Always pass in tests
-  }
+  });
 
-  async createBackup(): Promise<string> {
+  createBackup = jest.fn(async (): Promise<string> => {
     return '/tmp/test_backup.sqlite';
-  }
+  });
 
-  async getSchema(): Promise<{ name: string; sql: string }[]> {
+  getSchema = jest.fn(async (): Promise<{ name: string; sql: string }[]> => {
     return mockDatabaseSchema;
-  }
+  });
 
-  async checkIntegrity(): Promise<boolean> {
+  checkIntegrity = jest.fn(async (): Promise<boolean> => {
     return true;
-  }
+  });
 }
 
 /**
