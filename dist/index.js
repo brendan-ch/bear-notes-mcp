@@ -8,6 +8,7 @@ import { Server } from '@modelcontextprotocol/sdk/server/index.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { CallToolRequestSchema, ListToolsRequestSchema, } from '@modelcontextprotocol/sdk/types.js';
 import { BearService } from './services/bear-service.js';
+// Error types imported for potential use in error handling
 /**
  * Bear MCP Server
  * Provides MCP tools for interfacing with Bear's SQLite database
@@ -1789,7 +1790,7 @@ ${topTagsData}`,
             if (typeof archived !== 'boolean') {
                 throw new Error('archived parameter must be a boolean');
             }
-            const result = await this.bearService.archiveNote(noteId, archived);
+            await this.bearService.archiveNote(noteId, archived);
             return {
                 content: [
                     {
@@ -1900,7 +1901,7 @@ ${topTagsData}`,
 }
 // Start the server
 const server = new BearMCPServer();
-server.run().catch(error => {
+server.run().catch(() => {
     // Silent error handling to avoid JSON-RPC interference
     process.exit(1);
 });
