@@ -151,14 +151,12 @@ The server automatically finds your Bear database at:
 **❌ AVOID THESE FORMATS (auto-corrected):**
 - **Hyphens**: `project-alpha` → becomes `projectalpha`
 - **Spaces**: `work meeting` → becomes `workmeeting`  
-- **Underscores**: `tag_name` → becomes `tagname`
 - **Mixed case**: `ProjectAlpha` → becomes `projectalpha`
 
 **🔧 Automatic Tag Sanitization:**
 The server automatically validates and sanitizes all tags:
 - **Lowercase only**: `Project` → `project`
 - **No spaces**: `tag name` → `tagname`
-- **No underscores**: `tag_name` → `tagname`
 - **No hyphens**: `project-alpha` → `projectalpha`
 - **No commas**: `tag,name` → `tagname`
 - **✅ Forward slashes preserved**: `project/alpha` → `project/alpha` (for nested tags)
