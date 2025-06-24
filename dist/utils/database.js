@@ -15,7 +15,9 @@ export class BearDatabase {
     backupDir;
     constructor(dbPath) {
         // Default to standard Bear database location on macOS
-        this.dbPath = dbPath || path.join(os.homedir(), 'Library/Group Containers/9K33E3U3T4.net.shinyfrog.bear/Application Data/database.sqlite');
+        this.dbPath =
+            dbPath ||
+                path.join(os.homedir(), 'Library/Group Containers/9K33E3U3T4.net.shinyfrog.bear/Application Data/database.sqlite');
         // Use user's Documents directory for backups - much more accessible
         this.backupDir = path.join(os.homedir(), 'Documents', 'Bear MCP Backups');
     }
@@ -84,7 +86,7 @@ export class BearDatabase {
     async performSafetyChecks(requireWriteAccess = false) {
         // Only check if Bear is running for direct database write operations
         // Note: Modern write operations use sync-safe Bear API, so this check is rarely triggered
-        if (requireWriteAccess && await this.isBearRunning()) {
+        if (requireWriteAccess && (await this.isBearRunning())) {
             throw new BearSafetyError('Direct database writes are not allowed while Bear is running. Use sync-safe Bear API instead.');
         }
         // Verify database access
@@ -108,7 +110,7 @@ export class BearDatabase {
         await this.performSafetyChecks(!readOnly);
         return new Promise((resolve, reject) => {
             const mode = readOnly ? sqlite3.OPEN_READONLY : sqlite3.OPEN_READWRITE;
-            this.db = new sqlite3.Database(this.dbPath, mode, (err) => {
+            this.db = new sqlite3.Database(this.dbPath, mode, err => {
                 if (err) {
                     reject(new BearDatabaseError(`Failed to connect to database: ${err.message}`));
                 }
@@ -127,7 +129,7 @@ export class BearDatabase {
             return;
         }
         return new Promise((resolve, reject) => {
-            this.db.close((err) => {
+            this.db.close(err => {
                 if (err) {
                     reject(new BearDatabaseError(`Failed to close database: ${err.message}`));
                 }
@@ -256,7 +258,7 @@ export class CoreDataUtils {
      * Convert Core Data timestamp to JavaScript Date
      */
     static toDate(coreDataTimestamp) {
-        return new Date(this.CORE_DATA_EPOCH + (coreDataTimestamp * 1000));
+        return new Date(this.CORE_DATA_EPOCH + coreDataTimestamp * 1000);
     }
     /**
      * Convert JavaScript Date to Core Data timestamp

@@ -15,7 +15,7 @@ import {
   DatabaseStats,
   NoteSearchOptions,
   BearDatabaseError,
-  BearSafetyError
+  BearSafetyError,
 } from '../types/bear.js';
 
 /**
@@ -34,7 +34,7 @@ export class BearService {
    */
   async getDatabaseStats(): Promise<DatabaseStats> {
     await this.database.connect(true); // Read-only connection
-    
+
     try {
       const [
         totalNotes,
@@ -43,15 +43,23 @@ export class BearService {
         archivedNotes,
         encryptedNotes,
         totalTags,
-        totalAttachments
+        totalAttachments,
       ] = await Promise.all([
         this.database.queryOne<{ count: number }>('SELECT COUNT(*) as count FROM ZSFNOTE'),
-        this.database.queryOne<{ count: number }>('SELECT COUNT(*) as count FROM ZSFNOTE WHERE ZTRASHED = 0'),
-        this.database.queryOne<{ count: number }>('SELECT COUNT(*) as count FROM ZSFNOTE WHERE ZTRASHED = 1'),
-        this.database.queryOne<{ count: number }>('SELECT COUNT(*) as count FROM ZSFNOTE WHERE ZARCHIVED = 1'),
-        this.database.queryOne<{ count: number }>('SELECT COUNT(*) as count FROM ZSFNOTE WHERE ZENCRYPTED = 1'),
+        this.database.queryOne<{ count: number }>(
+          'SELECT COUNT(*) as count FROM ZSFNOTE WHERE ZTRASHED = 0'
+        ),
+        this.database.queryOne<{ count: number }>(
+          'SELECT COUNT(*) as count FROM ZSFNOTE WHERE ZTRASHED = 1'
+        ),
+        this.database.queryOne<{ count: number }>(
+          'SELECT COUNT(*) as count FROM ZSFNOTE WHERE ZARCHIVED = 1'
+        ),
+        this.database.queryOne<{ count: number }>(
+          'SELECT COUNT(*) as count FROM ZSFNOTE WHERE ZENCRYPTED = 1'
+        ),
         this.database.queryOne<{ count: number }>('SELECT COUNT(*) as count FROM ZSFNOTETAG'),
-        this.database.queryOne<{ count: number }>('SELECT COUNT(*) as count FROM ZSFNOTEFILE')
+        this.database.queryOne<{ count: number }>('SELECT COUNT(*) as count FROM ZSFNOTEFILE'),
       ]);
 
       // Get database file size and last modified date
@@ -67,7 +75,7 @@ export class BearService {
         totalTags: totalTags?.count || 0,
         totalAttachments: totalAttachments?.count || 0,
         databaseSize: stats.size,
-        lastModified: stats.mtime
+        lastModified: stats.mtime,
       };
     } finally {
       await this.database.disconnect();
@@ -79,7 +87,7 @@ export class BearService {
    */
   async getNotes(options: NoteSearchOptions = {}): Promise<NoteWithTags[]> {
     await this.database.connect(true);
-    
+
     try {
       let sql = `
         SELECT n.*, GROUP_CONCAT(t.ZTITLE) as tag_names
@@ -88,14 +96,14 @@ export class BearService {
         LEFT JOIN ZSFNOTETAG t ON nt.Z_13TAGS = t.Z_PK
         WHERE 1=1
       `;
-      
+
       const params: any[] = [];
 
       // Apply filters
       if (!options.includeTrashed) {
         sql += ' AND n.ZTRASHED = 0';
       }
-      
+
       if (!options.includeArchived) {
         sql += ' AND n.ZARCHIVED = 0';
       }
@@ -121,7 +129,7 @@ export class BearService {
       if (options.limit) {
         sql += ' LIMIT ?';
         params.push(options.limit);
-        
+
         if (options.offset) {
           sql += ' OFFSET ?';
           params.push(options.offset);
@@ -129,10 +137,10 @@ export class BearService {
       }
 
       const rows = await this.database.query<BearNote & { tag_names: string }>(sql, params);
-      
+
       return rows.map(row => ({
         ...row,
-        tags: row.tag_names ? row.tag_names.split(',').filter(Boolean) : []
+        tags: row.tag_names ? row.tag_names.split(',').filter(Boolean) : [],
       }));
     } finally {
       await this.database.disconnect();
@@ -144,7 +152,7 @@ export class BearService {
    */
   async getNoteById(id: number): Promise<NoteWithTags | null> {
     await this.database.connect(true);
-    
+
     try {
       const sql = `
         SELECT n.*, GROUP_CONCAT(t.ZTITLE) as tag_names
@@ -154,16 +162,16 @@ export class BearService {
         WHERE n.Z_PK = ?
         GROUP BY n.Z_PK
       `;
-      
+
       const row = await this.database.queryOne<BearNote & { tag_names: string }>(sql, [id]);
-      
+
       if (!row) {
         return null;
       }
 
       return {
         ...row,
-        tags: row.tag_names ? row.tag_names.split(',').filter(Boolean) : []
+        tags: row.tag_names ? row.tag_names.split(',').filter(Boolean) : [],
       };
     } finally {
       await this.database.disconnect();
@@ -175,7 +183,7 @@ export class BearService {
    */
   async getNoteByTitle(title: string): Promise<NoteWithTags | null> {
     await this.database.connect(true);
-    
+
     try {
       const sql = `
         SELECT n.*, GROUP_CONCAT(t.ZTITLE) as tag_names
@@ -186,16 +194,16 @@ export class BearService {
         GROUP BY n.Z_PK
         LIMIT 1
       `;
-      
+
       const row = await this.database.queryOne<BearNote & { tag_names: string }>(sql, [title]);
-      
+
       if (!row) {
         return null;
       }
 
       return {
         ...row,
-        tags: row.tag_names ? row.tag_names.split(',').filter(Boolean) : []
+        tags: row.tag_names ? row.tag_names.split(',').filter(Boolean) : [],
       };
     } finally {
       await this.database.disconnect();
@@ -214,7 +222,7 @@ export class BearService {
    */
   async getTags(): Promise<TagWithCount[]> {
     await this.database.connect(true);
-    
+
     try {
       const sql = `
         SELECT t.*, COUNT(nt.Z_5NOTES) as noteCount
@@ -224,7 +232,7 @@ export class BearService {
         GROUP BY t.Z_PK
         ORDER BY noteCount DESC, t.ZTITLE ASC
       `;
-      
+
       return await this.database.query<TagWithCount>(sql);
     } finally {
       await this.database.disconnect();
@@ -236,7 +244,7 @@ export class BearService {
    */
   async getNotesByTag(tagName: string): Promise<NoteWithTags[]> {
     await this.database.connect(true);
-    
+
     try {
       const sql = `
         SELECT n.*, GROUP_CONCAT(t2.ZTITLE) as tag_names
@@ -249,12 +257,12 @@ export class BearService {
         GROUP BY n.Z_PK
         ORDER BY n.ZMODIFICATIONDATE DESC
       `;
-      
+
       const rows = await this.database.query<BearNote & { tag_names: string }>(sql, [tagName]);
-      
+
       return rows.map(row => ({
         ...row,
-        tags: row.tag_names ? row.tag_names.split(',').filter(Boolean) : []
+        tags: row.tag_names ? row.tag_names.split(',').filter(Boolean) : [],
       }));
     } finally {
       await this.database.disconnect();
@@ -287,7 +295,7 @@ export class BearService {
    */
   async getSchema(): Promise<{ name: string; sql: string }[]> {
     await this.database.connect(true);
-    
+
     try {
       return this.database.getSchema();
     } finally {
@@ -300,7 +308,7 @@ export class BearService {
    */
   async checkIntegrity(): Promise<boolean> {
     await this.database.connect(true);
-    
+
     try {
       return this.database.checkIntegrity();
     } finally {
@@ -331,32 +339,34 @@ export class BearService {
       active: stats.activeNotes,
       trashed: stats.trashedNotes,
       archived: stats.archivedNotes,
-      encrypted: stats.encryptedNotes
+      encrypted: stats.encryptedNotes,
     };
   }
 
   /**
    * Get notes with advanced filtering options
    */
-  async getNotesAdvanced(options: {
-    query?: string;
-    tags?: string[];
-    excludeTags?: string[];
-    dateFrom?: Date;
-    dateTo?: Date;
-    modifiedAfter?: Date;
-    modifiedBefore?: Date;
-    includeContent?: boolean;
-    includeTrashed?: boolean;
-    includeArchived?: boolean;
-    includeEncrypted?: boolean;
-    sortBy?: 'created' | 'modified' | 'title' | 'size';
-    sortOrder?: 'asc' | 'desc';
-    limit?: number;
-    offset?: number;
-  } = {}): Promise<NoteWithTags[]> {
+  async getNotesAdvanced(
+    options: {
+      query?: string;
+      tags?: string[];
+      excludeTags?: string[];
+      dateFrom?: Date;
+      dateTo?: Date;
+      modifiedAfter?: Date;
+      modifiedBefore?: Date;
+      includeContent?: boolean;
+      includeTrashed?: boolean;
+      includeArchived?: boolean;
+      includeEncrypted?: boolean;
+      sortBy?: 'created' | 'modified' | 'title' | 'size';
+      sortOrder?: 'asc' | 'desc';
+      limit?: number;
+      offset?: number;
+    } = {}
+  ): Promise<NoteWithTags[]> {
     await this.database.connect(true);
-    
+
     try {
       let sql = `
         SELECT n.*, GROUP_CONCAT(DISTINCT t.ZTITLE) as tag_names,
@@ -370,14 +380,14 @@ export class BearService {
         LEFT JOIN ZSFNOTETAG t ON nt.Z_13TAGS = t.Z_PK
         WHERE 1=1
       `;
-      
+
       const params: any[] = [];
 
       // Basic filters
       if (!options.includeTrashed) {
         sql += ' AND n.ZTRASHED = 0';
       }
-      
+
       if (!options.includeArchived) {
         sql += ' AND n.ZARCHIVED = 0';
       }
@@ -424,7 +434,9 @@ export class BearService {
       }
 
       if (options.excludeTags && options.excludeTags.length > 0) {
-        const excludeConditions = options.excludeTags.map(() => 'tag_names NOT LIKE ? OR tag_names IS NULL').join(' AND ');
+        const excludeConditions = options.excludeTags
+          .map(() => 'tag_names NOT LIKE ? OR tag_names IS NULL')
+          .join(' AND ');
         sql += options.tags ? ` AND (${excludeConditions})` : ` HAVING (${excludeConditions})`;
         options.excludeTags.forEach(tag => params.push(`%${tag}%`));
       }
@@ -432,7 +444,7 @@ export class BearService {
       // Sorting
       const sortBy = options.sortBy || 'modified';
       const sortOrder = options.sortOrder || 'desc';
-      
+
       switch (sortBy) {
         case 'created':
           sql += ` ORDER BY n.ZCREATIONDATE ${sortOrder.toUpperCase()}`;
@@ -454,24 +466,26 @@ export class BearService {
       if (options.limit) {
         sql += ' LIMIT ?';
         params.push(options.limit);
-        
+
         if (options.offset) {
           sql += ' OFFSET ?';
           params.push(options.offset);
         }
       }
 
-      const rows = await this.database.query<BearNote & { 
-        tag_names: string; 
-        content_length: number; 
-        preview: string; 
-      }>(sql, params);
-      
+      const rows = await this.database.query<
+        BearNote & {
+          tag_names: string;
+          content_length: number;
+          preview: string;
+        }
+      >(sql, params);
+
       return rows.map(row => ({
         ...row,
         tags: row.tag_names ? row.tag_names.split(',').filter(Boolean) : [],
         contentLength: row.content_length,
-        preview: row.preview
+        preview: row.preview,
       }));
     } finally {
       await this.database.disconnect();
@@ -498,7 +512,7 @@ export class BearService {
     isEncrypted?: boolean;
   }): Promise<NoteWithTags[]> {
     await this.database.connect(true);
-    
+
     try {
       let sql = `
         SELECT n.*, GROUP_CONCAT(DISTINCT t.ZTITLE) as tag_names,
@@ -508,7 +522,7 @@ export class BearService {
         LEFT JOIN ZSFNOTETAG t ON nt.Z_13TAGS = t.Z_PK
         WHERE 1=1
       `;
-      
+
       const params: any[] = [];
 
       // Title search (OR logic for multiple terms)
@@ -589,22 +603,26 @@ export class BearService {
 
       if (criteria.hasAnyTags && criteria.hasAnyTags.length > 0) {
         const anyTagConditions = criteria.hasAnyTags.map(() => 'tag_names LIKE ?').join(' OR ');
-        const havingClause = criteria.hasAllTags ? ` AND (${anyTagConditions})` : ` HAVING (${anyTagConditions})`;
+        const havingClause = criteria.hasAllTags
+          ? ` AND (${anyTagConditions})`
+          : ` HAVING (${anyTagConditions})`;
         sql += havingClause;
         criteria.hasAnyTags.forEach(tag => params.push(`%${tag}%`));
       }
 
       sql += ' ORDER BY n.ZMODIFICATIONDATE DESC';
 
-      const rows = await this.database.query<BearNote & { 
-        tag_names: string; 
-        content_length: number; 
-      }>(sql, params);
-      
+      const rows = await this.database.query<
+        BearNote & {
+          tag_names: string;
+          content_length: number;
+        }
+      >(sql, params);
+
       return rows.map(row => ({
         ...row,
         tags: row.tag_names ? row.tag_names.split(',').filter(Boolean) : [],
-        contentLength: row.content_length
+        contentLength: row.content_length,
       }));
     } finally {
       await this.database.disconnect();
@@ -631,55 +649,49 @@ export class BearService {
     };
   }> {
     await this.database.connect(true);
-    
+
     try {
-      const [
-        totalStats,
-        longestNote,
-        shortestNote,
-        mostRecentNote,
-        oldestNote,
-        contentStats
-      ] = await Promise.all([
-        this.database.queryOne<{ count: number; avgLength: number }>(`
+      const [totalStats, longestNote, shortestNote, mostRecentNote, oldestNote, contentStats] =
+        await Promise.all([
+          this.database.queryOne<{ count: number; avgLength: number }>(`
           SELECT COUNT(*) as count, AVG(LENGTH(ZTEXT)) as avgLength
           FROM ZSFNOTE 
           WHERE ZTRASHED = 0
         `),
-        this.database.queryOne<{ ZTITLE: string; length: number }>(`
+          this.database.queryOne<{ ZTITLE: string; length: number }>(`
           SELECT ZTITLE, LENGTH(ZTEXT) as length
           FROM ZSFNOTE 
           WHERE ZTRASHED = 0 AND ZTEXT IS NOT NULL
           ORDER BY LENGTH(ZTEXT) DESC 
           LIMIT 1
         `),
-        this.database.queryOne<{ ZTITLE: string; length: number }>(`
+          this.database.queryOne<{ ZTITLE: string; length: number }>(`
           SELECT ZTITLE, LENGTH(ZTEXT) as length
           FROM ZSFNOTE 
           WHERE ZTRASHED = 0 AND ZTEXT IS NOT NULL
           ORDER BY LENGTH(ZTEXT) ASC 
           LIMIT 1
         `),
-        this.database.queryOne<{ ZTITLE: string; ZMODIFICATIONDATE: number }>(`
+          this.database.queryOne<{ ZTITLE: string; ZMODIFICATIONDATE: number }>(`
           SELECT ZTITLE, ZMODIFICATIONDATE
           FROM ZSFNOTE 
           WHERE ZTRASHED = 0
           ORDER BY ZMODIFICATIONDATE DESC 
           LIMIT 1
         `),
-        this.database.queryOne<{ ZTITLE: string; ZCREATIONDATE: number }>(`
+          this.database.queryOne<{ ZTITLE: string; ZCREATIONDATE: number }>(`
           SELECT ZTITLE, ZCREATIONDATE
           FROM ZSFNOTE 
           WHERE ZTRASHED = 0
           ORDER BY ZCREATIONDATE ASC 
           LIMIT 1
         `),
-        this.database.queryOne<{ 
-          hasImages: number; 
-          hasFiles: number; 
-          hasSourceCode: number; 
-          todos: number; 
-        }>(`
+          this.database.queryOne<{
+            hasImages: number;
+            hasFiles: number;
+            hasSourceCode: number;
+            todos: number;
+          }>(`
           SELECT 
             SUM(ZHASIMAGES) as hasImages,
             SUM(ZHASFILES) as hasFiles,
@@ -687,8 +699,8 @@ export class BearService {
             SUM(ZTODOCOMPLETED + ZTODOINCOMPLETED) as todos
           FROM ZSFNOTE 
           WHERE ZTRASHED = 0
-        `)
-      ]);
+        `),
+        ]);
 
       // Get monthly note creation stats
       const monthlyStats = await this.database.query<{ month: string; count: number }>(`
@@ -718,34 +730,36 @@ export class BearService {
         averageLength: Math.round(totalStats?.avgLength || 0),
         longestNote: {
           title: longestNote?.ZTITLE || '',
-          length: longestNote?.length || 0
+          length: longestNote?.length || 0,
         },
         shortestNote: {
           title: shortestNote?.ZTITLE || '',
-          length: shortestNote?.length || 0
+          length: shortestNote?.length || 0,
         },
         mostRecentNote: {
           title: mostRecentNote?.ZTITLE || '',
-          date: mostRecentNote ? CoreDataUtils.toDate(mostRecentNote.ZMODIFICATIONDATE) : new Date()
+          date: mostRecentNote
+            ? CoreDataUtils.toDate(mostRecentNote.ZMODIFICATIONDATE)
+            : new Date(),
         },
         oldestNote: {
           title: oldestNote?.ZTITLE || '',
-          date: oldestNote ? CoreDataUtils.toDate(oldestNote.ZCREATIONDATE) : new Date()
+          date: oldestNote ? CoreDataUtils.toDate(oldestNote.ZCREATIONDATE) : new Date(),
         },
         notesPerMonth: monthlyStats.map(stat => ({
           month: stat.month,
-          count: stat.count
+          count: stat.count,
         })),
         topTags: topTags.map(tag => ({
           tag: tag.ZTITLE,
-          count: tag.count
+          count: tag.count,
         })),
         contentStats: {
           hasImages: contentStats?.hasImages || 0,
           hasFiles: contentStats?.hasFiles || 0,
           hasSourceCode: contentStats?.hasSourceCode || 0,
-          hasTodos: contentStats?.todos || 0
-        }
+          hasTodos: contentStats?.todos || 0,
+        },
       };
     } finally {
       await this.database.disconnect();
@@ -755,12 +769,15 @@ export class BearService {
   /**
    * Find related notes based on content similarity and shared tags
    */
-  async getRelatedNotes(noteId: number, limit: number = 5): Promise<{
+  async getRelatedNotes(
+    noteId: number,
+    limit: number = 5
+  ): Promise<{
     byTags: NoteWithTags[];
     byContent: NoteWithTags[];
   }> {
     await this.database.connect(true);
-    
+
     try {
       // Get the source note's tags and content keywords
       const sourceNote = await this.getNoteById(noteId);
@@ -769,7 +786,10 @@ export class BearService {
       }
 
       // Find notes with shared tags
-      const relatedByTags = sourceNote.tags.length > 0 ? await this.database.query<BearNote & { tag_names: string; shared_tags: number }>(`
+      const relatedByTags =
+        sourceNote.tags.length > 0
+          ? await this.database.query<BearNote & { tag_names: string; shared_tags: number }>(
+              `
         SELECT n.*, GROUP_CONCAT(DISTINCT t.ZTITLE) as tag_names,
                COUNT(DISTINCT CASE WHEN t.ZTITLE IN (${sourceNote.tags.map(() => '?').join(',')}) THEN t.ZTITLE END) as shared_tags
         FROM ZSFNOTE n
@@ -780,11 +800,17 @@ export class BearService {
         HAVING shared_tags > 0
         ORDER BY shared_tags DESC, n.ZMODIFICATIONDATE DESC
         LIMIT ?
-      `, [...sourceNote.tags, noteId, limit]) : [];
+      `,
+              [...sourceNote.tags, noteId, limit]
+            )
+          : [];
 
       // Find notes with similar content (basic keyword matching)
       const contentKeywords = this.extractKeywords(sourceNote.ZTEXT || '');
-      const relatedByContent = contentKeywords.length > 0 ? await this.database.query<BearNote & { tag_names: string }>(`
+      const relatedByContent =
+        contentKeywords.length > 0
+          ? await this.database.query<BearNote & { tag_names: string }>(
+              `
         SELECT n.*, GROUP_CONCAT(DISTINCT t.ZTITLE) as tag_names
         FROM ZSFNOTE n
         LEFT JOIN Z_5TAGS nt ON n.Z_PK = nt.Z_5NOTES
@@ -794,17 +820,20 @@ export class BearService {
         GROUP BY n.Z_PK
         ORDER BY n.ZMODIFICATIONDATE DESC
         LIMIT ?
-      `, [noteId, ...contentKeywords.map(kw => `%${kw}%`), limit]) : [];
+      `,
+              [noteId, ...contentKeywords.map(kw => `%${kw}%`), limit]
+            )
+          : [];
 
       return {
         byTags: relatedByTags.map(row => ({
           ...row,
-          tags: row.tag_names ? row.tag_names.split(',').filter(Boolean) : []
+          tags: row.tag_names ? row.tag_names.split(',').filter(Boolean) : [],
         })),
         byContent: relatedByContent.map(row => ({
           ...row,
-          tags: row.tag_names ? row.tag_names.split(',').filter(Boolean) : []
-        }))
+          tags: row.tag_names ? row.tag_names.split(',').filter(Boolean) : [],
+        })),
       };
     } finally {
       await this.database.disconnect();
@@ -815,11 +844,48 @@ export class BearService {
    * Extract keywords from text for content similarity matching
    */
   private extractKeywords(text: string): string[] {
-    if (!text) return [];
-    
+    if (!text) {
+      return [];
+    }
+
     // Simple keyword extraction - remove common words and get significant terms
-    const commonWords = new Set(['the', 'a', 'an', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for', 'of', 'with', 'by', 'is', 'are', 'was', 'were', 'be', 'been', 'have', 'has', 'had', 'do', 'does', 'did', 'will', 'would', 'could', 'should', 'this', 'that', 'these', 'those']);
-    
+    const commonWords = new Set([
+      'the',
+      'a',
+      'an',
+      'and',
+      'or',
+      'but',
+      'in',
+      'on',
+      'at',
+      'to',
+      'for',
+      'of',
+      'with',
+      'by',
+      'is',
+      'are',
+      'was',
+      'were',
+      'be',
+      'been',
+      'have',
+      'has',
+      'had',
+      'do',
+      'does',
+      'did',
+      'will',
+      'would',
+      'could',
+      'should',
+      'this',
+      'that',
+      'these',
+      'those',
+    ]);
+
     return text
       .toLowerCase()
       .replace(/[^\w\s]/g, ' ')
@@ -831,31 +897,38 @@ export class BearService {
   /**
    * Advanced full-text search with ranking and relevance scoring
    */
-  async searchNotesFullText(query: string, options: {
-    limit?: number;
-    includeSnippets?: boolean;
-    searchFields?: ('title' | 'content' | 'both')[];
-    fuzzyMatch?: boolean;
-    caseSensitive?: boolean;
-    wholeWords?: boolean;
-    includeArchived?: boolean;
-    includeTrashed?: boolean;
-    tags?: string[];
-    dateFrom?: Date;
-    dateTo?: Date;
-  } = {}): Promise<Array<NoteWithTags & {
-    relevanceScore: number;
-    matchedTerms: string[];
-    snippets: string[];
-    titleMatches: number;
-    contentMatches: number;
-  }>> {
+  async searchNotesFullText(
+    query: string,
+    options: {
+      limit?: number;
+      includeSnippets?: boolean;
+      searchFields?: ('title' | 'content' | 'both')[];
+      fuzzyMatch?: boolean;
+      caseSensitive?: boolean;
+      wholeWords?: boolean;
+      includeArchived?: boolean;
+      includeTrashed?: boolean;
+      tags?: string[];
+      dateFrom?: Date;
+      dateTo?: Date;
+    } = {}
+  ): Promise<
+    Array<
+      NoteWithTags & {
+        relevanceScore: number;
+        matchedTerms: string[];
+        snippets: string[];
+        titleMatches: number;
+        contentMatches: number;
+      }
+    >
+  > {
     await this.database.connect(true);
-    
+
     try {
       const searchTerms = this.extractSearchTerms(query, options.fuzzyMatch);
       const searchFields = options.searchFields || ['both'];
-      
+
       let sql = `
         SELECT n.*, GROUP_CONCAT(DISTINCT t.ZTITLE) as tag_names,
                LENGTH(n.ZTEXT) as content_length
@@ -864,23 +937,23 @@ export class BearService {
         LEFT JOIN ZSFNOTETAG t ON nt.Z_13TAGS = t.Z_PK
         WHERE 1=1
       `;
-      
+
       const params: any[] = [];
 
       // Basic filters
       if (!options.includeTrashed) {
         sql += ' AND n.ZTRASHED = 0';
       }
-      
+
       if (!options.includeArchived) {
         sql += ' AND n.ZARCHIVED = 0';
       }
 
       // Build search conditions
       const searchConditions: string[] = [];
-      
+
       if (searchFields.includes('title') || searchFields.includes('both')) {
-        const titleConditions = searchTerms.map(() => 
+        const titleConditions = searchTerms.map(() =>
           options.caseSensitive ? 'n.ZTITLE LIKE ?' : 'LOWER(n.ZTITLE) LIKE LOWER(?)'
         );
         if (titleConditions.length > 0) {
@@ -890,7 +963,7 @@ export class BearService {
       }
 
       if (searchFields.includes('content') || searchFields.includes('both')) {
-        const contentConditions = searchTerms.map(() => 
+        const contentConditions = searchTerms.map(() =>
           options.caseSensitive ? 'n.ZTEXT LIKE ?' : 'LOWER(n.ZTEXT) LIKE LOWER(?)'
         );
         if (contentConditions.length > 0) {
@@ -931,31 +1004,34 @@ export class BearService {
         params.push(options.limit);
       }
 
-      const rows = await this.database.query<BearNote & { 
-        tag_names: string; 
-        content_length: number; 
-      }>(sql, params);
+      const rows = await this.database.query<
+        BearNote & {
+          tag_names: string;
+          content_length: number;
+        }
+      >(sql, params);
 
       // Calculate relevance scores and extract snippets
-      return rows.map(row => {
-        const note = {
-          ...row,
-          tags: row.tag_names ? row.tag_names.split(',').filter(Boolean) : [],
-          contentLength: row.content_length
-        };
+      return rows
+        .map(row => {
+          const note = {
+            ...row,
+            tags: row.tag_names ? row.tag_names.split(',').filter(Boolean) : [],
+            contentLength: row.content_length,
+          };
 
-        const analysis = this.analyzeSearchMatches(note, searchTerms, options);
-        
-        return {
-          ...note,
-          relevanceScore: analysis.relevanceScore,
-          matchedTerms: analysis.matchedTerms,
-          snippets: options.includeSnippets ? analysis.snippets : [],
-          titleMatches: analysis.titleMatches,
-          contentMatches: analysis.contentMatches
-        };
-      }).sort((a, b) => b.relevanceScore - a.relevanceScore);
+          const analysis = this.analyzeSearchMatches(note, searchTerms, options);
 
+          return {
+            ...note,
+            relevanceScore: analysis.relevanceScore,
+            matchedTerms: analysis.matchedTerms,
+            snippets: options.includeSnippets ? analysis.snippets : [],
+            titleMatches: analysis.titleMatches,
+            contentMatches: analysis.contentMatches,
+          };
+        })
+        .sort((a, b) => b.relevanceScore - a.relevanceScore);
     } finally {
       await this.database.disconnect();
     }
@@ -964,17 +1040,21 @@ export class BearService {
   /**
    * Search with auto-complete suggestions
    */
-  async getSearchSuggestions(partialQuery: string, limit: number = 10): Promise<{
+  async getSearchSuggestions(
+    partialQuery: string,
+    limit: number = 10
+  ): Promise<{
     terms: string[];
     titles: string[];
     tags: string[];
   }> {
     await this.database.connect(true);
-    
+
     try {
       const [termSuggestions, titleSuggestions, tagSuggestions] = await Promise.all([
         // Extract common words from content that start with the partial query
-        this.database.query<{ term: string; frequency: number }>(`
+        this.database.query<{ term: string; frequency: number }>(
+          `
           WITH RECURSIVE split(word, str) AS (
             SELECT '', LOWER(ZTEXT) || ' ' FROM ZSFNOTE WHERE ZTRASHED = 0 AND ZTEXT IS NOT NULL
             UNION ALL
@@ -988,31 +1068,39 @@ export class BearService {
           GROUP BY word
           ORDER BY frequency DESC
           LIMIT ?
-        `, [`${partialQuery.toLowerCase()}%`, limit]),
+        `,
+          [`${partialQuery.toLowerCase()}%`, limit]
+        ),
 
         // Find note titles that contain the partial query
-        this.database.query<{ title: string }>(`
+        this.database.query<{ title: string }>(
+          `
           SELECT DISTINCT ZTITLE as title
           FROM ZSFNOTE 
           WHERE ZTITLE LIKE ? AND ZTRASHED = 0 AND ZTITLE IS NOT NULL
           ORDER BY ZMODIFICATIONDATE DESC
           LIMIT ?
-        `, [`%${partialQuery}%`, limit]),
+        `,
+          [`%${partialQuery}%`, limit]
+        ),
 
         // Find tags that start with the partial query
-        this.database.query<{ tag: string }>(`
+        this.database.query<{ tag: string }>(
+          `
           SELECT DISTINCT ZTITLE as tag
           FROM ZSFNOTETAG 
           WHERE ZTITLE LIKE ?
           ORDER BY ZTITLE
           LIMIT ?
-        `, [`${partialQuery}%`, limit])
+        `,
+          [`${partialQuery}%`, limit]
+        ),
       ]);
 
       return {
         terms: termSuggestions.map(s => s.term),
         titles: titleSuggestions.map(s => s.title),
-        tags: tagSuggestions.map(s => s.tag)
+        tags: tagSuggestions.map(s => s.tag),
       };
     } finally {
       await this.database.disconnect();
@@ -1022,13 +1110,16 @@ export class BearService {
   /**
    * Search for similar notes using content analysis
    */
-  async findSimilarNotes(referenceText: string, options: {
-    limit?: number;
-    minSimilarity?: number;
-    excludeNoteId?: number;
-  } = {}): Promise<Array<NoteWithTags & { similarityScore: number; commonKeywords: string[] }>> {
+  async findSimilarNotes(
+    referenceText: string,
+    options: {
+      limit?: number;
+      minSimilarity?: number;
+      excludeNoteId?: number;
+    } = {}
+  ): Promise<Array<NoteWithTags & { similarityScore: number; commonKeywords: string[] }>> {
     await this.database.connect(true);
-    
+
     try {
       const referenceKeywords = this.extractKeywords(referenceText);
       if (referenceKeywords.length === 0) {
@@ -1052,7 +1143,9 @@ export class BearService {
       }
 
       // Add keyword matching conditions
-      const keywordConditions = referenceKeywords.map(() => 'LOWER(n.ZTEXT) LIKE LOWER(?)').join(' OR ');
+      const keywordConditions = referenceKeywords
+        .map(() => 'LOWER(n.ZTEXT) LIKE LOWER(?)')
+        .join(' OR ');
       sql += ` AND (${keywordConditions})`;
       referenceKeywords.forEach(keyword => params.push(`%${keyword}%`));
 
@@ -1063,35 +1156,39 @@ export class BearService {
         params.push(options.limit * 3); // Get more results for similarity filtering
       }
 
-      const rows = await this.database.query<BearNote & { 
-        tag_names: string; 
-        content_length: number; 
-      }>(sql, params);
+      const rows = await this.database.query<
+        BearNote & {
+          tag_names: string;
+          content_length: number;
+        }
+      >(sql, params);
 
       // Calculate similarity scores
-      const results = rows.map(row => {
-        const note = {
-          ...row,
-          tags: row.tag_names ? row.tag_names.split(',').filter(Boolean) : [],
-          contentLength: row.content_length
-        };
+      const results = rows
+        .map(row => {
+          const note = {
+            ...row,
+            tags: row.tag_names ? row.tag_names.split(',').filter(Boolean) : [],
+            contentLength: row.content_length,
+          };
 
-        const noteKeywords = this.extractKeywords(note.ZTEXT || '');
-        const commonKeywords = referenceKeywords.filter(kw => 
-          noteKeywords.some(nkw => nkw.includes(kw) || kw.includes(nkw))
-        );
-        
-        const similarityScore = commonKeywords.length / Math.max(referenceKeywords.length, noteKeywords.length);
+          const noteKeywords = this.extractKeywords(note.ZTEXT || '');
+          const commonKeywords = referenceKeywords.filter(kw =>
+            noteKeywords.some(nkw => nkw.includes(kw) || kw.includes(nkw))
+          );
 
-        return {
-          ...note,
-          similarityScore,
-          commonKeywords
-        };
-      })
-      .filter(result => result.similarityScore >= (options.minSimilarity || 0.1))
-      .sort((a, b) => b.similarityScore - a.similarityScore)
-      .slice(0, options.limit || 10);
+          const similarityScore =
+            commonKeywords.length / Math.max(referenceKeywords.length, noteKeywords.length);
+
+          return {
+            ...note,
+            similarityScore,
+            commonKeywords,
+          };
+        })
+        .filter(result => result.similarityScore >= (options.minSimilarity || 0.1))
+        .sort((a, b) => b.similarityScore - a.similarityScore)
+        .slice(0, options.limit || 10);
 
       return results;
     } finally {
@@ -1130,7 +1227,11 @@ export class BearService {
   /**
    * Analyze search matches and calculate relevance
    */
-  private analyzeSearchMatches(note: NoteWithTags, searchTerms: string[], options: any): {
+  private analyzeSearchMatches(
+    note: NoteWithTags,
+    searchTerms: string[],
+    options: any
+  ): {
     relevanceScore: number;
     matchedTerms: string[];
     snippets: string[];
@@ -1139,7 +1240,7 @@ export class BearService {
   } {
     const title = note.ZTITLE?.toLowerCase() || '';
     const content = note.ZTEXT?.toLowerCase() || '';
-    
+
     let titleMatches = 0;
     let contentMatches = 0;
     const matchedTerms: string[] = [];
@@ -1147,7 +1248,7 @@ export class BearService {
 
     searchTerms.forEach(term => {
       const termLower = term.toLowerCase();
-      
+
       // Count title matches
       const titleMatchCount = (title.match(new RegExp(termLower, 'g')) || []).length;
       if (titleMatchCount > 0) {
@@ -1176,13 +1277,13 @@ export class BearService {
 
     // Calculate relevance score
     let relevanceScore = 0;
-    
+
     // Title matches are weighted more heavily
     relevanceScore += titleMatches * 10;
-    
+
     // Content matches
     relevanceScore += contentMatches * 2;
-    
+
     // Boost for exact phrase matches
     const queryLower = searchTerms.join(' ').toLowerCase();
     if (title.includes(queryLower)) {
@@ -1193,7 +1294,7 @@ export class BearService {
     }
 
     // Boost for tag matches
-    const tagMatches = note.tags.filter(tag => 
+    const tagMatches = note.tags.filter(tag =>
       searchTerms.some(term => tag.toLowerCase().includes(term.toLowerCase()))
     ).length;
     relevanceScore += tagMatches * 15;
@@ -1208,19 +1309,21 @@ export class BearService {
       matchedTerms,
       snippets,
       titleMatches,
-      contentMatches
+      contentMatches,
     };
   }
 
   /**
    * Get comprehensive file attachment information
    */
-  async getFileAttachments(options: {
-    noteId?: number;
-    fileType?: string;
-    includeMetadata?: boolean;
-    limit?: number;
-  } = {}): Promise<{
+  async getFileAttachments(
+    options: {
+      noteId?: number;
+      fileType?: string;
+      includeMetadata?: boolean;
+      limit?: number;
+    } = {}
+  ): Promise<{
     totalAttachments: number;
     attachments: Array<{
       id: number;
@@ -1238,7 +1341,7 @@ export class BearService {
     attachmentsByType: Array<{ type: string; count: number; totalSize: number }>;
   }> {
     await this.database.connect(true);
-    
+
     try {
       let sql = `
         SELECT f.*, n.ZTITLE as note_title, n.Z_PK as note_id
@@ -1246,21 +1349,21 @@ export class BearService {
         INNER JOIN ZSFNOTE n ON f.ZNOTE = n.Z_PK
         WHERE n.ZTRASHED = 0
       `;
-      
+
       const params: any[] = [];
-      
+
       if (options.noteId) {
         sql += ' AND f.ZNOTE = ?';
         params.push(options.noteId);
       }
-      
+
       if (options.fileType) {
         sql += ' AND LOWER(f.ZFILENAME) LIKE LOWER(?)';
         params.push(`%.${options.fileType}`);
       }
-      
+
       sql += ' ORDER BY f.ZCREATIONDATE DESC';
-      
+
       if (options.limit) {
         sql += ' LIMIT ?';
         params.push(options.limit);
@@ -1300,10 +1403,10 @@ export class BearService {
       const attachments = files.map((file: any) => {
         const filename = file.ZFILENAME || 'unknown';
         const extension = filename.split('.').pop()?.toLowerCase() || '';
-        
+
         let contentType = 'application/octet-stream';
         let fileType = 'other';
-        
+
         // Determine content type and file type
         if (['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(extension)) {
           contentType = `image/${extension === 'jpg' ? 'jpeg' : extension}`;
@@ -1336,7 +1439,7 @@ export class BearService {
           noteTitle: file.note_title || 'Untitled',
           filePath: file.ZFILEPATH || '',
           contentType,
-          metadata: options.includeMetadata ? this.extractFileMetadata(file) : undefined
+          metadata: options.includeMetadata ? this.extractFileMetadata(file) : undefined,
         };
       });
 
@@ -1346,8 +1449,8 @@ export class BearService {
         attachmentsByType: typeStats.map(stat => ({
           type: stat.type,
           count: stat.count,
-          totalSize: stat.total_size
-        }))
+          totalSize: stat.total_size,
+        })),
       };
     } finally {
       await this.database.disconnect();
@@ -1357,11 +1460,13 @@ export class BearService {
   /**
    * Analyze note metadata and content patterns
    */
-  async analyzeNoteMetadata(options: {
-    includeContentAnalysis?: boolean;
-    includeLinkAnalysis?: boolean;
-    includeStructureAnalysis?: boolean;
-  } = {}): Promise<{
+  async analyzeNoteMetadata(
+    options: {
+      includeContentAnalysis?: boolean;
+      includeLinkAnalysis?: boolean;
+      includeStructureAnalysis?: boolean;
+    } = {}
+  ): Promise<{
     overview: {
       totalNotes: number;
       averageLength: number;
@@ -1398,7 +1503,7 @@ export class BearService {
     };
   }> {
     await this.database.connect(true);
-    
+
     try {
       // Basic overview
       const [overview] = await this.database.query<{
@@ -1474,8 +1579,8 @@ export class BearService {
           averageLength: Math.round(overview.avg_length || 0),
           lengthDistribution,
           creationPatterns,
-          modificationPatterns
-        }
+          modificationPatterns,
+        },
       };
 
       // Content analysis
@@ -1538,25 +1643,29 @@ export class BearService {
     modifiedAfter?: Date;
     modifiedBefore?: Date;
     limit?: number;
-  }): Promise<Array<NoteWithTags & {
-    wordCount: number;
-    attachmentCount: number;
-    linkCount: number;
-    imageCount: number;
-    todoCount: number;
-    codeBlockCount: number;
-    tableCount: number;
-    metadata: {
-      hasAttachments: boolean;
-      hasLinks: boolean;
-      hasImages: boolean;
-      hasTodos: boolean;
-      hasCodeBlocks: boolean;
-      hasTables: boolean;
-    };
-  }>> {
+  }): Promise<
+    Array<
+      NoteWithTags & {
+        wordCount: number;
+        attachmentCount: number;
+        linkCount: number;
+        imageCount: number;
+        todoCount: number;
+        codeBlockCount: number;
+        tableCount: number;
+        metadata: {
+          hasAttachments: boolean;
+          hasLinks: boolean;
+          hasImages: boolean;
+          hasTodos: boolean;
+          hasCodeBlocks: boolean;
+          hasTables: boolean;
+        };
+      }
+    >
+  > {
     await this.database.connect(true);
-    
+
     try {
       let sql = `
         SELECT n.*, 
@@ -1606,61 +1715,89 @@ export class BearService {
         params.push(criteria.limit);
       }
 
-      const rows = await this.database.query<BearNote & {
-        tag_names: string;
-        attachment_count: number;
-      }>(sql, params);
+      const rows = await this.database.query<
+        BearNote & {
+          tag_names: string;
+          attachment_count: number;
+        }
+      >(sql, params);
 
       // Analyze content for each note
-      const results = rows.map(row => {
-        const note = {
-          ...row,
-          tags: row.tag_names ? row.tag_names.split(',').filter(Boolean) : []
-        };
+      const results = rows
+        .map(row => {
+          const note = {
+            ...row,
+            tags: row.tag_names ? row.tag_names.split(',').filter(Boolean) : [],
+          };
 
-        const content = note.ZTEXT || '';
-        
-        // Count various content elements
-        const wordCount = content.split(/\s+/).filter(word => word.length > 0).length;
-        const linkCount = (content.match(/https?:\/\/[^\s\)]+/g) || []).length;
-        const imageCount = (content.match(/!\[.*?\]\(.*?\)/g) || []).length;
-        const todoCount = (content.match(/- \[[ x]\]/g) || []).length;
-        const codeBlockCount = (content.match(/```/g) || []).length / 2;
-        const tableCount = (content.match(/\|.*\|/g) || []).length;
+          const content = note.ZTEXT || '';
 
-        // Apply content-based filters
-        if (criteria.minWordCount && wordCount < criteria.minWordCount) return null;
-        if (criteria.maxWordCount && wordCount > criteria.maxWordCount) return null;
-        if (criteria.hasLinks === true && linkCount === 0) return null;
-        if (criteria.hasLinks === false && linkCount > 0) return null;
-        if (criteria.hasImages === true && imageCount === 0) return null;
-        if (criteria.hasImages === false && imageCount > 0) return null;
-        if (criteria.hasTodos === true && todoCount === 0) return null;
-        if (criteria.hasTodos === false && todoCount > 0) return null;
-        if (criteria.hasCodeBlocks === true && codeBlockCount === 0) return null;
-        if (criteria.hasCodeBlocks === false && codeBlockCount > 0) return null;
-        if (criteria.hasTables === true && tableCount === 0) return null;
-        if (criteria.hasTables === false && tableCount > 0) return null;
+          // Count various content elements
+          const wordCount = content.split(/\s+/).filter(word => word.length > 0).length;
+          const linkCount = (content.match(/https?:\/\/[^\s\)]+/g) || []).length;
+          const imageCount = (content.match(/!\[.*?\]\(.*?\)/g) || []).length;
+          const todoCount = (content.match(/- \[[ x]\]/g) || []).length;
+          const codeBlockCount = (content.match(/```/g) || []).length / 2;
+          const tableCount = (content.match(/\|.*\|/g) || []).length;
 
-        return {
-          ...note,
-          wordCount,
-          attachmentCount: row.attachment_count,
-          linkCount,
-          imageCount,
-          todoCount,
-          codeBlockCount,
-          tableCount,
-          metadata: {
-            hasAttachments: row.attachment_count > 0,
-            hasLinks: linkCount > 0,
-            hasImages: imageCount > 0,
-            hasTodos: todoCount > 0,
-            hasCodeBlocks: codeBlockCount > 0,
-            hasTables: tableCount > 0
+          // Apply content-based filters
+          if (criteria.minWordCount && wordCount < criteria.minWordCount) {
+            return null;
           }
-        };
-      }).filter(Boolean) as any[];
+          if (criteria.maxWordCount && wordCount > criteria.maxWordCount) {
+            return null;
+          }
+          if (criteria.hasLinks === true && linkCount === 0) {
+            return null;
+          }
+          if (criteria.hasLinks === false && linkCount > 0) {
+            return null;
+          }
+          if (criteria.hasImages === true && imageCount === 0) {
+            return null;
+          }
+          if (criteria.hasImages === false && imageCount > 0) {
+            return null;
+          }
+          if (criteria.hasTodos === true && todoCount === 0) {
+            return null;
+          }
+          if (criteria.hasTodos === false && todoCount > 0) {
+            return null;
+          }
+          if (criteria.hasCodeBlocks === true && codeBlockCount === 0) {
+            return null;
+          }
+          if (criteria.hasCodeBlocks === false && codeBlockCount > 0) {
+            return null;
+          }
+          if (criteria.hasTables === true && tableCount === 0) {
+            return null;
+          }
+          if (criteria.hasTables === false && tableCount > 0) {
+            return null;
+          }
+
+          return {
+            ...note,
+            wordCount,
+            attachmentCount: row.attachment_count,
+            linkCount,
+            imageCount,
+            todoCount,
+            codeBlockCount,
+            tableCount,
+            metadata: {
+              hasAttachments: row.attachment_count > 0,
+              hasLinks: linkCount > 0,
+              hasImages: imageCount > 0,
+              hasTodos: todoCount > 0,
+              hasCodeBlocks: codeBlockCount > 0,
+              hasTables: tableCount > 0,
+            },
+          };
+        })
+        .filter(Boolean) as any[];
 
       return results;
     } finally {
@@ -1693,10 +1830,10 @@ export class BearService {
         codeBlocks: 0,
         links: 0,
         images: 0,
-        tables: 0
+        tables: 0,
       },
       languagePatterns: [] as Array<{ language: string; count: number }>,
-      commonPatterns: [] as Array<{ pattern: string; description: string; count: number }>
+      commonPatterns: [] as Array<{ pattern: string; description: string; count: number }>,
     };
 
     const languageMap = new Map<string, number>();
@@ -1706,7 +1843,7 @@ export class BearService {
       phoneNumbers: 0,
       dates: 0,
       times: 0,
-      hashtags: 0
+      hashtags: 0,
     };
 
     texts.forEach(text => {
@@ -1729,11 +1866,15 @@ export class BearService {
       });
 
       // Common patterns
-      patternCounts.emails += (text.match(/\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b/g) || []).length;
+      patternCounts.emails += (
+        text.match(/\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b/g) || []
+      ).length;
       patternCounts.urls += (text.match(/https?:\/\/[^\s\)]+/g) || []).length;
       patternCounts.phoneNumbers += (text.match(/\b\d{3}[-.]?\d{3}[-.]?\d{4}\b/g) || []).length;
       patternCounts.dates += (text.match(/\b\d{1,2}[\/\-]\d{1,2}[\/\-]\d{2,4}\b/g) || []).length;
-      patternCounts.times += (text.match(/\b\d{1,2}:\d{2}(?::\d{2})?\s?(?:AM|PM|am|pm)?\b/g) || []).length;
+      patternCounts.times += (
+        text.match(/\b\d{1,2}:\d{2}(?::\d{2})?\s?(?:AM|PM|am|pm)?\b/g) || []
+      ).length;
       patternCounts.hashtags += (text.match(/#\w+/g) || []).length;
     });
 
@@ -1748,8 +1889,10 @@ export class BearService {
       { pattern: 'phoneNumbers', description: 'Phone numbers', count: patternCounts.phoneNumbers },
       { pattern: 'dates', description: 'Date patterns', count: patternCounts.dates },
       { pattern: 'times', description: 'Time patterns', count: patternCounts.times },
-      { pattern: 'hashtags', description: 'Hashtags', count: patternCounts.hashtags }
-    ].filter(p => p.count > 0).sort((a, b) => b.count - a.count);
+      { pattern: 'hashtags', description: 'Hashtags', count: patternCounts.hashtags },
+    ]
+      .filter(p => p.count > 0)
+      .sort((a, b) => b.count - a.count);
 
     return analysis;
   }
@@ -1763,7 +1906,7 @@ export class BearService {
       externalLinks: 0,
       brokenLinks: 0,
       topDomains: [] as Array<{ domain: string; count: number }>,
-      linkTypes: [] as Array<{ type: string; count: number }>
+      linkTypes: [] as Array<{ type: string; count: number }>,
     };
 
     const domainMap = new Map<string, number>();
@@ -1772,14 +1915,14 @@ export class BearService {
     texts.forEach(text => {
       // Extract all URLs
       const urls = text.match(/https?:\/\/[^\s\)\]]+/g) || [];
-      
+
       urls.forEach(url => {
         try {
           const urlObj = new URL(url);
           const domain = urlObj.hostname;
-          
+
           domainMap.set(domain, (domainMap.get(domain) || 0) + 1);
-          
+
           // Categorize link types
           if (domain.includes('github.com')) {
             typeMap.set('GitHub', (typeMap.get('GitHub') || 0) + 1);
@@ -1794,7 +1937,7 @@ export class BearService {
           } else {
             typeMap.set('Other', (typeMap.get('Other') || 0) + 1);
           }
-          
+
           analysis.externalLinks++;
         } catch (e) {
           analysis.brokenLinks++;
@@ -1802,7 +1945,8 @@ export class BearService {
       });
 
       // Bear internal links (bear:// protocol or [[Note Title]] format)
-      const internalLinks = text.match(/(?:bear:\/\/|x-callback-url:\/\/bear|bear-callback:\/\/|\[\[.*?\]\])/g) || [];
+      const internalLinks =
+        text.match(/(?:bear:\/\/|x-callback-url:\/\/bear|bear-callback:\/\/|\[\[.*?\]\])/g) || [];
       analysis.internalLinks += internalLinks.length;
     });
 
@@ -1828,7 +1972,7 @@ export class BearService {
       averageParagraphsPerNote: 0,
       notesWithTodos: 0,
       notesWithDates: 0,
-      notesWithNumbers: 0
+      notesWithNumbers: 0,
     };
 
     const titlePatternMap = new Map<string, { count: number; examples: string[] }>();
@@ -1837,7 +1981,7 @@ export class BearService {
 
     notes.forEach(note => {
       const { title, text } = note;
-      
+
       // Analyze title patterns
       if (title) {
         const patterns = this.extractTitlePatterns(title);
@@ -1856,14 +2000,20 @@ export class BearService {
       // Count words and paragraphs
       const words = text.split(/\s+/).filter(word => word.length > 0);
       totalWords += words.length;
-      
+
       const paragraphs = text.split(/\n\s*\n/).filter(p => p.trim().length > 0);
       totalParagraphs += paragraphs.length;
 
       // Check for specific content types
-      if (text.match(/- \[[ x]\]/)) analysis.notesWithTodos++;
-      if (text.match(/\b\d{1,2}[\/\-]\d{1,2}[\/\-]\d{2,4}\b/)) analysis.notesWithDates++;
-      if (text.match(/\b\d+\b/)) analysis.notesWithNumbers++;
+      if (text.match(/- \[[ x]\]/)) {
+        analysis.notesWithTodos++;
+      }
+      if (text.match(/\b\d{1,2}[\/\-]\d{1,2}[\/\-]\d{2,4}\b/)) {
+        analysis.notesWithDates++;
+      }
+      if (text.match(/\b\d+\b/)) {
+        analysis.notesWithNumbers++;
+      }
     });
 
     analysis.titlePatterns = Array.from(titlePatternMap.entries())
@@ -1882,35 +2032,63 @@ export class BearService {
    */
   private extractTitlePatterns(title: string): string[] {
     const patterns: string[] = [];
-    
+
     // Date patterns
-    if (title.match(/\d{4}-\d{2}-\d{2}/)) patterns.push('ISO Date (YYYY-MM-DD)');
-    if (title.match(/\d{1,2}\/\d{1,2}\/\d{2,4}/)) patterns.push('US Date (MM/DD/YYYY)');
-    if (title.match(/\d{1,2}-\d{1,2}-\d{2,4}/)) patterns.push('Dash Date (MM-DD-YYYY)');
-    
+    if (title.match(/\d{4}-\d{2}-\d{2}/)) {
+      patterns.push('ISO Date (YYYY-MM-DD)');
+    }
+    if (title.match(/\d{1,2}\/\d{1,2}\/\d{2,4}/)) {
+      patterns.push('US Date (MM/DD/YYYY)');
+    }
+    if (title.match(/\d{1,2}-\d{1,2}-\d{2,4}/)) {
+      patterns.push('Dash Date (MM-DD-YYYY)');
+    }
+
     // Meeting patterns
-    if (title.toLowerCase().includes('meeting')) patterns.push('Meeting Notes');
-    if (title.toLowerCase().includes('standup')) patterns.push('Standup Notes');
-    if (title.toLowerCase().includes('interview')) patterns.push('Interview Notes');
-    
+    if (title.toLowerCase().includes('meeting')) {
+      patterns.push('Meeting Notes');
+    }
+    if (title.toLowerCase().includes('standup')) {
+      patterns.push('Standup Notes');
+    }
+    if (title.toLowerCase().includes('interview')) {
+      patterns.push('Interview Notes');
+    }
+
     // Project patterns
-    if (title.toLowerCase().includes('project')) patterns.push('Project Notes');
-    if (title.toLowerCase().includes('todo') || title.toLowerCase().includes('task')) patterns.push('Task Lists');
-    
+    if (title.toLowerCase().includes('project')) {
+      patterns.push('Project Notes');
+    }
+    if (title.toLowerCase().includes('todo') || title.toLowerCase().includes('task')) {
+      patterns.push('Task Lists');
+    }
+
     // Learning patterns
-    if (title.toLowerCase().includes('notes on') || title.toLowerCase().includes('learning')) patterns.push('Learning Notes');
-    if (title.toLowerCase().includes('tutorial') || title.toLowerCase().includes('guide')) patterns.push('Tutorials/Guides');
-    
+    if (title.toLowerCase().includes('notes on') || title.toLowerCase().includes('learning')) {
+      patterns.push('Learning Notes');
+    }
+    if (title.toLowerCase().includes('tutorial') || title.toLowerCase().includes('guide')) {
+      patterns.push('Tutorials/Guides');
+    }
+
     // Question patterns
-    if (title.startsWith('How to') || title.startsWith('Why') || title.startsWith('What')) patterns.push('Question Format');
-    
+    if (title.startsWith('How to') || title.startsWith('Why') || title.startsWith('What')) {
+      patterns.push('Question Format');
+    }
+
     // Number patterns
-    if (title.match(/^\d+\.?\s/)) patterns.push('Numbered Title');
-    
+    if (title.match(/^\d+\.?\s/)) {
+      patterns.push('Numbered Title');
+    }
+
     // Capitalization patterns
-    if (title === title.toUpperCase()) patterns.push('ALL CAPS');
-    if (title.split(' ').every(word => word[0] === word[0].toUpperCase())) patterns.push('Title Case');
-    
+    if (title === title.toUpperCase()) {
+      patterns.push('ALL CAPS');
+    }
+    if (title.split(' ').every(word => word[0] === word[0].toUpperCase())) {
+      patterns.push('Title Case');
+    }
+
     return patterns.length > 0 ? patterns : ['No Pattern'];
   }
 
@@ -1935,68 +2113,72 @@ export class BearService {
       const { exec } = await import('child_process');
       const { promisify } = await import('util');
       const execAsync = promisify(exec);
-      
+
       // Build the content (tags will be handled via API parameter)
       let noteContent = '';
-      
+
       // Add content only (no hashtags - API will handle tags)
       if (options.content) {
         noteContent = options.content;
-        
+
         // CRITICAL FIX: Remove duplicate title headers from content
         // If content starts with a markdown header that matches the title, remove it
-        const titleHeaderPattern = new RegExp(`^#\\s+${options.title.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\s*\\n+`, 'i');
+        const titleHeaderPattern = new RegExp(
+          `^#\\s+${options.title.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\s*\\n+`,
+          'i'
+        );
         if (titleHeaderPattern.test(noteContent)) {
           noteContent = noteContent.replace(titleHeaderPattern, '');
         }
       }
-      
+
       // Create the Bear URL with proper encoding
       const encodedTitle = encodeURIComponent(options.title);
       const encodedContent = encodeURIComponent(noteContent);
       const encodedTags = encodeURIComponent(sanitizedTags.join(','));
-      
+
       // Build Bear API URL
       let bearURL = `bear://x-callback-url/create?title=${encodedTitle}`;
-      
+
       if (noteContent) {
         bearURL += `&text=${encodedContent}`;
       }
-      
+
       if (sanitizedTags.length > 0) {
         bearURL += `&tags=${encodedTags}`;
       }
-      
+
       if (options.isPinned) {
         bearURL += `&pin=yes`;
       }
-      
+
       // Note: Bear API doesn't directly support creating archived notes
       // We'll create the note normally and archive it separately if needed
-      
+
       // Execute the Bear API call
       await execAsync(`open "${bearURL}"`);
-      
+
       // Wait for Bear to process the creation
       await new Promise(resolve => setTimeout(resolve, 1000));
-      
+
       // If the note should be archived, we'll need to find it and archive it
       // This is a limitation of Bear's current API
-      let noteId = 'created-via-api'; // We can't get the actual ID from the create API
-      
+      const noteId = 'created-via-api'; // We can't get the actual ID from the create API
+
       if (options.isArchived) {
         // TODO: Implement archiving after creation once we can reliably find the new note
         // For now, we'll note this in the response
       }
-      
+
       return {
         noteId,
         success: true,
-        tagWarnings: tagWarnings.length > 0 ? tagWarnings : undefined
+        tagWarnings: tagWarnings.length > 0 ? tagWarnings : undefined,
       };
-      
     } catch (error) {
-      throw new Error(`Failed to create note via sync-safe Bear API: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      throw new Error(
+        `Failed to create note via sync-safe Bear API: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
     }
   }
 
@@ -2005,18 +2187,21 @@ export class BearService {
    * Note: Title changes are handled by updating the content's first line (markdown header).
    * We clear ZTITLE so Bear will re-extract it from the updated content.
    */
-  async updateNote(noteId: number, options: {
-    title?: string;
-    content?: string;
-    tags?: string[];
-    isArchived?: boolean;
-    isPinned?: boolean;
-    expectedModificationDate?: Date;
-  }): Promise<{ success: boolean; conflictDetected?: boolean; tagWarnings?: string[] }> {
+  async updateNote(
+    noteId: number,
+    options: {
+      title?: string;
+      content?: string;
+      tags?: string[];
+      isArchived?: boolean;
+      isPinned?: boolean;
+      expectedModificationDate?: Date;
+    }
+  ): Promise<{ success: boolean; conflictDetected?: boolean; tagWarnings?: string[] }> {
     // Validate and sanitize tags if provided
     let sanitizedTags: string[] | undefined;
     let tagWarnings: string[] = [];
-    
+
     if (options.tags !== undefined) {
       const tagValidation = this.validateAndSanitizeTags(options.tags);
       sanitizedTags = tagValidation.sanitized;
@@ -2026,17 +2211,20 @@ export class BearService {
     try {
       // First, read the current note from database to get ZUNIQUEIDENTIFIER
       await this.database.connect(true); // Read mode
-      
+
       const [currentNote] = await this.database.query<{
         ZUNIQUEIDENTIFIER: string;
         ZMODIFICATIONDATE: number;
         ZTITLE: string;
         ZTEXT: string;
-      }>(`
+      }>(
+        `
         SELECT ZUNIQUEIDENTIFIER, ZMODIFICATIONDATE, ZTITLE, ZTEXT 
         FROM ZSFNOTE 
         WHERE Z_PK = ? AND ZTRASHED = 0
-      `, [noteId]);
+      `,
+        [noteId]
+      );
 
       if (!currentNote) {
         throw new Error(`Note with ID ${noteId} not found or is trashed`);
@@ -2045,11 +2233,13 @@ export class BearService {
       // Conflict detection
       if (options.expectedModificationDate) {
         const currentModDate = CoreDataUtils.toDate(currentNote.ZMODIFICATIONDATE);
-        if (Math.abs(currentModDate.getTime() - options.expectedModificationDate.getTime()) > 1000) {
+        if (
+          Math.abs(currentModDate.getTime() - options.expectedModificationDate.getTime()) > 1000
+        ) {
           return {
             success: false,
             conflictDetected: true,
-            tagWarnings: tagWarnings.length > 0 ? tagWarnings : undefined
+            tagWarnings: tagWarnings.length > 0 ? tagWarnings : undefined,
           };
         }
       }
@@ -2060,20 +2250,23 @@ export class BearService {
       const { exec } = await import('child_process');
       const { promisify } = await import('util');
       const execAsync = promisify(exec);
-      
+
       // Build the new content
       let noteContent = '';
-      
+
       // Handle title and content updates
       if (options.title !== undefined || options.content !== undefined) {
         if (options.content !== undefined) {
           noteContent = options.content;
-          
+
           // CRITICAL FIX: Remove duplicate title headers from content during updates
           // This prevents duplicate titles when Claude sends content with markdown headers
           const titleToCheck = options.title !== undefined ? options.title : currentNote.ZTITLE;
           if (titleToCheck) {
-            const titleHeaderPattern = new RegExp(`^#\\s+${titleToCheck.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\s*\\n+`, 'i');
+            const titleHeaderPattern = new RegExp(
+              `^#\\s+${titleToCheck.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\s*\\n+`,
+              'i'
+            );
             if (titleHeaderPattern.test(noteContent)) {
               noteContent = noteContent.replace(titleHeaderPattern, '');
             }
@@ -2087,79 +2280,89 @@ export class BearService {
       } else {
         // No content/title updates, preserve existing content
         noteContent = currentNote.ZTEXT || '';
-        
+
         // CRITICAL FIX: Even for tags-only updates, remove duplicate title headers
         // This prevents duplicate titles when Claude adds tags to notes with existing headers
         if (currentNote.ZTITLE) {
-          const titleHeaderPattern = new RegExp(`^#\\s+${currentNote.ZTITLE.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\s*\\n+`, 'i');
+          const titleHeaderPattern = new RegExp(
+            `^#\\s+${currentNote.ZTITLE.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\s*\\n+`,
+            'i'
+          );
           if (titleHeaderPattern.test(noteContent)) {
             noteContent = noteContent.replace(titleHeaderPattern, '');
           }
         }
       }
-      
+
       // Note: Tags will be handled via API parameter, not embedded in content
-      
+
       // Create the Bear URL with proper encoding
       const encodedId = encodeURIComponent(currentNote.ZUNIQUEIDENTIFIER);
       const encodedContent = encodeURIComponent(noteContent);
-      
+
       // Build Bear API URL for updating
       let bearURL = `bear://x-callback-url/add-text?id=${encodedId}&mode=replace&text=${encodedContent}`;
-      
+
       if (options.title !== undefined) {
         const encodedTitle = encodeURIComponent(options.title);
         bearURL += `&title=${encodedTitle}`;
       }
-      
+
       if (sanitizedTags !== undefined && sanitizedTags.length > 0) {
         const encodedTags = encodeURIComponent(sanitizedTags.join(','));
         bearURL += `&tags=${encodedTags}`;
       }
-      
+
       if (options.isPinned !== undefined) {
         bearURL += `&pin=${options.isPinned ? 'yes' : 'no'}`;
       }
-      
+
       // Note: Bear API doesn't directly support archiving in add-text
       // We'll handle archiving separately if needed
-      
+
       // Execute the Bear API call
       await execAsync(`open "${bearURL}"`);
-      
+
       // Wait for Bear to process the update
       await new Promise(resolve => setTimeout(resolve, 1000));
-      
+
       // Handle archiving separately if needed (limitation of Bear API)
       if (options.isArchived !== undefined) {
         // TODO: Implement archiving via separate API call once available
       }
-      
+
       return {
         success: true,
-        tagWarnings: tagWarnings.length > 0 ? tagWarnings : undefined
+        tagWarnings: tagWarnings.length > 0 ? tagWarnings : undefined,
       };
-      
     } catch (error) {
       await this.database.disconnect();
-      throw new Error(`Failed to update note via sync-safe Bear API: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      throw new Error(
+        `Failed to update note via sync-safe Bear API: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
     }
   }
 
   /**
    * Duplicate an existing note
    */
-  async duplicateNote(noteId: number, options: {
-    titleSuffix?: string;
-    copyTags?: boolean;
-  } = {}): Promise<{ newNoteId: string; success: boolean }> {
+  async duplicateNote(
+    noteId: number,
+    options: {
+      titleSuffix?: string;
+      copyTags?: boolean;
+    } = {}
+  ): Promise<{ newNoteId: string; success: boolean }> {
     await this.database.connect(true); // Read mode first
-    
+
     try {
       // Get the source note
-      const [sourceNote] = await this.database.query<BearNote>(`
+      const [sourceNote] = await this.database.query<BearNote>(
+        `
         SELECT * FROM ZSFNOTE WHERE Z_PK = ? AND ZTRASHED = 0
-      `, [noteId]);
+      `,
+        [noteId]
+      );
 
       if (!sourceNote) {
         throw new Error(`Note with ID ${noteId} not found or is trashed`);
@@ -2168,12 +2371,15 @@ export class BearService {
       // Get tags if copying them
       let tags: string[] = [];
       if (options.copyTags !== false) {
-        const tagResults = await this.database.query<{ ZTITLE: string }>(`
+        const tagResults = await this.database.query<{ ZTITLE: string }>(
+          `
           SELECT t.ZTITLE
           FROM ZSFNOTETAG t
           INNER JOIN Z_5TAGS nt ON t.Z_PK = nt.Z_13TAGS
           WHERE nt.Z_5NOTES = ?
-        `, [noteId]);
+        `,
+          [noteId]
+        );
         tags = tagResults.map(t => t.ZTITLE);
       }
 
@@ -2181,22 +2387,24 @@ export class BearService {
 
       // Create the duplicate note
       const newTitle = sourceNote.ZTITLE + (options.titleSuffix || ' (Copy)');
-      
+
       const result = await this.createNote({
         title: newTitle,
         content: sourceNote.ZTEXT || '',
-        tags: tags,
+        tags,
         isArchived: sourceNote.ZARCHIVED === 1,
-        isPinned: sourceNote.ZPINNED === 1
+        isPinned: sourceNote.ZPINNED === 1,
       });
 
       return {
         newNoteId: result.noteId,
-        success: result.success
+        success: result.success,
       };
     } catch (error) {
       await this.database.disconnect();
-      throw new Error(`Failed to duplicate note: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      throw new Error(
+        `Failed to duplicate note: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
     }
   }
 
@@ -2205,11 +2413,11 @@ export class BearService {
    */
   async archiveNote(noteId: number, archived: boolean): Promise<{ success: boolean }> {
     const result = await this.updateNote(noteId, {
-      isArchived: archived
+      isArchived: archived,
     });
-    
+
     return {
-      success: result.success
+      success: result.success,
     };
   }
 
@@ -2218,9 +2426,9 @@ export class BearService {
    */
   private generateUUID(): string {
     // Generate a UUID v4 format that Bear uses
-    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-      const r = Math.random() * 16 | 0;
-      const v = c == 'x' ? r : (r & 0x3 | 0x8);
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+      const r = (Math.random() * 16) | 0;
+      const v = c == 'x' ? r : (r & 0x3) | 0x8;
       return v.toString(16).toUpperCase();
     });
   }
@@ -2244,36 +2452,46 @@ export class BearService {
   private async triggerBearReparse(noteId: number): Promise<void> {
     try {
       // Get current content
-      const currentNote = await this.database.queryOne<{ ZTEXT: string }>(`
+      const currentNote = await this.database.queryOne<{ ZTEXT: string }>(
+        `
         SELECT ZTEXT FROM ZSFNOTE WHERE Z_PK = ?
-      `, [noteId]);
-      
-      if (!currentNote) return;
-      
+      `,
+        [noteId]
+      );
+
+      if (!currentNote) {
+        return;
+      }
+
       // Simulate a content edit by adding and removing a character
       // This mimics what happens when you type and delete in Bear
       const originalContent = currentNote.ZTEXT || '';
-      const tempContent = originalContent + ' '; // Add a space
-      
+      const tempContent = `${originalContent} `; // Add a space
+
       // First update: add the space
       let now = CoreDataUtils.fromDate(new Date());
-      await this.database.query(`
+      await this.database.query(
+        `
         UPDATE ZSFNOTE 
         SET ZTEXT = ?, ZMODIFICATIONDATE = ?, ZVERSION = COALESCE(ZVERSION, 0) + 1
         WHERE Z_PK = ?
-      `, [tempContent, now, noteId]);
-      
+      `,
+        [tempContent, now, noteId]
+      );
+
       // Wait a moment
       await new Promise(resolve => setTimeout(resolve, 50));
-      
+
       // Second update: remove the space (back to original)
       now = CoreDataUtils.fromDate(new Date());
-      await this.database.query(`
+      await this.database.query(
+        `
         UPDATE ZSFNOTE 
         SET ZTEXT = ?, ZMODIFICATIONDATE = ?, ZVERSION = COALESCE(ZVERSION, 0) + 1
         WHERE Z_PK = ?
-      `, [originalContent, now, noteId]);
-      
+      `,
+        [originalContent, now, noteId]
+      );
     } catch (error) {
       // Silent error handling to avoid JSON-RPC interference
     }
@@ -2290,16 +2508,16 @@ export class BearService {
    * - Forward slashes allowed for nested tags (e.g., project/alpha)
    * - Must not be empty after sanitization
    */
-  private validateAndSanitizeTags(tags: string[]): { 
-    sanitized: string[], 
-    warnings: string[] 
+  private validateAndSanitizeTags(tags: string[]): {
+    sanitized: string[];
+    warnings: string[];
   } {
     const sanitized: string[] = [];
     const warnings: string[] = [];
 
     for (const originalTag of tags) {
       const trimmed = originalTag.trim();
-      
+
       if (!trimmed) {
         warnings.push(`Empty tag ignored`);
         continue;
@@ -2367,42 +2585,46 @@ export class BearService {
     return result.sanitized[0] || '';
   }
 
-
-
-
-
   /**
    * Most effective method to trigger Bear's hashtag parsing
    * Uses Bear's API to update the note with its own content, forcing a reparse
    */
-  private async triggerBearParseEffectively(noteUUID: string, noteContent: string, noteTitle?: string): Promise<void> {
+  private async triggerBearParseEffectively(
+    noteUUID: string,
+    noteContent: string,
+    noteTitle?: string
+  ): Promise<void> {
     try {
       const { exec } = await import('child_process');
       const { promisify } = await import('util');
       const execAsync = promisify(exec);
-      
+
       // CRITICAL FIX: Remove duplicate title headers before triggering reparse
       // This prevents duplicate titles when hashtag parsing updates notes with existing headers
       let processedContent = noteContent;
       if (noteTitle) {
-        const titleHeaderPattern = new RegExp(`^#\\s+${noteTitle.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\s*\\n+`, 'i');
+        const titleHeaderPattern = new RegExp(
+          `^#\\s+${noteTitle.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\s*\\n+`,
+          'i'
+        );
         if (titleHeaderPattern.test(processedContent)) {
           processedContent = processedContent.replace(titleHeaderPattern, '');
         }
       }
-      
+
       // Use Bear's API to replace the note content with itself
       // This forces Bear to reparse all hashtags in the content
       const encodedContent = encodeURIComponent(processedContent);
       const bearURL = `bear://x-callback-url/add-text?id=${noteUUID}&mode=replace&text=${encodedContent}&show_window=no`;
-      
+
       await execAsync(`open "${bearURL}"`);
-      
+
       // Wait for Bear to process the update and reparse hashtags
       await new Promise(resolve => setTimeout(resolve, 1000));
-      
     } catch (error) {
-      throw new Error(`Failed to trigger effective Bear parsing: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      throw new Error(
+        `Failed to trigger effective Bear parsing: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
     }
   }
 
@@ -2415,42 +2637,50 @@ export class BearService {
     if (!noteId && !noteTitle) {
       throw new Error('Either noteId or noteTitle is required');
     }
-    
+
     // Check if Bear is running
     const isBearRunning = await this.isBearRunning();
     if (!isBearRunning) {
       return `Bear is not running. Please start Bear first, then the hashtags will be parsed automatically. Alternatively, restart Bear to trigger parsing for all notes.`;
     }
-    
+
     try {
       await this.database.connect(true); // Read mode
-      
+
       // Find the note
       let query: string;
       let params: any[];
-      
+
       if (noteId) {
-        query = 'SELECT Z_PK, ZUNIQUEIDENTIFIER, ZTITLE, ZTEXT FROM ZSFNOTE WHERE ZUNIQUEIDENTIFIER = ? AND ZTRASHED = 0';
+        query =
+          'SELECT Z_PK, ZUNIQUEIDENTIFIER, ZTITLE, ZTEXT FROM ZSFNOTE WHERE ZUNIQUEIDENTIFIER = ? AND ZTRASHED = 0';
         params = [noteId];
       } else {
-        query = 'SELECT Z_PK, ZUNIQUEIDENTIFIER, ZTITLE, ZTEXT FROM ZSFNOTE WHERE ZTITLE = ? AND ZTRASHED = 0';
+        query =
+          'SELECT Z_PK, ZUNIQUEIDENTIFIER, ZTITLE, ZTEXT FROM ZSFNOTE WHERE ZTITLE = ? AND ZTRASHED = 0';
         params = [noteTitle];
       }
-      
-      const note = await this.database.queryOne<{ Z_PK: number; ZUNIQUEIDENTIFIER: string; ZTITLE: string; ZTEXT: string }>(query, params);
-      
+
+      const note = await this.database.queryOne<{
+        Z_PK: number;
+        ZUNIQUEIDENTIFIER: string;
+        ZTITLE: string;
+        ZTEXT: string;
+      }>(query, params);
+
       if (!note) {
         throw new Error(`Note not found: ${noteId || noteTitle}`);
       }
-      
+
       // Most effective approach: Use Bear's API to "update" the note with its own content
       // This forces Bear to reparse all hashtags in the content
       await this.triggerBearParseEffectively(note.ZUNIQUEIDENTIFIER, note.ZTEXT, note.ZTITLE);
-      
+
       return `Hashtag parsing triggered for note: ${noteId || noteTitle}. Bear should update the sidebar within a few seconds.`;
-      
     } catch (error) {
-      throw new Error(`Failed to trigger hashtag parsing: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      throw new Error(
+        `Failed to trigger hashtag parsing: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
     } finally {
       await this.database.disconnect();
     }
@@ -2465,49 +2695,53 @@ export class BearService {
       const { exec } = await import('child_process');
       const { promisify } = await import('util');
       const execAsync = promisify(exec);
-      
+
       // Validate and sanitize tags according to Bear's rules
       const tagValidation = this.validateAndSanitizeTags(tags);
       const sanitizedTags = tagValidation.sanitized;
-      
+
       // Build the content with embedded hashtags in Bear format (no title header since Bear API handles title separately)
       const hashtagsLine = sanitizedTags.map(tag => `#${tag}`).join(' ');
       let bearContent = '';
-      
+
       // Add hashtags line if there are tags
       if (hashtagsLine) {
-        bearContent += hashtagsLine + '\n\n';
+        bearContent += `${hashtagsLine}\n\n`;
       }
-      
+
       // Add the actual content
       if (content) {
         // CRITICAL FIX: Remove duplicate title headers from content
         // This prevents duplicate titles when content includes headers matching the title
         let processedContent = content;
-        const titleHeaderPattern = new RegExp(`^#\\s+${title.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\s*\\n+`, 'i');
+        const titleHeaderPattern = new RegExp(
+          `^#\\s+${title.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\s*\\n+`,
+          'i'
+        );
         if (titleHeaderPattern.test(processedContent)) {
           processedContent = processedContent.replace(titleHeaderPattern, '');
         }
         bearContent += processedContent;
       }
-      
+
       // Create the Bear URL with proper encoding
       const encodedTitle = encodeURIComponent(title);
       const encodedContent = encodeURIComponent(bearContent);
       const encodedTags = encodeURIComponent(sanitizedTags.join(','));
-      
+
       const bearURL = `bear://x-callback-url/create?title=${encodedTitle}&text=${encodedContent}&tags=${encodedTags}&edit=yes&show_window=no`;
-      
+
       // Creating note via Bear API (silent for JSON-RPC compatibility)
       await execAsync(`open "${bearURL}"`);
-      
+
       // Wait for Bear to process the creation
       await new Promise(resolve => setTimeout(resolve, 1000));
-      
+
       return `Note "${title}" created via Bear API with tags: ${sanitizedTags.join(', ')}`;
-      
     } catch (error) {
-      throw new Error(`Failed to create note via Bear API: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      throw new Error(
+        `Failed to create note via Bear API: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
     }
   }
 
@@ -2523,67 +2757,75 @@ export class BearService {
   }): Promise<string> {
     try {
       await this.database.connect(true); // Read mode
-      
+
       // Build query to find notes
       let query = 'SELECT Z_PK, ZUNIQUEIDENTIFIER, ZTITLE FROM ZSFNOTE WHERE ZTRASHED = 0';
       const params: any[] = [];
-      
+
       if (options.title_pattern) {
         query += ' AND ZTITLE LIKE ?';
         params.push(`%${options.title_pattern}%`);
       }
-      
+
       if (options.created_after) {
         const date = new Date(options.created_after);
         query += ' AND ZCREATIONDATE > ?';
         params.push(CoreDataUtils.fromDate(date));
       }
-      
+
       query += ' ORDER BY ZMODIFICATIONDATE DESC';
-      
+
       if (options.limit) {
         query += ' LIMIT ?';
         params.push(options.limit);
       }
-      
+
       const notes = await this.database.query<{
         Z_PK: number;
         ZUNIQUEIDENTIFIER: string;
         ZTITLE: string;
       }>(query, params);
-      
+
       if (notes.length === 0) {
         await this.database.disconnect();
         return 'No notes found matching the criteria';
       }
-      
+
       // Process each note
       let successCount = 0;
       for (const note of notes) {
         try {
           // Get the full note content for effective parsing trigger
-          const fullNote = await this.database.queryOne<{ ZTEXT: string }>(`
+          const fullNote = await this.database.queryOne<{ ZTEXT: string }>(
+            `
             SELECT ZTEXT FROM ZSFNOTE WHERE Z_PK = ?
-          `, [note.Z_PK]);
-          
+          `,
+            [note.Z_PK]
+          );
+
           if (fullNote?.ZTEXT) {
-            await this.triggerBearParseEffectively(note.ZUNIQUEIDENTIFIER, fullNote.ZTEXT, note.ZTITLE);
+            await this.triggerBearParseEffectively(
+              note.ZUNIQUEIDENTIFIER,
+              fullNote.ZTEXT,
+              note.ZTITLE
+            );
             successCount++;
           }
-          
+
           // Small delay between notes to avoid overwhelming Bear
           await new Promise(resolve => setTimeout(resolve, 200));
         } catch (error) {
           // Silent error handling to avoid JSON-RPC interference
         }
       }
-      
+
       await this.database.disconnect();
-      
+
       return `Triggered hashtag parsing for ${successCount}/${notes.length} notes. Check Bear's sidebar in a few seconds.`;
-      
     } catch (error) {
-      throw new Error(`Failed to batch trigger hashtag parsing: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      throw new Error(
+        `Failed to batch trigger hashtag parsing: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
     }
   }
-} 
+}

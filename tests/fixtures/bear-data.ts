@@ -3,7 +3,13 @@
  * Mock data for testing Bear MCP Server functionality
  */
 
-import { BearNote, BearTag, NoteWithTags, TagWithCount, DatabaseStats } from '../../src/types/bear.js';
+import {
+  BearNote,
+  BearTag,
+  NoteWithTags,
+  TagWithCount,
+  DatabaseStats,
+} from '../../src/types/bear.js';
 import { CoreDataUtils } from '../../src/utils/database.js';
 
 // Sample Bear Notes
@@ -20,7 +26,7 @@ export const mockBearNotes: BearNote[] = [
     ZENCRYPTED: 0,
     ZORDER: null,
     ZTRASHEDDATE: null,
-    ZARCHIVEDDATE: null
+    ZARCHIVEDDATE: null,
   },
   {
     Z_PK: 2,
@@ -34,7 +40,7 @@ export const mockBearNotes: BearNote[] = [
     ZENCRYPTED: 0,
     ZORDER: null,
     ZTRASHEDDATE: null,
-    ZARCHIVEDDATE: CoreDataUtils.fromDate(new Date('2023-12-15T09:00:00Z'))
+    ZARCHIVEDDATE: CoreDataUtils.fromDate(new Date('2023-12-15T09:00:00Z')),
   },
   {
     Z_PK: 3,
@@ -48,12 +54,13 @@ export const mockBearNotes: BearNote[] = [
     ZENCRYPTED: 0,
     ZORDER: null,
     ZTRASHEDDATE: CoreDataUtils.fromDate(new Date('2023-11-15T14:00:00Z')),
-    ZARCHIVEDDATE: null
+    ZARCHIVEDDATE: null,
   },
   {
     Z_PK: 4,
     ZTITLE: 'Pinned Note',
-    ZTEXT: '# Pinned Note\n\nThis is a pinned note with important information.\n\n#important #pinned',
+    ZTEXT:
+      '# Pinned Note\n\nThis is a pinned note with important information.\n\n#important #pinned',
     ZCREATIONDATE: CoreDataUtils.fromDate(new Date('2024-01-15T08:00:00Z')),
     ZMODIFICATIONDATE: CoreDataUtils.fromDate(new Date('2024-01-15T08:30:00Z')),
     ZTRASHED: 0,
@@ -62,7 +69,7 @@ export const mockBearNotes: BearNote[] = [
     ZENCRYPTED: 0,
     ZORDER: 1,
     ZTRASHEDDATE: null,
-    ZARCHIVEDDATE: null
+    ZARCHIVEDDATE: null,
   },
   {
     Z_PK: 5,
@@ -76,8 +83,8 @@ export const mockBearNotes: BearNote[] = [
     ZENCRYPTED: 0,
     ZORDER: null,
     ZTRASHEDDATE: null,
-    ZARCHIVEDDATE: null
-  }
+    ZARCHIVEDDATE: null,
+  },
 ];
 
 // Sample Bear Tags
@@ -88,7 +95,7 @@ export const mockBearTags: BearTag[] = [
     ZPARENT: null,
     ZORDER: null,
     ZCREATIONDATE: CoreDataUtils.fromDate(new Date('2024-01-01T10:00:00Z')),
-    ZMODIFICATIONDATE: CoreDataUtils.fromDate(new Date('2024-01-01T10:00:00Z'))
+    ZMODIFICATIONDATE: CoreDataUtils.fromDate(new Date('2024-01-01T10:00:00Z')),
   },
   {
     Z_PK: 2,
@@ -96,7 +103,7 @@ export const mockBearTags: BearTag[] = [
     ZPARENT: null,
     ZORDER: null,
     ZCREATIONDATE: CoreDataUtils.fromDate(new Date('2024-01-01T10:00:00Z')),
-    ZMODIFICATIONDATE: CoreDataUtils.fromDate(new Date('2024-01-01T10:00:00Z'))
+    ZMODIFICATIONDATE: CoreDataUtils.fromDate(new Date('2024-01-01T10:00:00Z')),
   },
   {
     Z_PK: 3,
@@ -104,7 +111,7 @@ export const mockBearTags: BearTag[] = [
     ZPARENT: null,
     ZORDER: null,
     ZCREATIONDATE: CoreDataUtils.fromDate(new Date('2023-12-01T15:00:00Z')),
-    ZMODIFICATIONDATE: CoreDataUtils.fromDate(new Date('2023-12-01T15:00:00Z'))
+    ZMODIFICATIONDATE: CoreDataUtils.fromDate(new Date('2023-12-01T15:00:00Z')),
   },
   {
     Z_PK: 4,
@@ -112,7 +119,7 @@ export const mockBearTags: BearTag[] = [
     ZPARENT: null,
     ZORDER: null,
     ZCREATIONDATE: CoreDataUtils.fromDate(new Date('2024-01-15T08:00:00Z')),
-    ZMODIFICATIONDATE: CoreDataUtils.fromDate(new Date('2024-01-15T08:00:00Z'))
+    ZMODIFICATIONDATE: CoreDataUtils.fromDate(new Date('2024-01-15T08:00:00Z')),
   },
   {
     Z_PK: 5,
@@ -120,26 +127,31 @@ export const mockBearTags: BearTag[] = [
     ZPARENT: null,
     ZORDER: null,
     ZCREATIONDATE: CoreDataUtils.fromDate(new Date('2024-01-10T09:00:00Z')),
-    ZMODIFICATIONDATE: CoreDataUtils.fromDate(new Date('2024-01-10T09:00:00Z'))
-  }
+    ZMODIFICATIONDATE: CoreDataUtils.fromDate(new Date('2024-01-10T09:00:00Z')),
+  },
 ];
 
 // Sample Notes with Tags
 export const mockNotesWithTags: NoteWithTags[] = mockBearNotes.map((note, index) => ({
   ...note,
-  tags: index === 0 ? ['test', 'sample'] : 
-        index === 1 ? ['archived', 'old'] :
-        index === 2 ? ['trash'] :
-        index === 3 ? ['important', 'pinned'] :
-        ['quick', 'untitled'],
+  tags:
+    index === 0
+      ? ['test', 'sample']
+      : index === 1
+        ? ['archived', 'old']
+        : index === 2
+          ? ['trash']
+          : index === 3
+            ? ['important', 'pinned']
+            : ['quick', 'untitled'],
   contentLength: note.ZTEXT?.length || 0,
-  preview: note.ZTEXT ? note.ZTEXT.substring(0, 200) : 'Empty note'
+  preview: note.ZTEXT ? note.ZTEXT.substring(0, 200) : 'Empty note',
 }));
 
 // Sample Tags with Count
 export const mockTagsWithCount: TagWithCount[] = mockBearTags.map((tag, index) => ({
   ...tag,
-  noteCount: index + 1 // Varying note counts for testing
+  noteCount: index + 1, // Varying note counts for testing
 }));
 
 // Sample Database Stats
@@ -152,7 +164,7 @@ export const mockDatabaseStats: DatabaseStats = {
   totalTags: 5,
   totalAttachments: 0,
   databaseSize: 1024 * 1024, // 1MB
-  lastModified: new Date('2024-01-20T16:05:00Z')
+  lastModified: new Date('2024-01-20T16:05:00Z'),
 };
 
 // Test Database Schema
@@ -169,7 +181,7 @@ export const mockDatabaseSchema = [
       ZARCHIVED INTEGER,
       ZPINNED INTEGER,
       ZENCRYPTED INTEGER
-    )`
+    )`,
   },
   {
     name: 'ZSFNOTETAG',
@@ -178,8 +190,8 @@ export const mockDatabaseSchema = [
       ZTITLE TEXT,
       ZCREATIONDATE REAL,
       ZMODIFICATIONDATE REAL
-    )`
-  }
+    )`,
+  },
 ];
 
 // Helper functions for creating test data
@@ -196,7 +208,7 @@ export const createMockNote = (overrides: Partial<BearNote> = {}): BearNote => (
   ZORDER: null,
   ZTRASHEDDATE: null,
   ZARCHIVEDDATE: null,
-  ...overrides
+  ...overrides,
 });
 
 export const createMockTag = (overrides: Partial<BearTag> = {}): BearTag => ({
@@ -206,7 +218,7 @@ export const createMockTag = (overrides: Partial<BearTag> = {}): BearTag => ({
   ZORDER: null,
   ZCREATIONDATE: CoreDataUtils.now(),
   ZMODIFICATIONDATE: CoreDataUtils.now(),
-  ...overrides
+  ...overrides,
 });
 
 export const createMockNoteWithTags = (overrides: Partial<NoteWithTags> = {}): NoteWithTags => ({
@@ -214,5 +226,5 @@ export const createMockNoteWithTags = (overrides: Partial<NoteWithTags> = {}): N
   tags: ['mock', 'test'],
   contentLength: 50,
   preview: 'Mock note preview...',
-  ...overrides
-}); 
+  ...overrides,
+});

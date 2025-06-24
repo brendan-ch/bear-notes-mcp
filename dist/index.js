@@ -739,17 +739,14 @@ class BearMCPServer {
                     properties: {
                         note_id: {
                             type: 'string',
-                            description: 'Note ID to trigger parsing for'
+                            description: 'Note ID to trigger parsing for',
                         },
                         note_title: {
                             type: 'string',
-                            description: 'Note title to trigger parsing for (alternative to note_id)'
-                        }
+                            description: 'Note title to trigger parsing for (alternative to note_id)',
+                        },
                     },
-                    oneOf: [
-                        { required: ["note_id"] },
-                        { required: ["note_title"] }
-                    ]
+                    oneOf: [{ required: ['note_id'] }, { required: ['note_title'] }],
                 },
             },
             {
@@ -760,21 +757,21 @@ class BearMCPServer {
                     properties: {
                         tag_filter: {
                             type: 'string',
-                            description: 'Filter notes by tag name'
+                            description: 'Filter notes by tag name',
                         },
                         title_pattern: {
                             type: 'string',
-                            description: 'Filter notes by title pattern'
+                            description: 'Filter notes by title pattern',
                         },
                         limit: {
                             type: 'number',
-                            description: 'Maximum number of notes to process'
+                            description: 'Maximum number of notes to process',
                         },
                         created_after: {
                             type: 'string',
-                            description: 'Filter notes created after this date (ISO string)'
-                        }
-                    }
+                            description: 'Filter notes created after this date (ISO string)',
+                        },
+                    },
                 },
             },
         ];
@@ -920,11 +917,13 @@ ${isRunning ? '✅ Write operations use sync-safe Bear API' : '✅ All database 
                     ],
                 };
             }
-            const notesList = notes.map(note => {
-                const preview = note.ZTEXT ? note.ZTEXT.substring(0, 100) + '...' : '';
+            const notesList = notes
+                .map(note => {
+                const preview = note.ZTEXT ? `${note.ZTEXT.substring(0, 100)}...` : '';
                 const tags = note.tags.length > 0 ? ` [${note.tags.join(', ')}]` : '';
                 return `📝 **${note.ZTITLE || 'Untitled'}**${tags}\n   ${preview}`;
-            }).join('\n\n');
+            })
+                .join('\n\n');
             return {
                 content: [
                     {
@@ -963,11 +962,13 @@ ${isRunning ? '✅ Write operations use sync-safe Bear API' : '✅ All database 
                     ],
                 };
             }
-            const notesList = notes.map(note => {
-                const preview = note.ZTEXT ? note.ZTEXT.substring(0, 100) + '...' : '';
+            const notesList = notes
+                .map(note => {
+                const preview = note.ZTEXT ? `${note.ZTEXT.substring(0, 100)}...` : '';
                 const tags = note.tags.length > 0 ? ` [${note.tags.join(', ')}]` : '';
                 return `📝 **${note.ZTITLE || 'Untitled'}** (ID: ${note.Z_PK})${tags}\n   ${preview}`;
-            }).join('\n\n');
+            })
+                .join('\n\n');
             return {
                 content: [
                     {
@@ -1117,12 +1118,14 @@ ${isRunning ? '✅ Write operations use sync-safe Bear API' : '✅ All database 
                     ],
                 };
             }
-            const notesList = notes.map(note => {
-                const preview = note.ZTEXT ? note.ZTEXT.substring(0, 100) + '...' : '';
+            const notesList = notes
+                .map(note => {
+                const preview = note.ZTEXT ? `${note.ZTEXT.substring(0, 100)}...` : '';
                 const otherTags = note.tags.filter(t => t !== tag);
                 const tagInfo = otherTags.length > 0 ? ` [+${otherTags.join(', ')}]` : '';
                 return `📝 **${note.ZTITLE || 'Untitled'}** (ID: ${note.Z_PK})${tagInfo}\n   ${preview}`;
-            }).join('\n\n');
+            })
+                .join('\n\n');
             return {
                 content: [
                     {
@@ -1164,12 +1167,14 @@ ${isRunning ? '✅ Write operations use sync-safe Bear API' : '✅ All database 
                     ],
                 };
             }
-            const notesList = notes.map(note => {
-                const preview = note.preview || (note.ZTEXT ? note.ZTEXT.substring(0, 100) + '...' : '');
+            const notesList = notes
+                .map(note => {
+                const preview = note.preview || (note.ZTEXT ? `${note.ZTEXT.substring(0, 100)}...` : '');
                 const tags = note.tags.length > 0 ? ` [${note.tags.join(', ')}]` : '';
                 const length = note.contentLength ? ` (${note.contentLength} chars)` : '';
                 return `📝 **${note.ZTITLE || 'Untitled'}** (ID: ${note.Z_PK})${tags}${length}\n   ${preview}`;
-            }).join('\n\n');
+            })
+                .join('\n\n');
             return {
                 content: [
                     {
@@ -1213,20 +1218,25 @@ ${isRunning ? '✅ Write operations use sync-safe Bear API' : '✅ All database 
                     ],
                 };
             }
-            const notesList = notes.map(note => {
-                const preview = note.ZTEXT ? note.ZTEXT.substring(0, 100) + '...' : '';
+            const notesList = notes
+                .map(note => {
+                const preview = note.ZTEXT ? `${note.ZTEXT.substring(0, 100)}...` : '';
                 const tags = note.tags.length > 0 ? ` [${note.tags.join(', ')}]` : '';
                 const length = note.contentLength ? ` (${note.contentLength} chars)` : '';
                 const status = [];
-                if (note.ZPINNED)
+                if (note.ZPINNED) {
                     status.push('📌');
-                if (note.ZARCHIVED)
+                }
+                if (note.ZARCHIVED) {
                     status.push('📦');
-                if (note.ZENCRYPTED)
+                }
+                if (note.ZENCRYPTED) {
                     status.push('🔒');
+                }
                 const statusStr = status.length > 0 ? ` ${status.join('')}` : '';
                 return `📝 **${note.ZTITLE || 'Untitled'}** (ID: ${note.Z_PK})${tags}${length}${statusStr}\n   ${preview}`;
-            }).join('\n\n');
+            })
+                .join('\n\n');
             return {
                 content: [
                     {
@@ -1250,8 +1260,14 @@ ${isRunning ? '✅ Write operations use sync-safe Bear API' : '✅ All database 
     async getNoteAnalytics() {
         try {
             const analytics = await this.bearService.getNoteAnalytics();
-            const monthlyData = analytics.notesPerMonth.slice(0, 6).map(stat => `   ${stat.month}: ${stat.count} notes`).join('\n');
-            const topTagsData = analytics.topTags.slice(0, 8).map(tag => `   ${tag.tag}: ${tag.count} notes`).join('\n');
+            const monthlyData = analytics.notesPerMonth
+                .slice(0, 6)
+                .map(stat => `   ${stat.month}: ${stat.count} notes`)
+                .join('\n');
+            const topTagsData = analytics.topTags
+                .slice(0, 8)
+                .map(tag => `   ${tag.tag}: ${tag.count} notes`)
+                .join('\n');
             return {
                 content: [
                     {
@@ -1350,16 +1366,17 @@ ${topTagsData}`,
     }
     async searchNotesFullText(args) {
         try {
-            const { query, limit = 20, includeSnippets = true, searchFields = ['both'], fuzzyMatch = false, caseSensitive = false } = args;
+            const { query, limit = 20, includeSnippets = true, searchFields = ['both'], fuzzyMatch = false, caseSensitive = false, } = args;
             const results = await this.bearService.searchNotesFullText(query, {
                 limit,
                 includeSnippets,
                 searchFields,
                 fuzzyMatch,
-                caseSensitive
+                caseSensitive,
             });
             return {
-                content: [{
+                content: [
+                    {
                         type: 'text',
                         text: JSON.stringify({
                             success: true,
@@ -1369,7 +1386,8 @@ ${topTagsData}`,
                                 results: results.map(result => ({
                                     id: result.Z_PK,
                                     title: result.ZTITLE,
-                                    content: result.ZTEXT?.substring(0, 500) + (result.ZTEXT && result.ZTEXT.length > 500 ? '...' : ''),
+                                    content: result.ZTEXT?.substring(0, 500) +
+                                        (result.ZTEXT && result.ZTEXT.length > 500 ? '...' : ''),
                                     tags: result.tags,
                                     createdAt: result.ZCREATIONDATE,
                                     modifiedAt: result.ZMODIFICATIONDATE,
@@ -1377,22 +1395,25 @@ ${topTagsData}`,
                                     matchedTerms: result.matchedTerms,
                                     snippets: result.snippets,
                                     titleMatches: result.titleMatches,
-                                    contentMatches: result.contentMatches
-                                }))
-                            }
-                        }, null, 2)
-                    }]
+                                    contentMatches: result.contentMatches,
+                                })),
+                            },
+                        }, null, 2),
+                    },
+                ],
             };
         }
         catch (error) {
             return {
-                content: [{
+                content: [
+                    {
                         type: 'text',
                         text: JSON.stringify({
                             success: false,
-                            error: error instanceof Error ? error.message : 'Unknown error occurred'
-                        }, null, 2)
-                    }]
+                            error: error instanceof Error ? error.message : 'Unknown error occurred',
+                        }, null, 2),
+                    },
+                ],
             };
         }
     }
@@ -1401,27 +1422,31 @@ ${topTagsData}`,
             const { partialQuery, limit = 10 } = args;
             const suggestions = await this.bearService.getSearchSuggestions(partialQuery, limit);
             return {
-                content: [{
+                content: [
+                    {
                         type: 'text',
                         text: JSON.stringify({
                             success: true,
                             data: {
                                 partialQuery,
-                                suggestions
-                            }
-                        }, null, 2)
-                    }]
+                                suggestions,
+                            },
+                        }, null, 2),
+                    },
+                ],
             };
         }
         catch (error) {
             return {
-                content: [{
+                content: [
+                    {
                         type: 'text',
                         text: JSON.stringify({
                             success: false,
-                            error: error instanceof Error ? error.message : 'Unknown error occurred'
-                        }, null, 2)
-                    }]
+                            error: error instanceof Error ? error.message : 'Unknown error occurred',
+                        }, null, 2),
+                    },
+                ],
             };
         }
     }
@@ -1431,10 +1456,11 @@ ${topTagsData}`,
             const results = await this.bearService.findSimilarNotes(referenceText, {
                 limit,
                 minSimilarity,
-                excludeNoteId
+                excludeNoteId,
             });
             return {
-                content: [{
+                content: [
+                    {
                         type: 'text',
                         text: JSON.stringify({
                             success: true,
@@ -1444,27 +1470,31 @@ ${topTagsData}`,
                                 similarNotes: results.map(result => ({
                                     id: result.Z_PK,
                                     title: result.ZTITLE,
-                                    content: result.ZTEXT?.substring(0, 300) + (result.ZTEXT && result.ZTEXT.length > 300 ? '...' : ''),
+                                    content: result.ZTEXT?.substring(0, 300) +
+                                        (result.ZTEXT && result.ZTEXT.length > 300 ? '...' : ''),
                                     tags: result.tags,
                                     createdAt: result.ZCREATIONDATE,
                                     modifiedAt: result.ZMODIFICATIONDATE,
                                     similarityScore: result.similarityScore,
-                                    commonKeywords: result.commonKeywords
-                                }))
-                            }
-                        }, null, 2)
-                    }]
+                                    commonKeywords: result.commonKeywords,
+                                })),
+                            },
+                        }, null, 2),
+                    },
+                ],
             };
         }
         catch (error) {
             return {
-                content: [{
+                content: [
+                    {
                         type: 'text',
                         text: JSON.stringify({
                             success: false,
-                            error: error instanceof Error ? error.message : 'Unknown error occurred'
-                        }, null, 2)
-                    }]
+                            error: error instanceof Error ? error.message : 'Unknown error occurred',
+                        }, null, 2),
+                    },
+                ],
             };
         }
     }
@@ -1475,57 +1505,65 @@ ${topTagsData}`,
                 noteId,
                 fileType,
                 includeMetadata,
-                limit
+                limit,
             });
             return {
-                content: [{
+                content: [
+                    {
                         type: 'text',
                         text: JSON.stringify({
                             success: true,
-                            data: attachments
-                        }, null, 2)
-                    }]
+                            data: attachments,
+                        }, null, 2),
+                    },
+                ],
             };
         }
         catch (error) {
             return {
-                content: [{
+                content: [
+                    {
                         type: 'text',
                         text: JSON.stringify({
                             success: false,
-                            error: error instanceof Error ? error.message : 'Unknown error occurred'
-                        }, null, 2)
-                    }]
+                            error: error instanceof Error ? error.message : 'Unknown error occurred',
+                        }, null, 2),
+                    },
+                ],
             };
         }
     }
     async analyzeNoteMetadata(args) {
         try {
-            const { includeContentAnalysis = false, includeLinkAnalysis = false, includeStructureAnalysis = false } = args;
+            const { includeContentAnalysis = false, includeLinkAnalysis = false, includeStructureAnalysis = false, } = args;
             const analysis = await this.bearService.analyzeNoteMetadata({
                 includeContentAnalysis,
                 includeLinkAnalysis,
-                includeStructureAnalysis
+                includeStructureAnalysis,
             });
             return {
-                content: [{
+                content: [
+                    {
                         type: 'text',
                         text: JSON.stringify({
                             success: true,
-                            data: analysis
-                        }, null, 2)
-                    }]
+                            data: analysis,
+                        }, null, 2),
+                    },
+                ],
             };
         }
         catch (error) {
             return {
-                content: [{
+                content: [
+                    {
                         type: 'text',
                         text: JSON.stringify({
                             success: false,
-                            error: error instanceof Error ? error.message : 'Unknown error occurred'
-                        }, null, 2)
-                    }]
+                            error: error instanceof Error ? error.message : 'Unknown error occurred',
+                        }, null, 2),
+                    },
+                ],
             };
         }
     }
@@ -1540,11 +1578,12 @@ ${topTagsData}`,
                 hasTables: args.hasTables,
                 minWordCount: args.minWordCount,
                 maxWordCount: args.maxWordCount,
-                limit: args.limit || 20
+                limit: args.limit || 20,
             };
             const notes = await this.bearService.getNotesWithMetadata(criteria);
             return {
-                content: [{
+                content: [
+                    {
                         type: 'text',
                         text: JSON.stringify({
                             success: true,
@@ -1553,7 +1592,8 @@ ${topTagsData}`,
                                 notes: notes.map(note => ({
                                     id: note.Z_PK,
                                     title: note.ZTITLE,
-                                    content: note.ZTEXT?.substring(0, 300) + (note.ZTEXT && note.ZTEXT.length > 300 ? '...' : ''),
+                                    content: note.ZTEXT?.substring(0, 300) +
+                                        (note.ZTEXT && note.ZTEXT.length > 300 ? '...' : ''),
                                     tags: note.tags,
                                     createdAt: note.ZCREATIONDATE,
                                     modifiedAt: note.ZMODIFICATIONDATE,
@@ -1564,22 +1604,25 @@ ${topTagsData}`,
                                     todoCount: note.todoCount,
                                     codeBlockCount: note.codeBlockCount,
                                     tableCount: note.tableCount,
-                                    metadata: note.metadata
-                                }))
-                            }
-                        }, null, 2)
-                    }]
+                                    metadata: note.metadata,
+                                })),
+                            },
+                        }, null, 2),
+                    },
+                ],
             };
         }
         catch (error) {
             return {
-                content: [{
+                content: [
+                    {
                         type: 'text',
                         text: JSON.stringify({
                             success: false,
-                            error: error instanceof Error ? error.message : 'Unknown error occurred'
-                        }, null, 2)
-                    }]
+                            error: error instanceof Error ? error.message : 'Unknown error occurred',
+                        }, null, 2),
+                    },
+                ],
             };
         }
     }
@@ -1594,10 +1637,11 @@ ${topTagsData}`,
                 content: content || '',
                 tags: tags || [],
                 isArchived,
-                isPinned
+                isPinned,
             });
             return {
-                content: [{
+                content: [
+                    {
                         type: 'text',
                         text: JSON.stringify({
                             success: true,
@@ -1605,21 +1649,24 @@ ${topTagsData}`,
                                 noteId: result.noteId,
                                 title: title.trim(),
                                 message: `Note created successfully with ID ${result.noteId}`,
-                                tagWarnings: result.tagWarnings
-                            }
-                        }, null, 2)
-                    }]
+                                tagWarnings: result.tagWarnings,
+                            },
+                        }, null, 2),
+                    },
+                ],
             };
         }
         catch (error) {
             return {
-                content: [{
+                content: [
+                    {
                         type: 'text',
                         text: JSON.stringify({
                             success: false,
-                            error: error instanceof Error ? error.message : 'Unknown error occurred'
-                        }, null, 2)
-                    }]
+                            error: error instanceof Error ? error.message : 'Unknown error occurred',
+                        }, null, 2),
+                    },
+                ],
             };
         }
     }
@@ -1630,55 +1677,66 @@ ${topTagsData}`,
                 throw new Error('Valid noteId is required');
             }
             const options = {};
-            if (title !== undefined)
+            if (title !== undefined) {
                 options.title = title;
-            if (content !== undefined)
+            }
+            if (content !== undefined) {
                 options.content = content;
-            if (tags !== undefined)
+            }
+            if (tags !== undefined) {
                 options.tags = tags;
-            if (isArchived !== undefined)
+            }
+            if (isArchived !== undefined) {
                 options.isArchived = isArchived;
-            if (isPinned !== undefined)
+            }
+            if (isPinned !== undefined) {
                 options.isPinned = isPinned;
+            }
             if (expectedModificationDate) {
                 options.expectedModificationDate = new Date(expectedModificationDate);
             }
             const result = await this.bearService.updateNote(noteId, options);
             if (result.conflictDetected) {
                 return {
-                    content: [{
+                    content: [
+                        {
                             type: 'text',
                             text: JSON.stringify({
                                 success: false,
                                 error: 'Conflict detected: Note was modified by another process',
-                                conflictDetected: true
-                            }, null, 2)
-                        }]
+                                conflictDetected: true,
+                            }, null, 2),
+                        },
+                    ],
                 };
             }
             return {
-                content: [{
+                content: [
+                    {
                         type: 'text',
                         text: JSON.stringify({
                             success: true,
                             data: {
                                 noteId,
                                 message: `Note ${noteId} updated successfully`,
-                                tagWarnings: result.tagWarnings
-                            }
-                        }, null, 2)
-                    }]
+                                tagWarnings: result.tagWarnings,
+                            },
+                        }, null, 2),
+                    },
+                ],
             };
         }
         catch (error) {
             return {
-                content: [{
+                content: [
+                    {
                         type: 'text',
                         text: JSON.stringify({
                             success: false,
-                            error: error instanceof Error ? error.message : 'Unknown error occurred'
-                        }, null, 2)
-                    }]
+                            error: error instanceof Error ? error.message : 'Unknown error occurred',
+                        }, null, 2),
+                    },
+                ],
             };
         }
     }
@@ -1690,31 +1748,35 @@ ${topTagsData}`,
             }
             const result = await this.bearService.duplicateNote(noteId, {
                 titleSuffix,
-                copyTags
+                copyTags,
             });
             return {
-                content: [{
+                content: [
+                    {
                         type: 'text',
                         text: JSON.stringify({
                             success: true,
                             data: {
                                 originalNoteId: noteId,
                                 newNoteId: result.newNoteId,
-                                message: `Note ${noteId} duplicated successfully as note ${result.newNoteId}`
-                            }
-                        }, null, 2)
-                    }]
+                                message: `Note ${noteId} duplicated successfully as note ${result.newNoteId}`,
+                            },
+                        }, null, 2),
+                    },
+                ],
             };
         }
         catch (error) {
             return {
-                content: [{
+                content: [
+                    {
                         type: 'text',
                         text: JSON.stringify({
                             success: false,
-                            error: error instanceof Error ? error.message : 'Unknown error occurred'
-                        }, null, 2)
-                    }]
+                            error: error instanceof Error ? error.message : 'Unknown error occurred',
+                        }, null, 2),
+                    },
+                ],
             };
         }
     }
@@ -1729,28 +1791,32 @@ ${topTagsData}`,
             }
             const result = await this.bearService.archiveNote(noteId, archived);
             return {
-                content: [{
+                content: [
+                    {
                         type: 'text',
                         text: JSON.stringify({
                             success: true,
                             data: {
                                 noteId,
                                 archived,
-                                message: `Note ${noteId} ${archived ? 'archived' : 'unarchived'} successfully`
-                            }
-                        }, null, 2)
-                    }]
+                                message: `Note ${noteId} ${archived ? 'archived' : 'unarchived'} successfully`,
+                            },
+                        }, null, 2),
+                    },
+                ],
             };
         }
         catch (error) {
             return {
-                content: [{
+                content: [
+                    {
                         type: 'text',
                         text: JSON.stringify({
                             success: false,
-                            error: error instanceof Error ? error.message : 'Unknown error occurred'
-                        }, null, 2)
-                    }]
+                            error: error instanceof Error ? error.message : 'Unknown error occurred',
+                        }, null, 2),
+                    },
+                ],
             };
         }
     }
@@ -1762,26 +1828,30 @@ ${topTagsData}`,
             }
             const result = await this.bearService.triggerHashtagParsing(note_id, note_title);
             return {
-                content: [{
+                content: [
+                    {
                         type: 'text',
                         text: JSON.stringify({
                             success: true,
                             data: {
-                                message: result
-                            }
-                        }, null, 2)
-                    }]
+                                message: result,
+                            },
+                        }, null, 2),
+                    },
+                ],
             };
         }
         catch (error) {
             return {
-                content: [{
+                content: [
+                    {
                         type: 'text',
                         text: JSON.stringify({
                             success: false,
-                            error: error instanceof Error ? error.message : 'Unknown error occurred'
-                        }, null, 2)
-                    }]
+                            error: error instanceof Error ? error.message : 'Unknown error occurred',
+                        }, null, 2),
+                    },
+                ],
             };
         }
     }
@@ -1792,29 +1862,33 @@ ${topTagsData}`,
                 tag_filter,
                 title_pattern,
                 limit,
-                created_after
+                created_after,
             });
             return {
-                content: [{
+                content: [
+                    {
                         type: 'text',
                         text: JSON.stringify({
                             success: true,
                             data: {
-                                message: result
-                            }
-                        }, null, 2)
-                    }]
+                                message: result,
+                            },
+                        }, null, 2),
+                    },
+                ],
             };
         }
         catch (error) {
             return {
-                content: [{
+                content: [
+                    {
                         type: 'text',
                         text: JSON.stringify({
                             success: false,
-                            error: error instanceof Error ? error.message : 'Unknown error occurred'
-                        }, null, 2)
-                    }]
+                            error: error instanceof Error ? error.message : 'Unknown error occurred',
+                        }, null, 2),
+                    },
+                ],
             };
         }
     }
@@ -1826,7 +1900,7 @@ ${topTagsData}`,
 }
 // Start the server
 const server = new BearMCPServer();
-server.run().catch((error) => {
+server.run().catch(error => {
     // Silent error handling to avoid JSON-RPC interference
     process.exit(1);
 });

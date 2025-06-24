@@ -10,7 +10,7 @@ import { mockBearNotes, mockBearTags, mockDatabaseSchema } from '../fixtures/bea
 // Mock fs/promises for testing
 const mockFSStat = {
   size: 1024 * 1024, // 1MB
-  mtime: new Date('2024-01-20T16:05:00Z')
+  mtime: new Date('2024-01-20T16:05:00Z'),
 };
 
 /**
@@ -36,12 +36,14 @@ export class MockBearDatabase {
     }
 
     // Handle getTags query specifically (it starts with SELECT t.*, COUNT)
-    if (sql.includes('SELECT t.*, COUNT(nt.Z_5NOTES) as noteCount') || 
-        (sql.includes('ZSFNOTETAG t') && sql.includes('COUNT') && sql.includes('GROUP BY'))) {
+    if (
+      sql.includes('SELECT t.*, COUNT(nt.Z_5NOTES) as noteCount') ||
+      (sql.includes('ZSFNOTETAG t') && sql.includes('COUNT') && sql.includes('GROUP BY'))
+    ) {
       // Return tags with note counts for getTags method
       const tagsWithCounts = mockBearTags.map((tag, index) => ({
         ...tag,
-        noteCount: index + 1
+        noteCount: index + 1,
       }));
       return tagsWithCounts as T[];
     }
@@ -54,18 +56,18 @@ export class MockBearDatabase {
     if (sql.includes('ZSFNOTE') && !sql.includes('COUNT')) {
       // Handle note searches and filters
       let filteredNotes = [...mockBearNotes];
-      
+
       // Handle WHERE conditions in SQL
       if (sql.includes('Z_PK = ?') && params.length > 0) {
         const id = params[0];
         filteredNotes = filteredNotes.filter(note => note.Z_PK === id);
       }
-      
+
       if (sql.includes('ZTITLE = ?') && params.length > 0) {
         const title = params[0];
         filteredNotes = filteredNotes.filter(note => note.ZTITLE === title);
       }
-      
+
       if (sql.includes('ZTITLE LIKE ?') || sql.includes('ZTEXT LIKE ?')) {
         if (params.length > 0) {
           const searchTerm = params[0].replace(/%/g, '').toLowerCase();
@@ -76,17 +78,22 @@ export class MockBearDatabase {
           });
         }
       }
-      
+
       // Add tags to notes
       const notesWithTags = filteredNotes.map(note => ({
         ...note,
-        tag_names: note.Z_PK === 1 ? 'test,sample' : 
-                   note.Z_PK === 2 ? 'archived,old' :
-                   note.Z_PK === 3 ? 'trash' :
-                   note.Z_PK === 4 ? 'important,pinned' :
-                   'quick,untitled'
+        tag_names:
+          note.Z_PK === 1
+            ? 'test,sample'
+            : note.Z_PK === 2
+              ? 'archived,old'
+              : note.Z_PK === 3
+                ? 'trash'
+                : note.Z_PK === 4
+                  ? 'important,pinned'
+                  : 'quick,untitled',
       }));
-      
+
       return notesWithTags as T[];
     }
 
@@ -100,7 +107,7 @@ export class MockBearDatabase {
         // Return tags with note counts
         const tagsWithCounts = mockBearTags.map((tag, index) => ({
           ...tag,
-          noteCount: index + 1
+          noteCount: index + 1,
         }));
         return tagsWithCounts as T[];
       }
@@ -121,23 +128,33 @@ export class MockBearDatabase {
       const tagName = params[0];
       const filteredNotes = mockBearNotes.filter(note => {
         // Mock tag associations
-        const noteTags = note.Z_PK === 1 ? ['test', 'sample'] : 
-                        note.Z_PK === 2 ? ['archived', 'old'] :
-                        note.Z_PK === 3 ? ['trash'] :
-                        note.Z_PK === 4 ? ['important', 'pinned'] :
-                        ['quick', 'untitled'];
+        const noteTags =
+          note.Z_PK === 1
+            ? ['test', 'sample']
+            : note.Z_PK === 2
+              ? ['archived', 'old']
+              : note.Z_PK === 3
+                ? ['trash']
+                : note.Z_PK === 4
+                  ? ['important', 'pinned']
+                  : ['quick', 'untitled'];
         return noteTags.includes(tagName);
       });
-      
+
       const notesWithTags = filteredNotes.map(note => ({
         ...note,
-        tag_names: note.Z_PK === 1 ? 'test,sample' : 
-                   note.Z_PK === 2 ? 'archived,old' :
-                   note.Z_PK === 3 ? 'trash' :
-                   note.Z_PK === 4 ? 'important,pinned' :
-                   'quick,untitled'
+        tag_names:
+          note.Z_PK === 1
+            ? 'test,sample'
+            : note.Z_PK === 2
+              ? 'archived,old'
+              : note.Z_PK === 3
+                ? 'trash'
+                : note.Z_PK === 4
+                  ? 'important,pinned'
+                  : 'quick,untitled',
       }));
-      
+
       return notesWithTags as T[];
     }
 
@@ -182,10 +199,10 @@ export class MockBearDatabase {
  */
 export function createMockBearService(): BearService {
   const service = new BearService();
-  
+
   // Mock the database property
   (service as any).database = new MockBearDatabase();
-  
+
   // Override getDatabaseStats to avoid filesystem calls
   const mockStats = {
     totalNotes: mockBearNotes.length,
@@ -196,10 +213,10 @@ export function createMockBearService(): BearService {
     totalTags: mockBearTags.length,
     totalAttachments: 0,
     databaseSize: mockFSStat.size,
-    lastModified: mockFSStat.mtime
+    lastModified: mockFSStat.mtime,
   };
   service.getDatabaseStats = jest.fn(() => Promise.resolve(mockStats)) as any;
-  
+
   return service;
 }
 
@@ -208,11 +225,11 @@ export function createMockBearService(): BearService {
  */
 export function setupTestEnvironment() {
   const originalEnv = process.env;
-  
+
   process.env = {
     ...originalEnv,
     NODE_ENV: 'test',
-    JEST_VERBOSE: 'false'
+    JEST_VERBOSE: 'false',
   };
 
   return () => {
@@ -257,8 +274,8 @@ export function createMCPToolRequest(toolName: string, args: any = {}) {
     method: 'tools/call',
     params: {
       name: toolName,
-      arguments: args
-    }
+      arguments: args,
+    },
   };
 }
 
@@ -268,7 +285,7 @@ export function createMCPToolRequest(toolName: string, args: any = {}) {
 export function validateMCPResponse(response: any) {
   expect(response).toHaveProperty('content');
   expect(Array.isArray(response.content)).toBe(true);
-  
+
   if (response.content.length > 0) {
     expect(response.content[0]).toHaveProperty('type');
     expect(response.content[0]).toHaveProperty('text');
@@ -280,7 +297,9 @@ export function validateMCPResponse(response: any) {
  */
 export const testDataGenerators = {
   randomString: (length: number = 10): string => {
-    return Math.random().toString(36).substring(2, 2 + length);
+    return Math.random()
+      .toString(36)
+      .substring(2, 2 + length);
   },
 
   randomInt: (min: number = 0, max: number = 100): number => {
@@ -294,5 +313,5 @@ export const testDataGenerators = {
   randomTag: (): string => {
     const tags = ['work', 'personal', 'project', 'idea', 'todo', 'meeting', 'research'];
     return tags[Math.floor(Math.random() * tags.length)];
-  }
-}; 
+  },
+};

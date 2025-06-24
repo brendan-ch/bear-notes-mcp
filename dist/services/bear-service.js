@@ -19,14 +19,14 @@ export class BearService {
     async getDatabaseStats() {
         await this.database.connect(true); // Read-only connection
         try {
-            const [totalNotes, activeNotes, trashedNotes, archivedNotes, encryptedNotes, totalTags, totalAttachments] = await Promise.all([
+            const [totalNotes, activeNotes, trashedNotes, archivedNotes, encryptedNotes, totalTags, totalAttachments,] = await Promise.all([
                 this.database.queryOne('SELECT COUNT(*) as count FROM ZSFNOTE'),
                 this.database.queryOne('SELECT COUNT(*) as count FROM ZSFNOTE WHERE ZTRASHED = 0'),
                 this.database.queryOne('SELECT COUNT(*) as count FROM ZSFNOTE WHERE ZTRASHED = 1'),
                 this.database.queryOne('SELECT COUNT(*) as count FROM ZSFNOTE WHERE ZARCHIVED = 1'),
                 this.database.queryOne('SELECT COUNT(*) as count FROM ZSFNOTE WHERE ZENCRYPTED = 1'),
                 this.database.queryOne('SELECT COUNT(*) as count FROM ZSFNOTETAG'),
-                this.database.queryOne('SELECT COUNT(*) as count FROM ZSFNOTEFILE')
+                this.database.queryOne('SELECT COUNT(*) as count FROM ZSFNOTEFILE'),
             ]);
             // Get database file size and last modified date
             const fs = await import('fs/promises');
@@ -40,7 +40,7 @@ export class BearService {
                 totalTags: totalTags?.count || 0,
                 totalAttachments: totalAttachments?.count || 0,
                 databaseSize: stats.size,
-                lastModified: stats.mtime
+                lastModified: stats.mtime,
             };
         }
         finally {
@@ -93,7 +93,7 @@ export class BearService {
             const rows = await this.database.query(sql, params);
             return rows.map(row => ({
                 ...row,
-                tags: row.tag_names ? row.tag_names.split(',').filter(Boolean) : []
+                tags: row.tag_names ? row.tag_names.split(',').filter(Boolean) : [],
             }));
         }
         finally {
@@ -120,7 +120,7 @@ export class BearService {
             }
             return {
                 ...row,
-                tags: row.tag_names ? row.tag_names.split(',').filter(Boolean) : []
+                tags: row.tag_names ? row.tag_names.split(',').filter(Boolean) : [],
             };
         }
         finally {
@@ -148,7 +148,7 @@ export class BearService {
             }
             return {
                 ...row,
-                tags: row.tag_names ? row.tag_names.split(',').filter(Boolean) : []
+                tags: row.tag_names ? row.tag_names.split(',').filter(Boolean) : [],
             };
         }
         finally {
@@ -201,7 +201,7 @@ export class BearService {
             const rows = await this.database.query(sql, [tagName]);
             return rows.map(row => ({
                 ...row,
-                tags: row.tag_names ? row.tag_names.split(',').filter(Boolean) : []
+                tags: row.tag_names ? row.tag_names.split(',').filter(Boolean) : [],
             }));
         }
         finally {
@@ -266,7 +266,7 @@ export class BearService {
             active: stats.activeNotes,
             trashed: stats.trashedNotes,
             archived: stats.archivedNotes,
-            encrypted: stats.encryptedNotes
+            encrypted: stats.encryptedNotes,
         };
     }
     /**
@@ -329,7 +329,9 @@ export class BearService {
                 options.tags.forEach(tag => params.push(`%${tag}%`));
             }
             if (options.excludeTags && options.excludeTags.length > 0) {
-                const excludeConditions = options.excludeTags.map(() => 'tag_names NOT LIKE ? OR tag_names IS NULL').join(' AND ');
+                const excludeConditions = options.excludeTags
+                    .map(() => 'tag_names NOT LIKE ? OR tag_names IS NULL')
+                    .join(' AND ');
                 sql += options.tags ? ` AND (${excludeConditions})` : ` HAVING (${excludeConditions})`;
                 options.excludeTags.forEach(tag => params.push(`%${tag}%`));
             }
@@ -366,7 +368,7 @@ export class BearService {
                 ...row,
                 tags: row.tag_names ? row.tag_names.split(',').filter(Boolean) : [],
                 contentLength: row.content_length,
-                preview: row.preview
+                preview: row.preview,
             }));
         }
         finally {
@@ -452,7 +454,9 @@ export class BearService {
             }
             if (criteria.hasAnyTags && criteria.hasAnyTags.length > 0) {
                 const anyTagConditions = criteria.hasAnyTags.map(() => 'tag_names LIKE ?').join(' OR ');
-                const havingClause = criteria.hasAllTags ? ` AND (${anyTagConditions})` : ` HAVING (${anyTagConditions})`;
+                const havingClause = criteria.hasAllTags
+                    ? ` AND (${anyTagConditions})`
+                    : ` HAVING (${anyTagConditions})`;
                 sql += havingClause;
                 criteria.hasAnyTags.forEach(tag => params.push(`%${tag}%`));
             }
@@ -461,7 +465,7 @@ export class BearService {
             return rows.map(row => ({
                 ...row,
                 tags: row.tag_names ? row.tag_names.split(',').filter(Boolean) : [],
-                contentLength: row.content_length
+                contentLength: row.content_length,
             }));
         }
         finally {
@@ -516,7 +520,7 @@ export class BearService {
             SUM(ZTODOCOMPLETED + ZTODOINCOMPLETED) as todos
           FROM ZSFNOTE 
           WHERE ZTRASHED = 0
-        `)
+        `),
             ]);
             // Get monthly note creation stats
             const monthlyStats = await this.database.query(`
@@ -544,34 +548,36 @@ export class BearService {
                 averageLength: Math.round(totalStats?.avgLength || 0),
                 longestNote: {
                     title: longestNote?.ZTITLE || '',
-                    length: longestNote?.length || 0
+                    length: longestNote?.length || 0,
                 },
                 shortestNote: {
                     title: shortestNote?.ZTITLE || '',
-                    length: shortestNote?.length || 0
+                    length: shortestNote?.length || 0,
                 },
                 mostRecentNote: {
                     title: mostRecentNote?.ZTITLE || '',
-                    date: mostRecentNote ? CoreDataUtils.toDate(mostRecentNote.ZMODIFICATIONDATE) : new Date()
+                    date: mostRecentNote
+                        ? CoreDataUtils.toDate(mostRecentNote.ZMODIFICATIONDATE)
+                        : new Date(),
                 },
                 oldestNote: {
                     title: oldestNote?.ZTITLE || '',
-                    date: oldestNote ? CoreDataUtils.toDate(oldestNote.ZCREATIONDATE) : new Date()
+                    date: oldestNote ? CoreDataUtils.toDate(oldestNote.ZCREATIONDATE) : new Date(),
                 },
                 notesPerMonth: monthlyStats.map(stat => ({
                     month: stat.month,
-                    count: stat.count
+                    count: stat.count,
                 })),
                 topTags: topTags.map(tag => ({
                     tag: tag.ZTITLE,
-                    count: tag.count
+                    count: tag.count,
                 })),
                 contentStats: {
                     hasImages: contentStats?.hasImages || 0,
                     hasFiles: contentStats?.hasFiles || 0,
                     hasSourceCode: contentStats?.hasSourceCode || 0,
-                    hasTodos: contentStats?.todos || 0
-                }
+                    hasTodos: contentStats?.todos || 0,
+                },
             };
         }
         finally {
@@ -590,7 +596,8 @@ export class BearService {
                 return { byTags: [], byContent: [] };
             }
             // Find notes with shared tags
-            const relatedByTags = sourceNote.tags.length > 0 ? await this.database.query(`
+            const relatedByTags = sourceNote.tags.length > 0
+                ? await this.database.query(`
         SELECT n.*, GROUP_CONCAT(DISTINCT t.ZTITLE) as tag_names,
                COUNT(DISTINCT CASE WHEN t.ZTITLE IN (${sourceNote.tags.map(() => '?').join(',')}) THEN t.ZTITLE END) as shared_tags
         FROM ZSFNOTE n
@@ -601,10 +608,12 @@ export class BearService {
         HAVING shared_tags > 0
         ORDER BY shared_tags DESC, n.ZMODIFICATIONDATE DESC
         LIMIT ?
-      `, [...sourceNote.tags, noteId, limit]) : [];
+      `, [...sourceNote.tags, noteId, limit])
+                : [];
             // Find notes with similar content (basic keyword matching)
             const contentKeywords = this.extractKeywords(sourceNote.ZTEXT || '');
-            const relatedByContent = contentKeywords.length > 0 ? await this.database.query(`
+            const relatedByContent = contentKeywords.length > 0
+                ? await this.database.query(`
         SELECT n.*, GROUP_CONCAT(DISTINCT t.ZTITLE) as tag_names
         FROM ZSFNOTE n
         LEFT JOIN Z_5TAGS nt ON n.Z_PK = nt.Z_5NOTES
@@ -614,16 +623,17 @@ export class BearService {
         GROUP BY n.Z_PK
         ORDER BY n.ZMODIFICATIONDATE DESC
         LIMIT ?
-      `, [noteId, ...contentKeywords.map(kw => `%${kw}%`), limit]) : [];
+      `, [noteId, ...contentKeywords.map(kw => `%${kw}%`), limit])
+                : [];
             return {
                 byTags: relatedByTags.map(row => ({
                     ...row,
-                    tags: row.tag_names ? row.tag_names.split(',').filter(Boolean) : []
+                    tags: row.tag_names ? row.tag_names.split(',').filter(Boolean) : [],
                 })),
                 byContent: relatedByContent.map(row => ({
                     ...row,
-                    tags: row.tag_names ? row.tag_names.split(',').filter(Boolean) : []
-                }))
+                    tags: row.tag_names ? row.tag_names.split(',').filter(Boolean) : [],
+                })),
             };
         }
         finally {
@@ -634,10 +644,46 @@ export class BearService {
      * Extract keywords from text for content similarity matching
      */
     extractKeywords(text) {
-        if (!text)
+        if (!text) {
             return [];
+        }
         // Simple keyword extraction - remove common words and get significant terms
-        const commonWords = new Set(['the', 'a', 'an', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for', 'of', 'with', 'by', 'is', 'are', 'was', 'were', 'be', 'been', 'have', 'has', 'had', 'do', 'does', 'did', 'will', 'would', 'could', 'should', 'this', 'that', 'these', 'those']);
+        const commonWords = new Set([
+            'the',
+            'a',
+            'an',
+            'and',
+            'or',
+            'but',
+            'in',
+            'on',
+            'at',
+            'to',
+            'for',
+            'of',
+            'with',
+            'by',
+            'is',
+            'are',
+            'was',
+            'were',
+            'be',
+            'been',
+            'have',
+            'has',
+            'had',
+            'do',
+            'does',
+            'did',
+            'will',
+            'would',
+            'could',
+            'should',
+            'this',
+            'that',
+            'these',
+            'those',
+        ]);
         return text
             .toLowerCase()
             .replace(/[^\w\s]/g, ' ')
@@ -714,11 +760,12 @@ export class BearService {
             }
             const rows = await this.database.query(sql, params);
             // Calculate relevance scores and extract snippets
-            return rows.map(row => {
+            return rows
+                .map(row => {
                 const note = {
                     ...row,
                     tags: row.tag_names ? row.tag_names.split(',').filter(Boolean) : [],
-                    contentLength: row.content_length
+                    contentLength: row.content_length,
                 };
                 const analysis = this.analyzeSearchMatches(note, searchTerms, options);
                 return {
@@ -727,9 +774,10 @@ export class BearService {
                     matchedTerms: analysis.matchedTerms,
                     snippets: options.includeSnippets ? analysis.snippets : [],
                     titleMatches: analysis.titleMatches,
-                    contentMatches: analysis.contentMatches
+                    contentMatches: analysis.contentMatches,
                 };
-            }).sort((a, b) => b.relevanceScore - a.relevanceScore);
+            })
+                .sort((a, b) => b.relevanceScore - a.relevanceScore);
         }
         finally {
             await this.database.disconnect();
@@ -773,12 +821,12 @@ export class BearService {
           WHERE ZTITLE LIKE ?
           ORDER BY ZTITLE
           LIMIT ?
-        `, [`${partialQuery}%`, limit])
+        `, [`${partialQuery}%`, limit]),
             ]);
             return {
                 terms: termSuggestions.map(s => s.term),
                 titles: titleSuggestions.map(s => s.title),
-                tags: tagSuggestions.map(s => s.tag)
+                tags: tagSuggestions.map(s => s.tag),
             };
         }
         finally {
@@ -809,7 +857,9 @@ export class BearService {
                 params.push(options.excludeNoteId);
             }
             // Add keyword matching conditions
-            const keywordConditions = referenceKeywords.map(() => 'LOWER(n.ZTEXT) LIKE LOWER(?)').join(' OR ');
+            const keywordConditions = referenceKeywords
+                .map(() => 'LOWER(n.ZTEXT) LIKE LOWER(?)')
+                .join(' OR ');
             sql += ` AND (${keywordConditions})`;
             referenceKeywords.forEach(keyword => params.push(`%${keyword}%`));
             sql += ' GROUP BY n.Z_PK ORDER BY n.ZMODIFICATIONDATE DESC';
@@ -819,11 +869,12 @@ export class BearService {
             }
             const rows = await this.database.query(sql, params);
             // Calculate similarity scores
-            const results = rows.map(row => {
+            const results = rows
+                .map(row => {
                 const note = {
                     ...row,
                     tags: row.tag_names ? row.tag_names.split(',').filter(Boolean) : [],
-                    contentLength: row.content_length
+                    contentLength: row.content_length,
                 };
                 const noteKeywords = this.extractKeywords(note.ZTEXT || '');
                 const commonKeywords = referenceKeywords.filter(kw => noteKeywords.some(nkw => nkw.includes(kw) || kw.includes(nkw)));
@@ -831,7 +882,7 @@ export class BearService {
                 return {
                     ...note,
                     similarityScore,
-                    commonKeywords
+                    commonKeywords,
                 };
             })
                 .filter(result => result.similarityScore >= (options.minSimilarity || 0.1))
@@ -929,7 +980,7 @@ export class BearService {
             matchedTerms,
             snippets,
             titleMatches,
-            contentMatches
+            contentMatches,
         };
     }
     /**
@@ -1024,7 +1075,7 @@ export class BearService {
                     noteTitle: file.note_title || 'Untitled',
                     filePath: file.ZFILEPATH || '',
                     contentType,
-                    metadata: options.includeMetadata ? this.extractFileMetadata(file) : undefined
+                    metadata: options.includeMetadata ? this.extractFileMetadata(file) : undefined,
                 };
             });
             return {
@@ -1033,8 +1084,8 @@ export class BearService {
                 attachmentsByType: typeStats.map(stat => ({
                     type: stat.type,
                     count: stat.count,
-                    totalSize: stat.total_size
-                }))
+                    totalSize: stat.total_size,
+                })),
             };
         }
         finally {
@@ -1105,8 +1156,8 @@ export class BearService {
                     averageLength: Math.round(overview.avg_length || 0),
                     lengthDistribution,
                     creationPatterns,
-                    modificationPatterns
-                }
+                    modificationPatterns,
+                },
             };
             // Content analysis
             if (options.includeContentAnalysis) {
@@ -1193,10 +1244,11 @@ export class BearService {
             }
             const rows = await this.database.query(sql, params);
             // Analyze content for each note
-            const results = rows.map(row => {
+            const results = rows
+                .map(row => {
                 const note = {
                     ...row,
-                    tags: row.tag_names ? row.tag_names.split(',').filter(Boolean) : []
+                    tags: row.tag_names ? row.tag_names.split(',').filter(Boolean) : [],
                 };
                 const content = note.ZTEXT || '';
                 // Count various content elements
@@ -1207,30 +1259,42 @@ export class BearService {
                 const codeBlockCount = (content.match(/```/g) || []).length / 2;
                 const tableCount = (content.match(/\|.*\|/g) || []).length;
                 // Apply content-based filters
-                if (criteria.minWordCount && wordCount < criteria.minWordCount)
+                if (criteria.minWordCount && wordCount < criteria.minWordCount) {
                     return null;
-                if (criteria.maxWordCount && wordCount > criteria.maxWordCount)
+                }
+                if (criteria.maxWordCount && wordCount > criteria.maxWordCount) {
                     return null;
-                if (criteria.hasLinks === true && linkCount === 0)
+                }
+                if (criteria.hasLinks === true && linkCount === 0) {
                     return null;
-                if (criteria.hasLinks === false && linkCount > 0)
+                }
+                if (criteria.hasLinks === false && linkCount > 0) {
                     return null;
-                if (criteria.hasImages === true && imageCount === 0)
+                }
+                if (criteria.hasImages === true && imageCount === 0) {
                     return null;
-                if (criteria.hasImages === false && imageCount > 0)
+                }
+                if (criteria.hasImages === false && imageCount > 0) {
                     return null;
-                if (criteria.hasTodos === true && todoCount === 0)
+                }
+                if (criteria.hasTodos === true && todoCount === 0) {
                     return null;
-                if (criteria.hasTodos === false && todoCount > 0)
+                }
+                if (criteria.hasTodos === false && todoCount > 0) {
                     return null;
-                if (criteria.hasCodeBlocks === true && codeBlockCount === 0)
+                }
+                if (criteria.hasCodeBlocks === true && codeBlockCount === 0) {
                     return null;
-                if (criteria.hasCodeBlocks === false && codeBlockCount > 0)
+                }
+                if (criteria.hasCodeBlocks === false && codeBlockCount > 0) {
                     return null;
-                if (criteria.hasTables === true && tableCount === 0)
+                }
+                if (criteria.hasTables === true && tableCount === 0) {
                     return null;
-                if (criteria.hasTables === false && tableCount > 0)
+                }
+                if (criteria.hasTables === false && tableCount > 0) {
                     return null;
+                }
                 return {
                     ...note,
                     wordCount,
@@ -1246,10 +1310,11 @@ export class BearService {
                         hasImages: imageCount > 0,
                         hasTodos: todoCount > 0,
                         hasCodeBlocks: codeBlockCount > 0,
-                        hasTables: tableCount > 0
-                    }
+                        hasTables: tableCount > 0,
+                    },
                 };
-            }).filter(Boolean);
+            })
+                .filter(Boolean);
             return results;
         }
         finally {
@@ -1280,10 +1345,10 @@ export class BearService {
                 codeBlocks: 0,
                 links: 0,
                 images: 0,
-                tables: 0
+                tables: 0,
             },
             languagePatterns: [],
-            commonPatterns: []
+            commonPatterns: [],
         };
         const languageMap = new Map();
         const patternCounts = {
@@ -1292,7 +1357,7 @@ export class BearService {
             phoneNumbers: 0,
             dates: 0,
             times: 0,
-            hashtags: 0
+            hashtags: 0,
         };
         texts.forEach(text => {
             // Markdown usage
@@ -1329,8 +1394,10 @@ export class BearService {
             { pattern: 'phoneNumbers', description: 'Phone numbers', count: patternCounts.phoneNumbers },
             { pattern: 'dates', description: 'Date patterns', count: patternCounts.dates },
             { pattern: 'times', description: 'Time patterns', count: patternCounts.times },
-            { pattern: 'hashtags', description: 'Hashtags', count: patternCounts.hashtags }
-        ].filter(p => p.count > 0).sort((a, b) => b.count - a.count);
+            { pattern: 'hashtags', description: 'Hashtags', count: patternCounts.hashtags },
+        ]
+            .filter(p => p.count > 0)
+            .sort((a, b) => b.count - a.count);
         return analysis;
     }
     /**
@@ -1342,7 +1409,7 @@ export class BearService {
             externalLinks: 0,
             brokenLinks: 0,
             topDomains: [],
-            linkTypes: []
+            linkTypes: [],
         };
         const domainMap = new Map();
         const typeMap = new Map();
@@ -1402,7 +1469,7 @@ export class BearService {
             averageParagraphsPerNote: 0,
             notesWithTodos: 0,
             notesWithDates: 0,
-            notesWithNumbers: 0
+            notesWithNumbers: 0,
         };
         const titlePatternMap = new Map();
         let totalWords = 0;
@@ -1429,12 +1496,15 @@ export class BearService {
             const paragraphs = text.split(/\n\s*\n/).filter(p => p.trim().length > 0);
             totalParagraphs += paragraphs.length;
             // Check for specific content types
-            if (text.match(/- \[[ x]\]/))
+            if (text.match(/- \[[ x]\]/)) {
                 analysis.notesWithTodos++;
-            if (text.match(/\b\d{1,2}[\/\-]\d{1,2}[\/\-]\d{2,4}\b/))
+            }
+            if (text.match(/\b\d{1,2}[\/\-]\d{1,2}[\/\-]\d{2,4}\b/)) {
                 analysis.notesWithDates++;
-            if (text.match(/\b\d+\b/))
+            }
+            if (text.match(/\b\d+\b/)) {
                 analysis.notesWithNumbers++;
+            }
         });
         analysis.titlePatterns = Array.from(titlePatternMap.entries())
             .map(([pattern, data]) => ({ pattern, count: data.count, examples: data.examples }))
@@ -1450,40 +1520,54 @@ export class BearService {
     extractTitlePatterns(title) {
         const patterns = [];
         // Date patterns
-        if (title.match(/\d{4}-\d{2}-\d{2}/))
+        if (title.match(/\d{4}-\d{2}-\d{2}/)) {
             patterns.push('ISO Date (YYYY-MM-DD)');
-        if (title.match(/\d{1,2}\/\d{1,2}\/\d{2,4}/))
+        }
+        if (title.match(/\d{1,2}\/\d{1,2}\/\d{2,4}/)) {
             patterns.push('US Date (MM/DD/YYYY)');
-        if (title.match(/\d{1,2}-\d{1,2}-\d{2,4}/))
+        }
+        if (title.match(/\d{1,2}-\d{1,2}-\d{2,4}/)) {
             patterns.push('Dash Date (MM-DD-YYYY)');
+        }
         // Meeting patterns
-        if (title.toLowerCase().includes('meeting'))
+        if (title.toLowerCase().includes('meeting')) {
             patterns.push('Meeting Notes');
-        if (title.toLowerCase().includes('standup'))
+        }
+        if (title.toLowerCase().includes('standup')) {
             patterns.push('Standup Notes');
-        if (title.toLowerCase().includes('interview'))
+        }
+        if (title.toLowerCase().includes('interview')) {
             patterns.push('Interview Notes');
+        }
         // Project patterns
-        if (title.toLowerCase().includes('project'))
+        if (title.toLowerCase().includes('project')) {
             patterns.push('Project Notes');
-        if (title.toLowerCase().includes('todo') || title.toLowerCase().includes('task'))
+        }
+        if (title.toLowerCase().includes('todo') || title.toLowerCase().includes('task')) {
             patterns.push('Task Lists');
+        }
         // Learning patterns
-        if (title.toLowerCase().includes('notes on') || title.toLowerCase().includes('learning'))
+        if (title.toLowerCase().includes('notes on') || title.toLowerCase().includes('learning')) {
             patterns.push('Learning Notes');
-        if (title.toLowerCase().includes('tutorial') || title.toLowerCase().includes('guide'))
+        }
+        if (title.toLowerCase().includes('tutorial') || title.toLowerCase().includes('guide')) {
             patterns.push('Tutorials/Guides');
+        }
         // Question patterns
-        if (title.startsWith('How to') || title.startsWith('Why') || title.startsWith('What'))
+        if (title.startsWith('How to') || title.startsWith('Why') || title.startsWith('What')) {
             patterns.push('Question Format');
+        }
         // Number patterns
-        if (title.match(/^\d+\.?\s/))
+        if (title.match(/^\d+\.?\s/)) {
             patterns.push('Numbered Title');
+        }
         // Capitalization patterns
-        if (title === title.toUpperCase())
+        if (title === title.toUpperCase()) {
             patterns.push('ALL CAPS');
-        if (title.split(' ').every(word => word[0] === word[0].toUpperCase()))
+        }
+        if (title.split(' ').every(word => word[0] === word[0].toUpperCase())) {
             patterns.push('Title Case');
+        }
         return patterns.length > 0 ? patterns : ['No Pattern'];
     }
     /**
@@ -1535,7 +1619,7 @@ export class BearService {
             await new Promise(resolve => setTimeout(resolve, 1000));
             // If the note should be archived, we'll need to find it and archive it
             // This is a limitation of Bear's current API
-            let noteId = 'created-via-api'; // We can't get the actual ID from the create API
+            const noteId = 'created-via-api'; // We can't get the actual ID from the create API
             if (options.isArchived) {
                 // TODO: Implement archiving after creation once we can reliably find the new note
                 // For now, we'll note this in the response
@@ -1543,7 +1627,7 @@ export class BearService {
             return {
                 noteId,
                 success: true,
-                tagWarnings: tagWarnings.length > 0 ? tagWarnings : undefined
+                tagWarnings: tagWarnings.length > 0 ? tagWarnings : undefined,
             };
         }
         catch (error) {
@@ -1582,7 +1666,7 @@ export class BearService {
                     return {
                         success: false,
                         conflictDetected: true,
-                        tagWarnings: tagWarnings.length > 0 ? tagWarnings : undefined
+                        tagWarnings: tagWarnings.length > 0 ? tagWarnings : undefined,
                     };
                 }
             }
@@ -1655,7 +1739,7 @@ export class BearService {
             }
             return {
                 success: true,
-                tagWarnings: tagWarnings.length > 0 ? tagWarnings : undefined
+                tagWarnings: tagWarnings.length > 0 ? tagWarnings : undefined,
             };
         }
         catch (error) {
@@ -1693,13 +1777,13 @@ export class BearService {
             const result = await this.createNote({
                 title: newTitle,
                 content: sourceNote.ZTEXT || '',
-                tags: tags,
+                tags,
                 isArchived: sourceNote.ZARCHIVED === 1,
-                isPinned: sourceNote.ZPINNED === 1
+                isPinned: sourceNote.ZPINNED === 1,
             });
             return {
                 newNoteId: result.noteId,
-                success: result.success
+                success: result.success,
             };
         }
         catch (error) {
@@ -1712,10 +1796,10 @@ export class BearService {
      */
     async archiveNote(noteId, archived) {
         const result = await this.updateNote(noteId, {
-            isArchived: archived
+            isArchived: archived,
         });
         return {
-            success: result.success
+            success: result.success,
         };
     }
     /**
@@ -1723,9 +1807,9 @@ export class BearService {
      */
     generateUUID() {
         // Generate a UUID v4 format that Bear uses
-        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-            const r = Math.random() * 16 | 0;
-            const v = c == 'x' ? r : (r & 0x3 | 0x8);
+        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+            const r = (Math.random() * 16) | 0;
+            const v = c == 'x' ? r : (r & 0x3) | 0x8;
             return v.toString(16).toUpperCase();
         });
     }
@@ -1751,12 +1835,13 @@ export class BearService {
             const currentNote = await this.database.queryOne(`
         SELECT ZTEXT FROM ZSFNOTE WHERE Z_PK = ?
       `, [noteId]);
-            if (!currentNote)
+            if (!currentNote) {
                 return;
+            }
             // Simulate a content edit by adding and removing a character
             // This mimics what happens when you type and delete in Bear
             const originalContent = currentNote.ZTEXT || '';
-            const tempContent = originalContent + ' '; // Add a space
+            const tempContent = `${originalContent} `; // Add a space
             // First update: add the space
             let now = CoreDataUtils.fromDate(new Date());
             await this.database.query(`
@@ -1898,11 +1983,13 @@ export class BearService {
             let query;
             let params;
             if (noteId) {
-                query = 'SELECT Z_PK, ZUNIQUEIDENTIFIER, ZTITLE, ZTEXT FROM ZSFNOTE WHERE ZUNIQUEIDENTIFIER = ? AND ZTRASHED = 0';
+                query =
+                    'SELECT Z_PK, ZUNIQUEIDENTIFIER, ZTITLE, ZTEXT FROM ZSFNOTE WHERE ZUNIQUEIDENTIFIER = ? AND ZTRASHED = 0';
                 params = [noteId];
             }
             else {
-                query = 'SELECT Z_PK, ZUNIQUEIDENTIFIER, ZTITLE, ZTEXT FROM ZSFNOTE WHERE ZTITLE = ? AND ZTRASHED = 0';
+                query =
+                    'SELECT Z_PK, ZUNIQUEIDENTIFIER, ZTITLE, ZTEXT FROM ZSFNOTE WHERE ZTITLE = ? AND ZTRASHED = 0';
                 params = [noteTitle];
             }
             const note = await this.database.queryOne(query, params);
@@ -1938,7 +2025,7 @@ export class BearService {
             let bearContent = '';
             // Add hashtags line if there are tags
             if (hashtagsLine) {
-                bearContent += hashtagsLine + '\n\n';
+                bearContent += `${hashtagsLine}\n\n`;
             }
             // Add the actual content
             if (content) {

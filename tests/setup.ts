@@ -22,7 +22,7 @@ declare global {
 // Custom Jest matchers for Bear-specific data validation
 expect.extend({
   toBeValidBearNote(received: any) {
-    const pass = (
+    const pass =
       typeof received === 'object' &&
       received !== null &&
       typeof received.Z_PK === 'number' &&
@@ -31,47 +31,47 @@ expect.extend({
       typeof received.ZCREATIONDATE === 'number' &&
       typeof received.ZMODIFICATIONDATE === 'number' &&
       typeof received.ZTRASHED === 'number' &&
-      typeof received.ZARCHIVED === 'number'
-    );
+      typeof received.ZARCHIVED === 'number';
 
     return {
-      message: () => pass 
-        ? `Expected ${received} not to be a valid Bear note`
-        : `Expected ${received} to be a valid Bear note with required properties`,
+      message: () =>
+        pass
+          ? `Expected ${received} not to be a valid Bear note`
+          : `Expected ${received} to be a valid Bear note with required properties`,
       pass,
     };
   },
 
   toBeValidBearTag(received: any) {
-    const pass = (
+    const pass =
       typeof received === 'object' &&
       received !== null &&
       typeof received.Z_PK === 'number' &&
       typeof received.ZTITLE === 'string' &&
       typeof received.ZCREATIONDATE === 'number' &&
-      typeof received.ZMODIFICATIONDATE === 'number'
-    );
+      typeof received.ZMODIFICATIONDATE === 'number';
 
     return {
-      message: () => pass 
-        ? `Expected ${received} not to be a valid Bear tag`
-        : `Expected ${received} to be a valid Bear tag with required properties`,
+      message: () =>
+        pass
+          ? `Expected ${received} not to be a valid Bear tag`
+          : `Expected ${received} to be a valid Bear tag with required properties`,
       pass,
     };
   },
 
   toHaveValidTimestamp(received: any) {
-    const pass = (
+    const pass =
       typeof received === 'number' &&
       received > 0 &&
       // Core Data timestamps are seconds since 2001-01-01
-      received > 631152000 // Reasonable minimum timestamp
-    );
+      received > 631152000; // Reasonable minimum timestamp
 
     return {
-      message: () => pass 
-        ? `Expected ${received} not to be a valid Core Data timestamp`
-        : `Expected ${received} to be a valid Core Data timestamp (seconds since 2001-01-01)`,
+      message: () =>
+        pass
+          ? `Expected ${received} not to be a valid Core Data timestamp`
+          : `Expected ${received} to be a valid Core Data timestamp (seconds since 2001-01-01)`,
       pass,
     };
   },
@@ -106,14 +106,14 @@ beforeAll(() => {
   if (process.env.NODE_ENV !== 'test') {
     console.warn('Warning: Tests should run with NODE_ENV=test');
   }
-  
+
   // Check for required test dependencies
   const requiredEnvVars = [];
   const missingVars = requiredEnvVars.filter(varName => !process.env[varName]);
-  
+
   if (missingVars.length > 0) {
     console.warn(`Warning: Missing environment variables: ${missingVars.join(', ')}`);
   }
 });
 
-export {}; 
+export {};

@@ -24,7 +24,7 @@ describe('BearService Integration Tests', () => {
   describe('Database Statistics', () => {
     it('should get database statistics successfully', async () => {
       const stats = await bearService.getDatabaseStats();
-      
+
       expect(stats).toBeDefined();
       expect(typeof stats.totalNotes).toBe('number');
       expect(typeof stats.activeNotes).toBe('number');
@@ -39,7 +39,7 @@ describe('BearService Integration Tests', () => {
 
     it('should return reasonable statistics values', async () => {
       const stats = await bearService.getDatabaseStats();
-      
+
       expect(stats.totalNotes).toBeGreaterThanOrEqual(0);
       expect(stats.activeNotes).toBeGreaterThanOrEqual(0);
       expect(stats.activeNotes).toBeLessThanOrEqual(stats.totalNotes);
@@ -52,10 +52,10 @@ describe('BearService Integration Tests', () => {
   describe('Database Schema', () => {
     it('should get database schema successfully', async () => {
       const schema = await bearService.getSchema();
-      
+
       expect(Array.isArray(schema)).toBe(true);
       expect(schema.length).toBeGreaterThan(0);
-      
+
       schema.forEach(table => {
         expect(table).toHaveProperty('name');
         expect(table).toHaveProperty('sql');
@@ -67,7 +67,7 @@ describe('BearService Integration Tests', () => {
     it('should include expected Bear tables', async () => {
       const schema = await bearService.getSchema();
       const tableNames = schema.map(table => table.name);
-      
+
       expect(tableNames).toContain('ZSFNOTE');
       expect(tableNames).toContain('ZSFNOTETAG');
     });
@@ -95,34 +95,34 @@ describe('BearService Integration Tests', () => {
   describe('Notes Retrieval', () => {
     it('should get recent notes successfully', async () => {
       const notes = await bearService.getRecentNotes(5);
-      
+
       expect(Array.isArray(notes)).toBe(true);
       expect(notes.length).toBeLessThanOrEqual(5);
-      
-             notes.forEach(note => {
-         expect(note).toHaveProperty('Z_PK');
-         expect(note).toHaveProperty('ZCREATIONDATE');
-         expect(note).toHaveProperty('ZMODIFICATIONDATE');
-         expect(Array.isArray(note.tags)).toBe(true);
-       });
+
+      notes.forEach(note => {
+        expect(note).toHaveProperty('Z_PK');
+        expect(note).toHaveProperty('ZCREATIONDATE');
+        expect(note).toHaveProperty('ZMODIFICATIONDATE');
+        expect(Array.isArray(note.tags)).toBe(true);
+      });
     });
 
     it('should get notes with default limit', async () => {
       const notes = await bearService.getRecentNotes();
-      
+
       expect(Array.isArray(notes)).toBe(true);
       expect(notes.length).toBeLessThanOrEqual(10); // Default limit
     });
 
     it('should get note by ID', async () => {
       const note = await bearService.getNoteById(1);
-      
-             if (note) {
-         expect(note).toHaveProperty('Z_PK');
-         expect(note).toHaveProperty('ZCREATIONDATE');
-         expect(Array.isArray(note.tags)).toBe(true);
-         expect(note.Z_PK).toBe(1);
-       }
+
+      if (note) {
+        expect(note).toHaveProperty('Z_PK');
+        expect(note).toHaveProperty('ZCREATIONDATE');
+        expect(Array.isArray(note.tags)).toBe(true);
+        expect(note.Z_PK).toBe(1);
+      }
     });
 
     it('should return null for non-existent note ID', async () => {
@@ -132,67 +132,66 @@ describe('BearService Integration Tests', () => {
 
     it('should get note by title', async () => {
       const note = await bearService.getNoteByTitle('Test Note 1');
-      
-             if (note) {
-         expect(note).toHaveProperty('Z_PK');
-         expect(note).toHaveProperty('ZCREATIONDATE');
-         expect(note.ZTITLE).toBe('Test Note 1');
-         expect(Array.isArray(note.tags)).toBe(true);
-       }
+
+      if (note) {
+        expect(note).toHaveProperty('Z_PK');
+        expect(note).toHaveProperty('ZCREATIONDATE');
+        expect(note.ZTITLE).toBe('Test Note 1');
+        expect(Array.isArray(note.tags)).toBe(true);
+      }
     });
   });
 
   describe('Tags Operations', () => {
     it('should get all tags successfully', async () => {
       const tags = await bearService.getTags();
-      
+
       expect(Array.isArray(tags)).toBe(true);
-      
-             tags.forEach(tag => {
-         expect(tag).toHaveProperty('Z_PK');
-         expect(tag).toHaveProperty('ZTITLE');
-         expect(typeof tag.noteCount).toBe('number');
-         expect(tag.noteCount).toBeGreaterThanOrEqual(0);
-       });
-     });
 
-     it('should get notes by tag', async () => {
-       const notes = await bearService.getNotesByTag('test');
-       
-       expect(Array.isArray(notes)).toBe(true);
-       
-       notes.forEach(note => {
-         expect(note).toHaveProperty('Z_PK');
-         expect(note).toHaveProperty('ZCREATIONDATE');
-         expect(Array.isArray(note.tags)).toBe(true);
-         expect(note.tags).toContain('test');
-       });
-     });
-   });
+      tags.forEach(tag => {
+        expect(tag).toHaveProperty('Z_PK');
+        expect(tag).toHaveProperty('ZTITLE');
+        expect(typeof tag.noteCount).toBe('number');
+        expect(tag.noteCount).toBeGreaterThanOrEqual(0);
+      });
+    });
 
-   describe('Search Operations', () => {
-     it('should search notes by query', async () => {
-       const notes = await bearService.searchNotes('test');
-       
-       expect(Array.isArray(notes)).toBe(true);
-       
-       notes.forEach(note => {
-         expect(note).toHaveProperty('Z_PK');
-         expect(note).toHaveProperty('ZCREATIONDATE');
+    it('should get notes by tag', async () => {
+      const notes = await bearService.getNotesByTag('test');
+
+      expect(Array.isArray(notes)).toBe(true);
+
+      notes.forEach(note => {
+        expect(note).toHaveProperty('Z_PK');
+        expect(note).toHaveProperty('ZCREATIONDATE');
         expect(Array.isArray(note.tags)).toBe(true);
-        
+        expect(note.tags).toContain('test');
+      });
+    });
+  });
+
+  describe('Search Operations', () => {
+    it('should search notes by query', async () => {
+      const notes = await bearService.searchNotes('test');
+
+      expect(Array.isArray(notes)).toBe(true);
+
+      notes.forEach(note => {
+        expect(note).toHaveProperty('Z_PK');
+        expect(note).toHaveProperty('ZCREATIONDATE');
+        expect(Array.isArray(note.tags)).toBe(true);
+
         // Note should contain the search term in title or content
-        const containsQuery = (
+        const containsQuery =
           (note.ZTITLE && note.ZTITLE.toLowerCase().includes('test')) ||
-          (note.ZTEXT && note.ZTEXT.toLowerCase().includes('test'))
-        );
+          (note.ZTEXT && note.ZTEXT.toLowerCase().includes('test'));
         expect(containsQuery).toBe(true);
       });
     });
 
     it('should handle empty search results', async () => {
       const notes = await bearService.searchNotes('nonexistentquery123');
-      
+
       expect(Array.isArray(notes)).toBe(true);
       expect(notes.length).toBe(0);
     });
@@ -204,10 +203,10 @@ describe('BearService Integration Tests', () => {
       const brokenService = new BearService();
       (brokenService as any).database = {
         connect: jest.fn().mockRejectedValue(new Error('Connection failed')),
-        disconnect: jest.fn().mockResolvedValue(undefined)
+        disconnect: jest.fn().mockResolvedValue(undefined),
       };
 
       await expect(brokenService.getDatabaseStats()).rejects.toThrow('Connection failed');
     });
   });
-}); 
+});
