@@ -1942,6 +1942,13 @@ export class BearService {
       // Add content only (no hashtags - API will handle tags)
       if (options.content) {
         noteContent = options.content;
+        
+        // CRITICAL FIX: Remove duplicate title headers from content
+        // If content starts with a markdown header that matches the title, remove it
+        const titleHeaderPattern = new RegExp(`^#\\s+${options.title.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\s*\\n+`, 'i');
+        if (titleHeaderPattern.test(noteContent)) {
+          noteContent = noteContent.replace(titleHeaderPattern, '');
+        }
       }
       
       // Create the Bear URL with proper encoding

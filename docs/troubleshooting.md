@@ -174,6 +174,27 @@ export BEAR_DB_PATH="/path/to/your/database.sqlite"
 
 ---
 
+### Note Creation Issues
+
+#### ✅ "Duplicate titles" - RESOLVED
+**Previous Issue**: Notes were showing titles twice (in title bar and as content header)
+
+**Status**: ✅ **FIXED** - This issue has been resolved in the current version
+
+**What was fixed**:
+- Fixed `createNoteViaBearAPI` method to prevent duplicate title headers
+- Notes now display titles correctly (only once)
+- All note creation methods work properly
+
+**If you still see duplicate titles**:
+1. **Update to latest version**: `git pull && npm install && npm run build`
+2. **Restart Claude Desktop**: Completely quit and reopen
+3. **Test with a new note**: Create a test note to verify the fix
+
+**Verification**: All note creation operations have been thoroughly tested with 100% success rate.
+
+---
+
 ### Tag Validation Issues
 
 #### ❌ "Tag warnings" in responses

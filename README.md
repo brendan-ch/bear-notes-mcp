@@ -206,6 +206,7 @@ We've implemented a **best-of-both-worlds solution** that eliminates iCloud sync
 - ✅ **All write operations** - Sync-safe Bear API (6 tools)
 - ✅ **Full feature parity** - Everything works as designed
 - ✅ **iCloud sync compatible** - No conflicts or issues
+- ✅ **Duplicate title fix** - Notes display titles correctly (no duplication)
 
 ### 🙏 **Thanks to Bear Team**
 
