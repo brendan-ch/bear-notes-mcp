@@ -230,6 +230,13 @@ export class DatabaseService implements IDatabaseService {
   }
 
   /**
+   * Check if Bear app is currently running
+   */
+  async isBearRunning(): Promise<boolean> {
+    return this.database.isBearRunning();
+  }
+
+  /**
    * Dispose of the database service
    */
   async dispose(): Promise<void> {

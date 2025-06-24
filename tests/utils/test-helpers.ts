@@ -198,9 +198,21 @@ export class MockBearDatabase {
   });
 
   // Additional methods for SearchService testing
-  setQueryResult = jest.fn((result: any[]) => {
-    this.query.mockResolvedValueOnce(result);
-  });
+  setQueryResult(result: any[] | Error) {
+    if (result instanceof Error) {
+      this.query.mockRejectedValueOnce(result);
+    } else {
+      this.query.mockResolvedValueOnce(result);
+    }
+  }
+
+  setQueryOneResult(result: any | null | Error) {
+    if (result instanceof Error) {
+      this.queryOne.mockRejectedValueOnce(result);
+    } else {
+      this.queryOne.mockResolvedValueOnce(result);
+    }
+  }
 
   reset = jest.fn(() => {
     this.connected = false;
@@ -486,6 +498,37 @@ export function validateMCPResponse(response: any) {
     expect(response.content[0]).toHaveProperty('type');
     expect(response.content[0]).toHaveProperty('text');
   }
+}
+
+/**
+ * Create mock data helpers
+ */
+export function createMockTagWithCount(overrides: Partial<any> = {}): any {
+  return {
+    Z_PK: 1,
+    ZTITLE: 'test-tag',
+    ZCREATIONDATE: 694224000, // CoreData timestamp
+    ZMODIFICATIONDATE: 694224000,
+    noteCount: 1,
+    ...overrides,
+  };
+}
+
+export function createMockNoteWithTags(overrides: Partial<any> = {}): any {
+  return {
+    Z_PK: 1,
+    ZUNIQUEIDENTIFIER: 'note-uuid-123',
+    ZTITLE: 'Test Note',
+    ZTEXT: 'Test note content',
+    ZCREATIONDATE: 694224000,
+    ZMODIFICATIONDATE: 694224000,
+    ZTRASHED: 0,
+    ZARCHIVED: 0,
+    ZENCRYPTED: 0,
+    ZPINNED: 0,
+    tags: ['test', 'sample'],
+    ...overrides,
+  };
 }
 
 /**

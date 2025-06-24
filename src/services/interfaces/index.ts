@@ -31,6 +31,9 @@ export interface IDatabaseService {
   checkIntegrity(): Promise<boolean>;
   verifyAccess(): Promise<void>;
   createBackup(): Promise<string>;
+  
+  // Bear-specific operations
+  isBearRunning(): Promise<boolean>;
 }
 
 /**

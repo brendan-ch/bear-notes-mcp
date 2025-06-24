@@ -8,6 +8,7 @@ import { SERVICE_TOKENS } from './interfaces/index.js';
 import { DatabaseService } from './database-service.js';
 import { NoteService } from './note-service.js';
 import { SearchService } from './search-service.js';
+import { TagService } from './tag-service.js';
 import { config } from '../config/index.js';
 
 /**
@@ -32,8 +33,13 @@ export function bootstrapServices(): void {
     () => new SearchService()
   );
 
+  // Register TagService as singleton
+  globalContainer.registerSingleton(
+    SERVICE_TOKENS.TAG_SERVICE,
+    () => new TagService()
+  );
+
   // TODO: Register other services as they are created
-  // globalContainer.registerSingleton(SERVICE_TOKENS.TAG_SERVICE, () => new TagService());
   // globalContainer.registerSingleton(SERVICE_TOKENS.ANALYTICS_SERVICE, () => new AnalyticsService());
   // globalContainer.registerSingleton(SERVICE_TOKENS.BEAR_API_SERVICE, () => new BearApiService());
   // globalContainer.registerSingleton(SERVICE_TOKENS.FILE_SYSTEM_SERVICE, () => new FileSystemService());
@@ -54,6 +60,7 @@ export function validateServiceRegistration(): void {
     SERVICE_TOKENS.DATABASE_SERVICE,
     SERVICE_TOKENS.NOTE_SERVICE,
     SERVICE_TOKENS.SEARCH_SERVICE,
+    SERVICE_TOKENS.TAG_SERVICE,
   ];
 
   const missingServices = requiredServices.filter(
