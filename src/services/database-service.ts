@@ -5,16 +5,35 @@
 
 import { BearDatabase } from '../utils/database.js';
 import { DatabaseStats } from '../types/bear.js';
-import { IDatabaseService } from './interfaces/index.js';
+import { IDatabaseService, ICacheService, IPerformanceService, SERVICE_TOKENS } from './interfaces/index.js';
 import { config } from '../config/index.js';
 import { SqlParameters } from '../types/database.js';
+import { CacheService } from './cache-service.js';
 
 export class DatabaseService implements IDatabaseService {
   private database: BearDatabase;
   private _isConnected = false;
+  private cacheService?: ICacheService;
+  private performanceService?: IPerformanceService;
 
   constructor(dbPath?: string) {
     this.database = new BearDatabase(dbPath || config.database.bearDbPath);
+  }
+
+  /**
+   * Initialize services (called after container is set up)
+   */
+  private initializeServices(): void {
+    if (!this.cacheService) {
+      try {
+        // Use lazy loading to avoid circular dependencies
+        const containerModule = require('./container/service-container.js') as { globalContainer: { resolve: <T>(token: string) => T } };
+        this.cacheService = containerModule.globalContainer.resolve<ICacheService>(SERVICE_TOKENS.CACHE_SERVICE);
+        this.performanceService = containerModule.globalContainer.resolve<IPerformanceService>(SERVICE_TOKENS.PERFORMANCE_SERVICE);
+      } catch {
+        // Services not available yet, will retry later
+      }
+    }
   }
 
   /**
@@ -47,7 +66,44 @@ export class DatabaseService implements IDatabaseService {
     if (!this._isConnected) {
       throw new Error('Database not connected. Call connect() first.');
     }
-    return this.database.query<T>(sql, params);
+
+    this.initializeServices();
+
+    const startTime = Date.now();
+    let cacheHit = false;
+    let result: T[];
+
+    // Try cache first for SELECT queries
+    if (this.cacheService && sql.trim().toLowerCase().startsWith('select')) {
+      const cacheKey = CacheService.generateQueryKey(sql, params || []);
+      const cachedResult = await this.cacheService.get<T[]>(cacheKey);
+      
+      if (cachedResult) {
+        cacheHit = true;
+        result = cachedResult;
+      } else {
+        result = await this.database.query<T>(sql, params);
+        // Cache the result for 5 minutes for SELECT queries
+        await this.cacheService.set(cacheKey, result, { ttl: 5 * 60 * 1000 });
+      }
+    } else {
+      result = await this.database.query<T>(sql, params);
+    }
+
+    // Record performance metrics
+    if (this.performanceService) {
+      const executionTime = Date.now() - startTime;
+      await this.performanceService.recordQuery({
+        sql,
+        executionTime,
+        timestamp: new Date(),
+        resultCount: result.length,
+        cacheHit,
+        parameters: params,
+      });
+    }
+
+    return result;
   }
 
   /**
@@ -57,7 +113,44 @@ export class DatabaseService implements IDatabaseService {
     if (!this._isConnected) {
       throw new Error('Database not connected. Call connect() first.');
     }
-    return this.database.queryOne<T>(sql, params);
+
+    this.initializeServices();
+
+    const startTime = Date.now();
+    let cacheHit = false;
+    let result: T | null;
+
+    // Try cache first for SELECT queries
+    if (this.cacheService && sql.trim().toLowerCase().startsWith('select')) {
+      const cacheKey = CacheService.generateQueryKey(sql + '_ONE', params || []);
+      const cachedResult = await this.cacheService.get<T | null>(cacheKey);
+      
+      if (cachedResult !== null) {
+        cacheHit = true;
+        result = cachedResult;
+      } else {
+        result = await this.database.queryOne<T>(sql, params);
+        // Cache the result for 5 minutes for SELECT queries
+        await this.cacheService.set(cacheKey, result, { ttl: 5 * 60 * 1000 });
+      }
+    } else {
+      result = await this.database.queryOne<T>(sql, params);
+    }
+
+    // Record performance metrics
+    if (this.performanceService) {
+      const executionTime = Date.now() - startTime;
+      await this.performanceService.recordQuery({
+        sql,
+        executionTime,
+        timestamp: new Date(),
+        resultCount: result ? 1 : 0,
+        cacheHit,
+        parameters: params,
+      });
+    }
+
+    return result;
   }
 
   /**

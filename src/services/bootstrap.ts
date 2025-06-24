@@ -9,6 +9,9 @@ import { DatabaseService } from './database-service.js';
 import { NoteService } from './note-service.js';
 import { SearchService } from './search-service.js';
 import { TagService } from './tag-service.js';
+import { CacheService } from './cache-service.js';
+import { PerformanceService } from './performance-service.js';
+import { ValidationService } from './validation-service.js';
 import { config } from '../config/index.js';
 
 /**
@@ -39,6 +42,28 @@ export function bootstrapServices(): void {
     () => new TagService()
   );
 
+  // Register CacheService as singleton
+  globalContainer.registerSingleton(
+    SERVICE_TOKENS.CACHE_SERVICE,
+    () => new CacheService({
+      maxSize: config.performance.cacheEnabled ? 1000 : 0,
+      ttl: config.performance.cacheTtl * 1000,
+      enableMetrics: true,
+    })
+  );
+
+  // Register PerformanceService as singleton
+  globalContainer.registerSingleton(
+    SERVICE_TOKENS.PERFORMANCE_SERVICE,
+    () => new PerformanceService()
+  );
+
+  // Register ValidationService as singleton
+  globalContainer.registerSingleton(
+    SERVICE_TOKENS.VALIDATION_SERVICE,
+    () => new ValidationService()
+  );
+
   // TODO: Register other services as they are created
   // globalContainer.registerSingleton(SERVICE_TOKENS.ANALYTICS_SERVICE, () => new AnalyticsService());
   // globalContainer.registerSingleton(SERVICE_TOKENS.BEAR_API_SERVICE, () => new BearApiService());
@@ -61,6 +86,9 @@ export function validateServiceRegistration(): void {
     SERVICE_TOKENS.NOTE_SERVICE,
     SERVICE_TOKENS.SEARCH_SERVICE,
     SERVICE_TOKENS.TAG_SERVICE,
+    SERVICE_TOKENS.CACHE_SERVICE,
+    SERVICE_TOKENS.PERFORMANCE_SERVICE,
+    SERVICE_TOKENS.VALIDATION_SERVICE,
   ];
 
   const missingServices = requiredServices.filter(

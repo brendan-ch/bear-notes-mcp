@@ -394,12 +394,58 @@ export interface IServiceContainer {
   dispose(): Promise<void>;
 }
 
+/**
+ * Validation service interface - handles input validation and sanitization
+ */
+export interface IValidationService {
+  validate(data: Record<string, unknown>, schema: Record<string, unknown>, context?: Record<string, unknown>): {
+    isValid: boolean;
+    errors: unknown[];
+    sanitizedData?: Record<string, unknown>;
+  };
+  
+  validateField(name: string, value: unknown, rule: Record<string, unknown>, context?: Record<string, unknown>): unknown;
+  
+  sanitize(data: Record<string, unknown>, schema: Record<string, unknown>): Record<string, unknown>;
+  
+  validateMcpArgs(method: string, args: Record<string, unknown>): {
+    isValid: boolean;
+    errors: unknown[];
+    sanitizedData?: Record<string, unknown>;
+  };
+  
+  validateNoteData(data: Record<string, unknown>): {
+    isValid: boolean;
+    errors: unknown[];
+    sanitizedData?: Record<string, unknown>;
+  };
+  
+  validateSearchParams(params: Record<string, unknown>): {
+    isValid: boolean;
+    errors: unknown[];
+    sanitizedData?: Record<string, unknown>;
+  };
+  
+  validateTagParams(params: Record<string, unknown>): {
+    isValid: boolean;
+    errors: unknown[];
+    sanitizedData?: Record<string, unknown>;
+  };
+}
+
+// Re-export cache and performance interfaces
+export type { ICacheService, CacheEntry, CacheStats, CacheOptions } from '../cache-service.js';
+export type { IPerformanceService, QueryPerformance, SystemMetrics, PerformanceReport } from '../performance-service.js';
+
 // Service tokens for dependency injection
 export const SERVICE_TOKENS = {
   DATABASE_SERVICE: 'DatabaseService',
   NOTE_SERVICE: 'NoteService',
   SEARCH_SERVICE: 'SearchService',
   TAG_SERVICE: 'TagService',
+  CACHE_SERVICE: 'CacheService',
+  PERFORMANCE_SERVICE: 'PerformanceService',
+  VALIDATION_SERVICE: 'ValidationService',
   ANALYTICS_SERVICE: 'AnalyticsService',
   BEAR_API_SERVICE: 'BearApiService',
   FILE_SYSTEM_SERVICE: 'FileSystemService',
