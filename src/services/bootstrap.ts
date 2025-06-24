@@ -27,31 +27,23 @@ export function bootstrapServices(): void {
   );
 
   // Register NoteService as singleton
-  globalContainer.registerSingleton(
-    SERVICE_TOKENS.NOTE_SERVICE,
-    () => new NoteService()
-  );
+  globalContainer.registerSingleton(SERVICE_TOKENS.NOTE_SERVICE, () => new NoteService());
 
   // Register SearchService as singleton
-  globalContainer.registerSingleton(
-    SERVICE_TOKENS.SEARCH_SERVICE,
-    () => new SearchService()
-  );
+  globalContainer.registerSingleton(SERVICE_TOKENS.SEARCH_SERVICE, () => new SearchService());
 
   // Register TagService as singleton
-  globalContainer.registerSingleton(
-    SERVICE_TOKENS.TAG_SERVICE,
-    () => new TagService()
-  );
+  globalContainer.registerSingleton(SERVICE_TOKENS.TAG_SERVICE, () => new TagService());
 
   // Register CacheService as singleton
   globalContainer.registerSingleton(
     SERVICE_TOKENS.CACHE_SERVICE,
-    () => new CacheService({
-      maxSize: config.performance.cacheEnabled ? 1000 : 0,
-      ttl: config.performance.cacheTtl * 1000,
-      enableMetrics: true,
-    })
+    () =>
+      new CacheService({
+        maxSize: config.performance.cacheEnabled ? 1000 : 0,
+        ttl: config.performance.cacheTtl * 1000,
+        enableMetrics: true,
+      })
   );
 
   // Register PerformanceService as singleton
@@ -69,25 +61,23 @@ export function bootstrapServices(): void {
   // Register LoggingService as singleton
   globalContainer.registerSingleton(
     SERVICE_TOKENS.LOGGING_SERVICE,
-    () => new LoggingService({
-      level: config.env === 'development' ? 'debug' : 'info',
-      enableConsole: true,
-      enableFile: true,
-      logDir: './logs',
-      serviceName: 'bear-mcp-server',
-      environment: config.env,
-    })
+    () =>
+      new LoggingService({
+        level: config.env === 'development' ? 'debug' : 'info',
+        enableConsole: true,
+        enableFile: true,
+        logDir: './logs',
+        serviceName: 'bear-mcp-server',
+        environment: config.env,
+      })
   );
 
   // Register HealthService as singleton (with dependencies)
-  globalContainer.registerSingleton(
-    SERVICE_TOKENS.HEALTH_SERVICE,
-    () => {
-      const databaseService = globalContainer.resolve(SERVICE_TOKENS.DATABASE_SERVICE) as any;
-      const cacheService = globalContainer.resolve(SERVICE_TOKENS.CACHE_SERVICE) as any;
-      return new HealthService({}, databaseService, cacheService);
-    }
-  );
+  globalContainer.registerSingleton(SERVICE_TOKENS.HEALTH_SERVICE, () => {
+    const databaseService = globalContainer.resolve(SERVICE_TOKENS.DATABASE_SERVICE) as any;
+    const cacheService = globalContainer.resolve(SERVICE_TOKENS.CACHE_SERVICE) as any;
+    return new HealthService({}, databaseService, cacheService);
+  });
 
   // TODO: Register other services as they are created
   // globalContainer.registerSingleton(SERVICE_TOKENS.ANALYTICS_SERVICE, () => new AnalyticsService());
@@ -118,11 +108,9 @@ export function validateServiceRegistration(): void {
     SERVICE_TOKENS.HEALTH_SERVICE,
   ];
 
-  const missingServices = requiredServices.filter(
-    token => !globalContainer.isRegistered(token)
-  );
+  const missingServices = requiredServices.filter(token => !globalContainer.isRegistered(token));
 
   if (missingServices.length > 0) {
     throw new Error(`Missing service registrations: ${missingServices.join(', ')}`);
   }
-} 
+}

@@ -45,15 +45,15 @@ describe('SearchService', () => {
     it('should perform basic search using searchNotes', async () => {
       const query = 'test';
       const options = { limit: 5 };
-      
+
       // Mock database responses
       mockDatabaseService.setQueryResult([
         {
           ...mockBearNotes[0],
           tag_names: 'work,important',
           content_length: 100,
-          preview: 'Test note content...'
-        }
+          preview: 'Test note content...',
+        },
       ]);
 
       const result = await searchService.searchNotes(query, options);
@@ -64,7 +64,7 @@ describe('SearchService', () => {
       expect(result[0]).toMatchObject({
         Z_PK: mockBearNotes[0].Z_PK,
         ZTITLE: mockBearNotes[0].ZTITLE,
-        tags: ['work', 'important']
+        tags: ['work', 'important'],
       });
     });
 
@@ -82,8 +82,8 @@ describe('SearchService', () => {
           ...mockBearNotes[0],
           tag_names: 'work',
           content_length: 100,
-          preview: 'Content preview...'
-        }
+          preview: 'Content preview...',
+        },
       ]);
 
       const result = await searchService.searchNotes('');
@@ -99,15 +99,15 @@ describe('SearchService', () => {
         limit: 10,
         includeSnippets: true,
         searchFields: ['both' as const],
-        fuzzyMatch: false
+        fuzzyMatch: false,
       };
 
       mockDatabaseService.setQueryResult([
         {
           ...mockBearNotes[0],
           tag_names: 'work,important',
-          content_length: 200
-        }
+          content_length: 200,
+        },
       ]);
 
       const result = await searchService.searchNotesFullText(query, options);
@@ -125,15 +125,15 @@ describe('SearchService', () => {
       const query = 'meeting';
       const options = {
         searchFields: ['title' as const],
-        includeSnippets: false
+        includeSnippets: false,
       };
 
       mockDatabaseService.setQueryResult([
         {
           ...mockBearNotes[1],
           tag_names: 'meetings',
-          content_length: 150
-        }
+          content_length: 150,
+        },
       ]);
 
       const result = await searchService.searchNotesFullText(query, options);
@@ -146,15 +146,15 @@ describe('SearchService', () => {
       const query = 'importnt'; // Misspelled 'important'
       const options = {
         fuzzyMatch: true,
-        includeSnippets: true
+        includeSnippets: true,
       };
 
       mockDatabaseService.setQueryResult([
         {
           ...mockBearNotes[0],
           tag_names: 'work',
-          content_length: 100
-        }
+          content_length: 100,
+        },
       ]);
 
       const result = await searchService.searchNotesFullText(query, options);
@@ -167,15 +167,15 @@ describe('SearchService', () => {
       const query = 'project';
       const options = {
         tags: ['work', 'important'],
-        limit: 5
+        limit: 5,
       };
 
       mockDatabaseService.setQueryResult([
         {
           ...mockBearNotes[0],
           tag_names: 'work,important,project',
-          content_length: 200
-        }
+          content_length: 200,
+        },
       ]);
 
       const result = await searchService.searchNotesFullText(query, options);
@@ -189,15 +189,15 @@ describe('SearchService', () => {
       const query = 'test';
       const options = {
         dateFrom: new Date('2024-01-01'),
-        dateTo: new Date('2024-12-31')
+        dateTo: new Date('2024-12-31'),
       };
 
       mockDatabaseService.setQueryResult([
         {
           ...mockBearNotes[0],
           tag_names: 'test',
-          content_length: 100
-        }
+          content_length: 100,
+        },
       ]);
 
       const result = await searchService.searchNotesFullText(query, options);
@@ -207,19 +207,19 @@ describe('SearchService', () => {
 
     it('should include/exclude archived and trashed notes', async () => {
       const query = 'test';
-      
+
       // Test including archived and trashed
       const includeOptions = {
         includeArchived: true,
-        includeTrashed: true
+        includeTrashed: true,
       };
 
       mockDatabaseService.setQueryResult([
         {
           ...mockBearNotes[0],
           tag_names: 'test',
-          content_length: 100
-        }
+          content_length: 100,
+        },
       ]);
 
       const resultInclude = await searchService.searchNotesFullText(query, includeOptions);
@@ -228,15 +228,15 @@ describe('SearchService', () => {
       // Test excluding archived and trashed (default)
       const excludeOptions = {
         includeArchived: false,
-        includeTrashed: false
+        includeTrashed: false,
       };
 
       mockDatabaseService.setQueryResult([
         {
           ...mockBearNotes[0],
           tag_names: 'test',
-          content_length: 100
-        }
+          content_length: 100,
+        },
       ]);
 
       const resultExclude = await searchService.searchNotesFullText(query, excludeOptions);
@@ -252,20 +252,17 @@ describe('SearchService', () => {
       // Mock term suggestions
       mockDatabaseService.setQueryResult([
         { term: 'project', frequency: 10 },
-        { term: 'projects', frequency: 5 }
+        { term: 'projects', frequency: 5 },
       ]);
 
-      // Mock title suggestions  
+      // Mock title suggestions
       mockDatabaseService.setQueryResult([
         { title: 'Project Planning' },
-        { title: 'Project Review' }
+        { title: 'Project Review' },
       ]);
 
       // Mock tag suggestions
-      mockDatabaseService.setQueryResult([
-        { tag: 'project' },
-        { tag: 'projects' }
-      ]);
+      mockDatabaseService.setQueryResult([{ tag: 'project' }, { tag: 'projects' }]);
 
       const result = await searchService.getSearchSuggestions(partialQuery, limit);
 
@@ -294,7 +291,7 @@ describe('SearchService', () => {
       const options = {
         limit: 5,
         minSimilarity: 0.1, // Lower threshold to ensure matches
-        excludeNoteId: 1
+        excludeNoteId: 1,
       };
 
       // Mock notes with relevant content for similarity matching
@@ -303,14 +300,14 @@ describe('SearchService', () => {
           ...mockBearNotes[1],
           ZTEXT: 'Project management is important for team collaboration and success',
           tag_names: 'work,management',
-          content_length: 300
+          content_length: 300,
         },
         {
           ...mockBearNotes[2],
           ZTEXT: 'Team collaboration helps with project management workflows',
           tag_names: 'team,project',
-          content_length: 250
-        }
+          content_length: 250,
+        },
       ]);
 
       const result = await searchService.findSimilarNotes(referenceText, options);
@@ -335,15 +332,15 @@ describe('SearchService', () => {
     it('should filter by minimum similarity threshold', async () => {
       const referenceText = 'project management';
       const options = {
-        minSimilarity: 0.8 // High threshold
+        minSimilarity: 0.8, // High threshold
       };
 
       mockDatabaseService.setQueryResult([
         {
           ...mockBearNotes[0],
           tag_names: 'unrelated',
-          content_length: 100
-        }
+          content_length: 100,
+        },
       ]);
 
       const result = await searchService.findSimilarNotes(referenceText, options);
@@ -363,7 +360,7 @@ describe('SearchService', () => {
         sortBy: 'title' as const,
         sortOrder: 'asc' as const,
         limit: 10,
-        offset: 0
+        offset: 0,
       };
 
       mockDatabaseService.setQueryResult([
@@ -371,8 +368,8 @@ describe('SearchService', () => {
           ...mockBearNotes[0],
           tag_names: 'work,important',
           content_length: 200,
-          preview: 'Project content preview...'
-        }
+          preview: 'Project content preview...',
+        },
       ]);
 
       const result = await searchService.getNotesAdvanced(options);
@@ -392,14 +389,14 @@ describe('SearchService', () => {
             ...mockBearNotes[0],
             tag_names: 'test',
             content_length: 100,
-            preview: 'Test content...'
-          }
+            preview: 'Test content...',
+          },
         ]);
 
         const result = await searchService.getNotesAdvanced({
           query: 'test',
           sortBy,
-          sortOrder: 'desc'
+          sortOrder: 'desc',
         });
 
         expect(result).toHaveLength(1);
@@ -410,7 +407,7 @@ describe('SearchService', () => {
       const options = {
         query: 'test',
         limit: 5,
-        offset: 10
+        offset: 10,
       };
 
       mockDatabaseService.setQueryResult([
@@ -418,8 +415,8 @@ describe('SearchService', () => {
           ...mockBearNotes[0],
           tag_names: 'test',
           content_length: 100,
-          preview: 'Test content...'
-        }
+          preview: 'Test content...',
+        },
       ]);
 
       const result = await searchService.getNotesAdvanced(options);
@@ -440,15 +437,15 @@ describe('SearchService', () => {
         maxLength: 1000,
         isPinned: false,
         isArchived: false,
-        isTrashed: false
+        isTrashed: false,
       };
 
       mockDatabaseService.setQueryResult([
         {
           ...mockBearNotes[0],
           tag_names: 'work,important',
-          content_length: 500
-        }
+          content_length: 500,
+        },
       ]);
 
       const result = await searchService.getNotesWithCriteria(criteria);
@@ -462,15 +459,15 @@ describe('SearchService', () => {
       const criteria = {
         isPinned: true,
         isArchived: false,
-        isEncrypted: false
+        isEncrypted: false,
       };
 
       mockDatabaseService.setQueryResult([
         {
           ...mockBearNotes[0],
           tag_names: 'test',
-          content_length: 200
-        }
+          content_length: 200,
+        },
       ]);
 
       const result = await searchService.getNotesWithCriteria(criteria);
@@ -481,15 +478,15 @@ describe('SearchService', () => {
     it('should handle length filters', async () => {
       const criteria = {
         minLength: 100,
-        maxLength: 500
+        maxLength: 500,
       };
 
       mockDatabaseService.setQueryResult([
         {
           ...mockBearNotes[0],
           tag_names: 'test',
-          content_length: 300
-        }
+          content_length: 300,
+        },
       ]);
 
       const result = await searchService.getNotesWithCriteria(criteria);
@@ -508,8 +505,8 @@ describe('SearchService', () => {
       mockDatabaseService.setQueryResult([
         {
           ...mockBearNotes[0],
-          tag_names: 'work,important,project'
-        }
+          tag_names: 'work,important,project',
+        },
       ]);
 
       // Mock related by tags query
@@ -517,16 +514,16 @@ describe('SearchService', () => {
         {
           ...mockBearNotes[1],
           tag_names: 'work,meetings',
-          shared_tags: 1
-        }
+          shared_tags: 1,
+        },
       ]);
 
       // Mock related by content query
       mockDatabaseService.setQueryResult([
         {
           ...mockBearNotes[2],
-          tag_names: 'development,coding'
-        }
+          tag_names: 'development,coding',
+        },
       ]);
 
       const result = await searchService.getRelatedNotes(noteId, limit);
@@ -553,8 +550,8 @@ describe('SearchService', () => {
       mockDatabaseService.setQueryResult([
         {
           ...mockBearNotes[0],
-          tag_names: null
-        }
+          tag_names: null,
+        },
       ]);
 
       const result = await searchService.getRelatedNotes(noteId);
@@ -580,7 +577,7 @@ describe('SearchService', () => {
       expect(keywords).toContain('management');
       expect(keywords).toContain('team');
       expect(keywords).toContain('collaboration');
-      
+
       // Should not contain common words
       expect(keywords).not.toContain('this');
       expect(keywords).not.toContain('is');
@@ -621,7 +618,7 @@ describe('SearchService', () => {
         ZTITLE: 'Project Management Guide',
         ZTEXT: 'This is a comprehensive guide about project management and team collaboration.',
         tags: ['work', 'project', 'management'],
-        contentLength: 100
+        contentLength: 100,
       };
 
       const searchTerms = ['project', 'management'];
@@ -634,7 +631,7 @@ describe('SearchService', () => {
       expect(analysis).toHaveProperty('snippets');
       expect(analysis).toHaveProperty('titleMatches');
       expect(analysis).toHaveProperty('contentMatches');
-      
+
       expect(typeof analysis.relevanceScore).toBe('number');
       expect(analysis.relevanceScore).toBeGreaterThan(0);
       expect(analysis.matchedTerms).toContain('project');
@@ -675,4 +672,4 @@ describe('SearchService', () => {
       await expect(searchService.dispose()).resolves.not.toThrow();
     });
   });
-}); 
+});

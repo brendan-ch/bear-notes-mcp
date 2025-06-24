@@ -3,14 +3,7 @@
  * Defines contracts for the decomposed service architecture
  */
 
-import {
-  BearNote,
-  BearTag,
-  NoteWithTags,
-  TagWithCount,
-  DatabaseStats,
-  NoteSearchOptions,
-} from '../../types/bear.js';
+import { NoteWithTags, TagWithCount, DatabaseStats, NoteSearchOptions } from '../../types/bear.js';
 import { SqlParameters } from '../../types/database.js';
 
 /**
@@ -25,14 +18,14 @@ export interface IDatabaseService {
   // Database operations
   query<T = unknown>(sql: string, params?: SqlParameters): Promise<T[]>;
   queryOne<T = unknown>(sql: string, params?: SqlParameters): Promise<T | null>;
-  
+
   // Database maintenance
   getDatabaseStats(): Promise<DatabaseStats>;
   getSchema(): Promise<{ name: string; sql: string }[]>;
   checkIntegrity(): Promise<boolean>;
   verifyAccess(): Promise<void>;
   createBackup(): Promise<string>;
-  
+
   // Bear-specific operations
   isBearRunning(): Promise<boolean>;
 }
@@ -46,7 +39,7 @@ export interface INoteService {
   getNoteById(id: number): Promise<NoteWithTags | null>;
   getNoteByTitle(title: string): Promise<NoteWithTags | null>;
   getRecentNotes(limit?: number): Promise<NoteWithTags[]>;
-  
+
   // Note status queries
   getNoteCountsByStatus(): Promise<{
     total: number;
@@ -94,7 +87,7 @@ export interface INoteService {
 export interface ISearchService {
   // Basic search
   searchNotes(query: string, options?: NoteSearchOptions): Promise<NoteWithTags[]>;
-  
+
   // Advanced search
   searchNotesFullText(
     query: string,
@@ -186,13 +179,13 @@ export interface ITagService {
   // Tag retrieval
   getTags(): Promise<TagWithCount[]>;
   getNotesByTag(tagName: string): Promise<NoteWithTags[]>;
-  
+
   // Tag management
   validateAndSanitizeTags(tags: string[]): {
     sanitized: string[];
     warnings: string[];
   };
-  
+
   // Bear-specific tag operations
   triggerHashtagParsing(noteId?: string, noteTitle?: string): Promise<string>;
   batchTriggerHashtagParsing(options: {
@@ -344,10 +337,10 @@ export interface IAnalyticsService {
 export interface IBearApiService {
   // Bear process management
   isBearRunning(): Promise<boolean>;
-  
+
   // Bear API operations
   createNoteViaBearAPI(title: string, content: string, tags: string[]): Promise<string>;
-  
+
   // Bear cache management
   clearBearCache(): Promise<void>;
   triggerBearReparse(noteId: number): Promise<void>;
@@ -362,11 +355,11 @@ export interface IFileSystemService {
   readFile(path: string): Promise<string>;
   writeFile(path: string, content: string): Promise<void>;
   deleteFile(path: string): Promise<void>;
-  
+
   // Directory operations
   createDirectory(path: string): Promise<void>;
   listDirectory(path: string): Promise<string[]>;
-  
+
   // File metadata
   getFileStats(path: string): Promise<{
     size: number;
@@ -374,7 +367,7 @@ export interface IFileSystemService {
     isFile: boolean;
     isDirectory: boolean;
   }>;
-  
+
   // Backup operations
   createBackup(sourcePath: string, backupPath: string): Promise<string>;
 }
@@ -386,10 +379,10 @@ export interface IServiceContainer {
   // Service registration
   register<T>(token: string, factory: () => T): void;
   registerSingleton<T>(token: string, factory: () => T): void;
-  
+
   // Service resolution
   resolve<T>(token: string): T;
-  
+
   // Service lifecycle
   dispose(): Promise<void>;
 }
@@ -398,34 +391,46 @@ export interface IServiceContainer {
  * Validation service interface - handles input validation and sanitization
  */
 export interface IValidationService {
-  validate(data: Record<string, unknown>, schema: Record<string, unknown>, context?: Record<string, unknown>): {
+  validate(
+    data: Record<string, unknown>,
+    schema: Record<string, unknown>,
+    context?: Record<string, unknown>
+  ): {
     isValid: boolean;
     errors: unknown[];
     sanitizedData?: Record<string, unknown>;
   };
-  
-  validateField(name: string, value: unknown, rule: Record<string, unknown>, context?: Record<string, unknown>): unknown;
-  
+
+  validateField(
+    name: string,
+    value: unknown,
+    rule: Record<string, unknown>,
+    context?: Record<string, unknown>
+  ): unknown;
+
   sanitize(data: Record<string, unknown>, schema: Record<string, unknown>): Record<string, unknown>;
-  
-  validateMcpArgs(method: string, args: Record<string, unknown>): {
+
+  validateMcpArgs(
+    method: string,
+    args: Record<string, unknown>
+  ): {
     isValid: boolean;
     errors: unknown[];
     sanitizedData?: Record<string, unknown>;
   };
-  
+
   validateNoteData(data: Record<string, unknown>): {
     isValid: boolean;
     errors: unknown[];
     sanitizedData?: Record<string, unknown>;
   };
-  
+
   validateSearchParams(params: Record<string, unknown>): {
     isValid: boolean;
     errors: unknown[];
     sanitizedData?: Record<string, unknown>;
   };
-  
+
   validateTagParams(params: Record<string, unknown>): {
     isValid: boolean;
     errors: unknown[];
@@ -442,33 +447,47 @@ export interface ILoggingService {
   info(message: string, meta?: Record<string, unknown>): void;
   warn(message: string, meta?: Record<string, unknown>): void;
   error(message: string, error?: Error | unknown, meta?: Record<string, unknown>): void;
-  
+
   // Structured logging with context
   child(context: Record<string, unknown>): ILoggingService;
-  
+
   // Performance logging
   startTimer(label: string): () => void;
   logPerformance(operation: string, duration: number, meta?: Record<string, unknown>): void;
-  
+
   // Health checks and monitoring
-  logHealthCheck(service: string, status: 'healthy' | 'unhealthy' | 'degraded', details?: Record<string, unknown>): void;
+  logHealthCheck(
+    service: string,
+    status: 'healthy' | 'unhealthy' | 'degraded',
+    details?: Record<string, unknown>
+  ): void;
   logSystemMetrics(metrics: Record<string, unknown>): void;
-  
+
   // Service lifecycle logging
   logServiceStart(serviceName: string, version?: string): void;
   logServiceStop(serviceName: string, reason?: string): void;
-  
+
   // Database operation logging
-  logDatabaseOperation(operation: string, duration: number, rowsAffected?: number, error?: Error): void;
-  
+  logDatabaseOperation(
+    operation: string,
+    duration: number,
+    rowsAffected?: number,
+    error?: Error
+  ): void;
+
   // Security and audit logging
   logSecurityEvent(event: string, details: Record<string, unknown>): void;
-  logAuditEvent(action: string, resource: string, user?: string, details?: Record<string, unknown>): void;
-  
+  logAuditEvent(
+    action: string,
+    resource: string,
+    user?: string,
+    details?: Record<string, unknown>
+  ): void;
+
   // Configuration
   setLevel(level: 'debug' | 'info' | 'warn' | 'error'): void;
   getLevel(): string;
-  
+
   // Cleanup
   close(): Promise<void>;
 }
@@ -482,12 +501,15 @@ export interface IHealthService {
     status: 'healthy' | 'unhealthy' | 'degraded';
     timestamp: Date;
     uptime: number;
-    services: Record<string, {
-      status: 'healthy' | 'unhealthy' | 'degraded';
-      responseTime?: number;
-      error?: string;
-      lastCheck: Date;
-    }>;
+    services: Record<
+      string,
+      {
+        status: 'healthy' | 'unhealthy' | 'degraded';
+        responseTime?: number;
+        error?: string;
+        lastCheck: Date;
+      }
+    >;
     system: {
       memory: {
         used: number;
@@ -504,12 +526,24 @@ export interface IHealthService {
       };
     };
   }>;
-  
+
   // Individual service health checks
-  checkDatabaseHealth(): Promise<{ status: 'healthy' | 'unhealthy' | 'degraded'; responseTime: number; error?: string }>;
-  checkBearHealth(): Promise<{ status: 'healthy' | 'unhealthy' | 'degraded'; responseTime: number; error?: string }>;
-  checkCacheHealth(): Promise<{ status: 'healthy' | 'unhealthy' | 'degraded'; responseTime: number; error?: string }>;
-  
+  checkDatabaseHealth(): Promise<{
+    status: 'healthy' | 'unhealthy' | 'degraded';
+    responseTime: number;
+    error?: string;
+  }>;
+  checkBearHealth(): Promise<{
+    status: 'healthy' | 'unhealthy' | 'degraded';
+    responseTime: number;
+    error?: string;
+  }>;
+  checkCacheHealth(): Promise<{
+    status: 'healthy' | 'unhealthy' | 'degraded';
+    responseTime: number;
+    error?: string;
+  }>;
+
   // Monitoring configuration
   setHealthCheckInterval(intervalMs: number): void;
   startHealthChecks(): void;
@@ -518,7 +552,12 @@ export interface IHealthService {
 
 // Re-export cache and performance interfaces
 export type { ICacheService, CacheEntry, CacheStats, CacheOptions } from '../cache-service.js';
-export type { IPerformanceService, QueryPerformance, SystemMetrics, PerformanceReport } from '../performance-service.js';
+export type {
+  IPerformanceService,
+  QueryPerformance,
+  SystemMetrics,
+  PerformanceReport,
+} from '../performance-service.js';
 
 // Service tokens for dependency injection
 export const SERVICE_TOKENS = {
@@ -534,4 +573,4 @@ export const SERVICE_TOKENS = {
   ANALYTICS_SERVICE: 'AnalyticsService',
   BEAR_API_SERVICE: 'BearApiService',
   FILE_SYSTEM_SERVICE: 'FileSystemService',
-} as const; 
+} as const;

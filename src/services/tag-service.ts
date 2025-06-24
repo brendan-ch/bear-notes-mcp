@@ -6,7 +6,7 @@ import { SqlParameters } from '../types/database.js';
 
 /**
  * TagService - Handles all tag management and operations for Bear notes
- * 
+ *
  * Responsibilities:
  * - Tag retrieval and filtering
  * - Tag validation and sanitization
@@ -346,4 +346,4 @@ export class TagService implements ITagService {
     // TagService doesn't hold any persistent resources
     // Database connections are managed by DatabaseService
   }
-} 
+}

@@ -1,5 +1,9 @@
 import { TagService } from '../../src/services/tag-service.js';
-import { MockBearDatabase, createMockTagWithCount, createMockNoteWithTags } from '../utils/test-helpers.js';
+import {
+  MockBearDatabase,
+  createMockTagWithCount,
+  createMockNoteWithTags,
+} from '../utils/test-helpers.js';
 import { globalContainer } from '../../src/services/container/service-container.js';
 import { SERVICE_TOKENS } from '../../src/services/interfaces/index.js';
 import { TagWithCount, NoteWithTags } from '../../src/types/bear.js';
@@ -22,13 +26,13 @@ describe('TagService', () => {
     // Reset container and mocks
     jest.clearAllMocks();
     globalContainer.dispose();
-    
+
     // Create fresh mock database
     mockDatabase = new MockBearDatabase();
-    
+
     // Register mock database service
     globalContainer.registerSingleton(SERVICE_TOKENS.DATABASE_SERVICE, () => mockDatabase);
-    
+
     // Create TagService instance
     tagService = new TagService();
   });
@@ -148,7 +152,7 @@ describe('TagService', () => {
 
       expect(result.sanitized).toEqual([
         'workproject',
-        'personalnotes', 
+        'personalnotes',
         'project/mobile',
         'testcase',
         'under_score',
@@ -191,7 +195,9 @@ describe('TagService', () => {
 
       expect(result.sanitized).toEqual([]);
       expect(result.warnings).toHaveLength(4);
-      expect(result.warnings).toContain('Tag "---" became empty after sanitization and was ignored');
+      expect(result.warnings).toContain(
+        'Tag "---" became empty after sanitization and was ignored'
+      );
     });
 
     it('should preserve underscores as they are allowed in Bear', () => {
@@ -303,7 +309,7 @@ describe('TagService', () => {
         { Z_PK: 2, ZUNIQUEIDENTIFIER: 'uuid-2', ZTITLE: 'Note 2' },
       ];
       mockDatabase.setQueryResult(mockNotes);
-      
+
       // Mock individual note content queries
       mockDatabase.setQueryOneResult({ ZTEXT: 'Note content with #hashtags' });
     });
@@ -313,7 +319,9 @@ describe('TagService', () => {
 
       expect(result).toContain('Triggered hashtag parsing for 2/2 notes');
       expect(mockDatabase.query).toHaveBeenCalledWith(
-        expect.stringContaining('SELECT Z_PK, ZUNIQUEIDENTIFIER, ZTITLE FROM ZSFNOTE WHERE ZTRASHED = 0'),
+        expect.stringContaining(
+          'SELECT Z_PK, ZUNIQUEIDENTIFIER, ZTITLE FROM ZSFNOTE WHERE ZTRASHED = 0'
+        ),
         []
       );
     });
@@ -345,10 +353,7 @@ describe('TagService', () => {
         limit: 10,
       });
 
-      expect(mockDatabase.query).toHaveBeenCalledWith(
-        expect.stringContaining('LIMIT ?'),
-        [10]
-      );
+      expect(mockDatabase.query).toHaveBeenCalledWith(expect.stringContaining('LIMIT ?'), [10]);
     });
 
     it('should handle no notes found', async () => {
@@ -362,7 +367,8 @@ describe('TagService', () => {
 
     it('should handle notes without content gracefully', async () => {
       // First call returns notes, subsequent calls return null content
-      mockDatabase.queryOne = jest.fn()
+      mockDatabase.queryOne = jest
+        .fn()
         .mockResolvedValueOnce({ ZTEXT: null }) // First note has no content
         .mockResolvedValueOnce({ ZTEXT: null }); // Second note has no content
 
@@ -404,7 +410,7 @@ describe('TagService', () => {
   describe('service lifecycle', () => {
     it('should maintain database connection state correctly', async () => {
       await tagService.getTags();
-      
+
       expect(mockDatabase.connect).toHaveBeenCalledWith(true);
       expect(mockDatabase.disconnect).toHaveBeenCalled();
     });
@@ -422,4 +428,4 @@ describe('TagService', () => {
       expect(mockDatabase.disconnect).toHaveBeenCalledTimes(3);
     });
   });
-}); 
+});

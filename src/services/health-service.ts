@@ -6,6 +6,14 @@
 import os from 'os';
 import { IHealthService, IDatabaseService, ICacheService } from './interfaces/index.js';
 
+// Type declaration for NodeJS global
+/* eslint-disable no-undef */
+declare global {
+  namespace NodeJS {
+    interface Timeout {}
+  }
+}
+
 /**
  * Health status types
  */
@@ -100,9 +108,9 @@ export class HealthService implements IHealthService {
   async checkHealth(): Promise<HealthCheckResult> {
     const timestamp = new Date();
     const uptime = Date.now() - this.startTime;
-    
+
     const services: Record<string, ServiceHealthResult> = {};
-    
+
     // Check individual services
     try {
       services.database = await this.checkDatabaseHealth();
@@ -160,7 +168,7 @@ export class HealthService implements IHealthService {
    */
   async checkDatabaseHealth(): Promise<ServiceHealthResult> {
     const startTime = Date.now();
-    
+
     try {
       if (!this.databaseService) {
         return {
@@ -202,7 +210,7 @@ export class HealthService implements IHealthService {
    */
   async checkBearHealth(): Promise<ServiceHealthResult> {
     const startTime = Date.now();
-    
+
     try {
       if (!this.databaseService) {
         return {
@@ -251,7 +259,7 @@ export class HealthService implements IHealthService {
    */
   async checkCacheHealth(): Promise<ServiceHealthResult> {
     const startTime = Date.now();
-    
+
     try {
       if (!this.cacheService) {
         return {
@@ -265,7 +273,7 @@ export class HealthService implements IHealthService {
       // Test cache with a simple operation
       const testKey = '__health_check__';
       const testValue = { timestamp: Date.now() };
-      
+
       await this.cacheService.set(testKey, testValue, { ttl: 1000 }); // 1 second TTL
       const retrieved = await this.cacheService.get(testKey);
       await this.cacheService.delete(testKey);
@@ -334,7 +342,7 @@ export class HealthService implements IHealthService {
     system: SystemHealth
   ): HealthStatus {
     const serviceStatuses = Object.values(services).map(s => s.status);
-    
+
     // If any critical service is unhealthy, overall is unhealthy
     if (serviceStatuses.includes('unhealthy')) {
       return 'unhealthy';
@@ -358,7 +366,7 @@ export class HealthService implements IHealthService {
    */
   setHealthCheckInterval(intervalMs: number): void {
     this.config.checkInterval = intervalMs;
-    
+
     if (this.intervalId) {
       this.stopHealthChecks();
       if (this.config.enableAutoChecks) {
@@ -429,4 +437,4 @@ export class HealthService implements IHealthService {
 /**
  * Export types for external use
  */
-export type { IHealthService }; 
+export type { IHealthService };

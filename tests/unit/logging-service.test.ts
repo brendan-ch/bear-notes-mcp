@@ -14,7 +14,9 @@ jest.mock('winston', () => ({
     warn: jest.fn(),
     error: jest.fn(),
     close: jest.fn((callback?: () => void) => {
-      if (callback) callback();
+      if (callback) {
+        callback();
+      }
     }),
     level: 'info',
   })),
@@ -38,7 +40,7 @@ describe('LoggingService', () => {
   beforeEach(() => {
     // Reset mocks
     jest.clearAllMocks();
-    
+
     // Create mock logger
     mockLogger = {
       debug: jest.fn(),
@@ -46,7 +48,9 @@ describe('LoggingService', () => {
       warn: jest.fn(),
       error: jest.fn(),
       close: jest.fn((callback?: () => void) => {
-        if (callback) callback();
+        if (callback) {
+          callback();
+        }
       }),
       level: 'info',
     };
@@ -535,13 +539,15 @@ describe('LoggingService', () => {
 
     it('should get current configuration', () => {
       const config = loggingService.getConfig();
-      expect(config).toEqual(expect.objectContaining({
-        level: expect.any(String),
-        enableConsole: expect.any(Boolean),
-        enableFile: expect.any(Boolean),
-        serviceName: expect.any(String),
-        environment: expect.any(String),
-      }));
+      expect(config).toEqual(
+        expect.objectContaining({
+          level: expect.any(String),
+          enableConsole: expect.any(Boolean),
+          enableFile: expect.any(Boolean),
+          serviceName: expect.any(String),
+          environment: expect.any(String),
+        })
+      );
     });
 
     it('should update configuration', () => {
@@ -576,25 +582,27 @@ describe('LoggingService', () => {
 
   describe('Interface Compliance', () => {
     it('should implement ILoggingService interface', () => {
-      expect(loggingService).toEqual(expect.objectContaining({
-        debug: expect.any(Function),
-        info: expect.any(Function),
-        warn: expect.any(Function),
-        error: expect.any(Function),
-        child: expect.any(Function),
-        startTimer: expect.any(Function),
-        logPerformance: expect.any(Function),
-        logHealthCheck: expect.any(Function),
-        logSystemMetrics: expect.any(Function),
-        logServiceStart: expect.any(Function),
-        logServiceStop: expect.any(Function),
-        logDatabaseOperation: expect.any(Function),
-        logSecurityEvent: expect.any(Function),
-        logAuditEvent: expect.any(Function),
-        setLevel: expect.any(Function),
-        getLevel: expect.any(Function),
-        close: expect.any(Function),
-      }));
+      expect(loggingService).toEqual(
+        expect.objectContaining({
+          debug: expect.any(Function),
+          info: expect.any(Function),
+          warn: expect.any(Function),
+          error: expect.any(Function),
+          child: expect.any(Function),
+          startTimer: expect.any(Function),
+          logPerformance: expect.any(Function),
+          logHealthCheck: expect.any(Function),
+          logSystemMetrics: expect.any(Function),
+          logServiceStart: expect.any(Function),
+          logServiceStop: expect.any(Function),
+          logDatabaseOperation: expect.any(Function),
+          logSecurityEvent: expect.any(Function),
+          logAuditEvent: expect.any(Function),
+          setLevel: expect.any(Function),
+          getLevel: expect.any(Function),
+          close: expect.any(Function),
+        })
+      );
     });
 
     it('should satisfy ILoggingService type', () => {
@@ -603,4 +611,4 @@ describe('LoggingService', () => {
       expect(service).toBeDefined();
     });
   });
-}); 
+});

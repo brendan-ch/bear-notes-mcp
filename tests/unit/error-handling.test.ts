@@ -79,7 +79,7 @@ describe('Error Handling System', () => {
     it('should provide recovery actions', () => {
       const error = new TestError('Test message');
       const actions = error.getRecoveryActions();
-      
+
       expect(actions).toContain('Please try again');
       expect(actions).toContain('Contact support if the problem persists');
     });
@@ -287,7 +287,9 @@ describe('Error Handling System', () => {
     it('should create file system error', () => {
       const error = new FileSystemError('read', '/path/to/file.txt');
 
-      expect(error.message).toBe('File System service error: read failed for path: /path/to/file.txt');
+      expect(error.message).toBe(
+        'File System service error: read failed for path: /path/to/file.txt'
+      );
     });
   });
 
@@ -295,7 +297,9 @@ describe('Error Handling System', () => {
     it('should create performance error with metrics', () => {
       const error = new PerformanceError('database_query', 1000, 2500);
 
-      expect(error.message).toBe('Performance threshold exceeded for database_query: 2500ms > 1000ms');
+      expect(error.message).toBe(
+        'Performance threshold exceeded for database_query: 2500ms > 1000ms'
+      );
       expect(error.code).toBe('PERFORMANCE_THRESHOLD_EXCEEDED');
       expect(error.context.operation).toBe('database_query');
       expect(error.context.threshold).toBe(1000);
@@ -509,4 +513,4 @@ describe('Error Handling System', () => {
       expect(error.context.sql).toBe('INSERT INTO notes...');
     });
   });
-}); 
+});

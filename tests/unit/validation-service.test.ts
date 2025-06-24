@@ -138,9 +138,15 @@ describe('ValidationService', () => {
           type: 'string',
           custom: (value: unknown) => {
             const str = value as string;
-            if (str.length < 8) return 'Password must be at least 8 characters';
-            if (!/[A-Z]/.test(str)) return 'Password must contain uppercase letter';
-            if (!/[0-9]/.test(str)) return 'Password must contain number';
+            if (str.length < 8) {
+              return 'Password must be at least 8 characters';
+            }
+            if (!/[A-Z]/.test(str)) {
+              return 'Password must contain uppercase letter';
+            }
+            if (!/[0-9]/.test(str)) {
+              return 'Password must contain number';
+            }
             return true;
           },
         },
@@ -164,11 +170,15 @@ describe('ValidationService', () => {
       const schema: ValidationSchema = {
         name: {
           type: 'string',
-          sanitize: (value: unknown) => typeof value === 'string' ? value.trim().toLowerCase() : value,
+          sanitize: (value: unknown) =>
+            typeof value === 'string' ? value.trim().toLowerCase() : value,
         },
         tags: {
           type: 'array',
-          sanitize: (value: unknown) => Array.isArray(value) ? value.map(tag => typeof tag === 'string' ? tag.trim() : tag) : value,
+          sanitize: (value: unknown) =>
+            Array.isArray(value)
+              ? value.map(tag => (typeof tag === 'string' ? tag.trim() : tag))
+              : value,
         },
       };
 
@@ -430,10 +440,11 @@ describe('ValidationService', () => {
     it('should sanitize data according to schema', () => {
       const schema: ValidationSchema = {
         name: {
-          sanitize: (value: unknown) => typeof value === 'string' ? value.trim().toUpperCase() : value,
+          sanitize: (value: unknown) =>
+            typeof value === 'string' ? value.trim().toUpperCase() : value,
         },
         tags: {
-          sanitize: (value: unknown) => Array.isArray(value) ? value.filter(Boolean) : value,
+          sanitize: (value: unknown) => (Array.isArray(value) ? value.filter(Boolean) : value),
         },
       };
 
@@ -459,7 +470,7 @@ describe('ValidationUtils', () => {
         name: {
           required: true,
           type: 'string',
-          sanitize: (value: unknown) => typeof value === 'string' ? value.trim() : value,
+          sanitize: (value: unknown) => (typeof value === 'string' ? value.trim() : value),
         },
       };
 
@@ -587,4 +598,4 @@ describe('ValidationUtils', () => {
       expect(ValidationUtils.sanitizers.tag('  Work@Tag!  ')).toBe('worktag');
     });
   });
-}); 
+});

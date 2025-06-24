@@ -1,6 +1,6 @@
 /**
  * Comprehensive Error Types for Bear Notes MCP
- * 
+ *
  * This module defines a standardized error hierarchy for the entire application,
  * providing consistent error handling, context, and recovery strategies.
  */
@@ -46,7 +46,7 @@ export abstract class BaseError extends Error {
     context: ErrorContext = {}
   ) {
     super(message);
-    
+
     this.name = this.constructor.name;
     this.code = code;
     this.category = category;
@@ -101,24 +101,12 @@ export abstract class BaseError extends Error {
  * Validation and Input Errors
  */
 export class ValidationError extends BaseError {
-  constructor(
-    message: string,
-    field?: string,
-    value?: unknown,
-    context: ErrorContext = {}
-  ) {
-    super(
-      message,
-      'VALIDATION_ERROR',
-      'validation',
-      'medium',
-      true,
-      {
-        ...context,
-        field,
-        value: typeof value === 'object' ? JSON.stringify(value) : String(value),
-      }
-    );
+  constructor(message: string, field?: string, value?: unknown, context: ErrorContext = {}) {
+    super(message, 'VALIDATION_ERROR', 'validation', 'medium', true, {
+      ...context,
+      field,
+      value: typeof value === 'object' ? JSON.stringify(value) : String(value),
+    });
   }
 
   getUserMessage(): string {
@@ -136,22 +124,12 @@ export class ValidationError extends BaseError {
 
 export class RequiredFieldError extends ValidationError {
   constructor(field: string, context: ErrorContext = {}) {
-    super(
-      `Required field '${field}' is missing or empty`,
-      field,
-      undefined,
-      context
-    );
+    super(`Required field '${field}' is missing or empty`, field, undefined, context);
   }
 }
 
 export class InvalidTypeError extends ValidationError {
-  constructor(
-    field: string,
-    expectedType: string,
-    actualType: string,
-    context: ErrorContext = {}
-  ) {
+  constructor(field: string, expectedType: string, actualType: string, context: ErrorContext = {}) {
     super(
       `Field '${field}' expected ${expectedType}, got ${actualType}`,
       field,
@@ -169,20 +147,16 @@ export class InvalidRangeError extends ValidationError {
     max?: number,
     context: ErrorContext = {}
   ) {
-    const range = min !== undefined && max !== undefined 
-      ? `between ${min} and ${max}`
-      : min !== undefined 
-        ? `at least ${min}`
-        : max !== undefined
-          ? `at most ${max}`
-          : 'within valid range';
-    
-    super(
-      `Field '${field}' value ${value} must be ${range}`,
-      field,
-      value,
-      context
-    );
+    const range =
+      min !== undefined && max !== undefined
+        ? `between ${min} and ${max}`
+        : min !== undefined
+          ? `at least ${min}`
+          : max !== undefined
+            ? `at most ${max}`
+            : 'within valid range';
+
+    super(`Field '${field}' value ${value} must be ${range}`, field, value, context);
   }
 }
 
@@ -190,24 +164,12 @@ export class InvalidRangeError extends ValidationError {
  * Database and Data Access Errors
  */
 export class DatabaseError extends BaseError {
-  constructor(
-    message: string,
-    operation?: string,
-    sql?: string,
-    context: ErrorContext = {}
-  ) {
-    super(
-      message,
-      'DATABASE_ERROR',
-      'database',
-      'high',
-      true,
-      {
-        ...context,
-        operation,
-        sql,
-      }
-    );
+  constructor(message: string, operation?: string, sql?: string, context: ErrorContext = {}) {
+    super(message, 'DATABASE_ERROR', 'database', 'high', true, {
+      ...context,
+      operation,
+      sql,
+    });
   }
 
   getUserMessage(): string {
@@ -226,23 +188,13 @@ export class DatabaseError extends BaseError {
 
 export class ConnectionError extends DatabaseError {
   constructor(dbPath: string, context: ErrorContext = {}) {
-    super(
-      `Failed to connect to database at ${dbPath}`,
-      'connect',
-      undefined,
-      context
-    );
+    super(`Failed to connect to database at ${dbPath}`, 'connect', undefined, context);
   }
 }
 
 export class QueryError extends DatabaseError {
   constructor(sql: string, originalError: string, context: ErrorContext = {}) {
-    super(
-      `Query execution failed: ${originalError}`,
-      'query',
-      sql,
-      context
-    );
+    super(`Query execution failed: ${originalError}`, 'query', sql, context);
   }
 }
 
@@ -261,32 +213,17 @@ export class TransactionError extends DatabaseError {
  * Business Logic and Service Errors
  */
 export class BusinessError extends BaseError {
-  constructor(
-    message: string,
-    code: string,
-    context: ErrorContext = {}
-  ) {
-    super(
-      message,
-      code,
-      'business',
-      'medium',
-      true,
-      context
-    );
+  constructor(message: string, code: string, context: ErrorContext = {}) {
+    super(message, code, 'business', 'medium', true, context);
   }
 }
 
 export class NoteNotFoundError extends BusinessError {
   constructor(identifier: string | number, context: ErrorContext = {}) {
-    super(
-      `Note not found: ${identifier}`,
-      'NOTE_NOT_FOUND',
-      {
-        ...context,
-        noteId: typeof identifier === 'number' ? identifier : undefined,
-      }
-    );
+    super(`Note not found: ${identifier}`, 'NOTE_NOT_FOUND', {
+      ...context,
+      noteId: typeof identifier === 'number' ? identifier : undefined,
+    });
   }
 
   getUserMessage(): string {
@@ -304,21 +241,13 @@ export class NoteNotFoundError extends BusinessError {
 
 export class TagNotFoundError extends BusinessError {
   constructor(tagName: string, context: ErrorContext = {}) {
-    super(
-      `Tag not found: ${tagName}`,
-      'TAG_NOT_FOUND',
-      context
-    );
+    super(`Tag not found: ${tagName}`, 'TAG_NOT_FOUND', context);
   }
 }
 
 export class DuplicateNoteError extends BusinessError {
   constructor(title: string, context: ErrorContext = {}) {
-    super(
-      `Note with title '${title}' already exists`,
-      'DUPLICATE_NOTE',
-      context
-    );
+    super(`Note with title '${title}' already exists`, 'DUPLICATE_NOTE', context);
   }
 }
 
@@ -326,11 +255,7 @@ export class DuplicateNoteError extends BusinessError {
  * External Service and Integration Errors
  */
 export class ExternalServiceError extends BaseError {
-  constructor(
-    service: string,
-    message: string,
-    context: ErrorContext = {}
-  ) {
+  constructor(service: string, message: string, context: ErrorContext = {}) {
     super(
       `${service} service error: ${message}`,
       'EXTERNAL_SERVICE_ERROR',
@@ -366,11 +291,7 @@ export class BearAppError extends ExternalServiceError {
 
 export class FileSystemError extends ExternalServiceError {
   constructor(operation: string, path: string, context: ErrorContext = {}) {
-    super(
-      'File System',
-      `${operation} failed for path: ${path}`,
-      context
-    );
+    super('File System', `${operation} failed for path: ${path}`, context);
   }
 }
 
@@ -378,12 +299,7 @@ export class FileSystemError extends ExternalServiceError {
  * Performance and Resource Errors
  */
 export class PerformanceError extends BaseError {
-  constructor(
-    operation: string,
-    threshold: number,
-    actual: number,
-    context: ErrorContext = {}
-  ) {
+  constructor(operation: string, threshold: number, actual: number, context: ErrorContext = {}) {
     super(
       `Performance threshold exceeded for ${operation}: ${actual}ms > ${threshold}ms`,
       'PERFORMANCE_THRESHOLD_EXCEEDED',
@@ -401,11 +317,7 @@ export class PerformanceError extends BaseError {
 }
 
 export class ResourceExhaustionError extends BaseError {
-  constructor(
-    resource: string,
-    limit: number,
-    context: ErrorContext = {}
-  ) {
+  constructor(resource: string, limit: number, context: ErrorContext = {}) {
     super(
       `Resource exhaustion: ${resource} limit of ${limit} exceeded`,
       'RESOURCE_EXHAUSTION',
@@ -437,11 +349,7 @@ export class ResourceExhaustionError extends BaseError {
  * Configuration and Environment Errors
  */
 export class ConfigurationError extends BaseError {
-  constructor(
-    setting: string,
-    message: string,
-    context: ErrorContext = {}
-  ) {
+  constructor(setting: string, message: string, context: ErrorContext = {}) {
     super(
       `Configuration error for '${setting}': ${message}`,
       'CONFIGURATION_ERROR',
@@ -473,18 +381,8 @@ export class ConfigurationError extends BaseError {
  * Security and Authorization Errors
  */
 export class SecurityError extends BaseError {
-  constructor(
-    message: string,
-    context: ErrorContext = {}
-  ) {
-    super(
-      message,
-      'SECURITY_ERROR',
-      'security',
-      'critical',
-      false,
-      context
-    );
+  constructor(message: string, context: ErrorContext = {}) {
+    super(message, 'SECURITY_ERROR', 'security', 'critical', false, context);
   }
 
   getUserMessage(): string {
@@ -492,23 +390,16 @@ export class SecurityError extends BaseError {
   }
 
   getRecoveryActions(): string[] {
-    return [
-      'Check your permissions',
-      'Contact an administrator',
-      'Verify your authentication',
-    ];
+    return ['Check your permissions', 'Contact an administrator', 'Verify your authentication'];
   }
 }
 
 export class UnauthorizedError extends SecurityError {
   constructor(operation: string, context: ErrorContext = {}) {
-    super(
-      `Unauthorized access to ${operation}`,
-      {
-        ...context,
-        operation,
-      }
-    );
+    super(`Unauthorized access to ${operation}`, {
+      ...context,
+      operation,
+    });
   }
 }
 
@@ -545,22 +436,14 @@ export class ErrorUtils {
     }
 
     if (error instanceof Error) {
-      return new BusinessError(
-        error.message,
-        'UNKNOWN_ERROR',
-        {
-          ...context,
-          originalError: error.name,
-          stackTrace: error.stack,
-        }
-      );
+      return new BusinessError(error.message, 'UNKNOWN_ERROR', {
+        ...context,
+        originalError: error.name,
+        stackTrace: error.stack,
+      });
     }
 
-    return new BusinessError(
-      String(error),
-      'UNKNOWN_ERROR',
-      context
-    );
+    return new BusinessError(String(error), 'UNKNOWN_ERROR', context);
   }
 
   /**
@@ -590,4 +473,4 @@ export class ErrorUtils {
       }
     }) as T;
   }
-} 
+}

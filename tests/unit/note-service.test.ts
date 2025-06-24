@@ -39,10 +39,7 @@ describe('NoteService', () => {
     };
 
     // Register mock service in container
-    globalContainer.registerSingleton(
-      SERVICE_TOKENS.DATABASE_SERVICE,
-      () => mockDatabaseService
-    );
+    globalContainer.registerSingleton(SERVICE_TOKENS.DATABASE_SERVICE, () => mockDatabaseService);
 
     noteService = new NoteService();
   });
@@ -88,10 +85,12 @@ describe('NoteService', () => {
     });
 
     it('should handle empty tag names', async () => {
-      mockDatabaseService.query.mockResolvedValue([{
-        ...mockNotes[0],
-        tag_names: null,
-      }]);
+      mockDatabaseService.query.mockResolvedValue([
+        {
+          ...mockNotes[0],
+          tag_names: null,
+        },
+      ]);
 
       const result = await noteService.getNotes();
       expect(result[0].tags).toEqual([]);
@@ -279,10 +278,10 @@ describe('NoteService', () => {
     it('should get note counts by status', async () => {
       mockDatabaseService.queryOne
         .mockResolvedValueOnce({ count: 100 }) // total
-        .mockResolvedValueOnce({ count: 80 })  // active
-        .mockResolvedValueOnce({ count: 10 })  // trashed
-        .mockResolvedValueOnce({ count: 5 })   // archived
-        .mockResolvedValueOnce({ count: 3 });  // encrypted
+        .mockResolvedValueOnce({ count: 80 }) // active
+        .mockResolvedValueOnce({ count: 10 }) // trashed
+        .mockResolvedValueOnce({ count: 5 }) // archived
+        .mockResolvedValueOnce({ count: 3 }); // encrypted
 
       const result = await noteService.getNoteCountsByStatus();
 
@@ -326,9 +325,7 @@ describe('NoteService', () => {
     });
 
     it('should throw error for empty title', async () => {
-      await expect(
-        noteService.createNote({ title: '' })
-      ).rejects.toThrow(BearSafetyError);
+      await expect(noteService.createNote({ title: '' })).rejects.toThrow(BearSafetyError);
     });
 
     it('should handle archived notes', async () => {
@@ -375,9 +372,9 @@ describe('NoteService', () => {
     it('should throw error if note creation fails', async () => {
       mockDatabaseService.query.mockRejectedValue(new Error('Insert failed'));
 
-      await expect(
-        noteService.createNote({ title: 'Test Note' })
-      ).rejects.toThrow(BearDatabaseError);
+      await expect(noteService.createNote({ title: 'Test Note' })).rejects.toThrow(
+        BearDatabaseError
+      );
     });
   });
 
@@ -407,15 +404,15 @@ describe('NoteService', () => {
     it('should throw error if note not found', async () => {
       mockDatabaseService.queryOne.mockResolvedValue(null);
 
-      await expect(
-        noteService.updateNote(999, { title: 'New Title' })
-      ).rejects.toThrow(BearDatabaseError);
+      await expect(noteService.updateNote(999, { title: 'New Title' })).rejects.toThrow(
+        BearDatabaseError
+      );
     });
 
     it('should detect modification conflicts', async () => {
       const oldDate = new Date('2024-01-01');
       const expectedDate = new Date('2024-01-02');
-      
+
       mockDatabaseService.queryOne.mockResolvedValue({
         ...mockExistingNote,
         ZMODIFICATIONDATE: MockCoreDataUtils.fromDate(oldDate),
@@ -457,7 +454,7 @@ describe('NoteService', () => {
     it('should duplicate note successfully', async () => {
       mockDatabaseService.queryOne
         .mockResolvedValueOnce(mockOriginalNote) // Get original note
-        .mockResolvedValueOnce({ Z_PK: 2 });     // New note ID
+        .mockResolvedValueOnce({ Z_PK: 2 }); // New note ID
 
       const createNoteSpy = jest.spyOn(noteService, 'createNote').mockResolvedValue({
         noteId: 'new-uuid',
@@ -481,10 +478,7 @@ describe('NoteService', () => {
 
     it('should copy tags when specified', async () => {
       mockDatabaseService.queryOne.mockResolvedValueOnce(mockOriginalNote);
-      mockDatabaseService.query.mockResolvedValue([
-        { ZTITLE: 'tag1' },
-        { ZTITLE: 'tag2' },
-      ]);
+      mockDatabaseService.query.mockResolvedValue([{ ZTITLE: 'tag1' }, { ZTITLE: 'tag2' }]);
 
       const createNoteSpy = jest.spyOn(noteService, 'createNote').mockResolvedValue({
         noteId: 'new-uuid',
@@ -520,9 +514,7 @@ describe('NoteService', () => {
     it('should throw error if original note not found', async () => {
       mockDatabaseService.queryOne.mockResolvedValue(null);
 
-      await expect(
-        noteService.duplicateNote(999)
-      ).rejects.toThrow(BearDatabaseError);
+      await expect(noteService.duplicateNote(999)).rejects.toThrow(BearDatabaseError);
     });
   });
 
@@ -544,9 +536,7 @@ describe('NoteService', () => {
     it('should handle database errors', async () => {
       mockDatabaseService.query.mockRejectedValue(new Error('Update failed'));
 
-      await expect(
-        noteService.archiveNote(1, true)
-      ).rejects.toThrow(BearDatabaseError);
+      await expect(noteService.archiveNote(1, true)).rejects.toThrow(BearDatabaseError);
     });
   });
 
@@ -554,7 +544,7 @@ describe('NoteService', () => {
     it('should generate UUID in uppercase', () => {
       const noteServiceAny = noteService as any;
       const uuid = noteServiceAny.generateUUID();
-      
+
       expect(uuid).toBe('MOCK-UUID-1234');
     });
 
@@ -576,10 +566,10 @@ describe('NoteService', () => {
 
     it('should sanitize tag names correctly', () => {
       const noteServiceAny = noteService as any;
-      
+
       expect(noteServiceAny.sanitizeTagName('tag@name!')).toBe('tagname');
       expect(noteServiceAny.sanitizeTagName('  spaced  tag  ')).toBe('spaced tag');
       expect(noteServiceAny.sanitizeTagName('tag-with_underscores')).toBe('tag-with_underscores');
     });
   });
-}); 
+});

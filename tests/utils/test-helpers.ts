@@ -170,12 +170,14 @@ export class MockBearDatabase {
     return results.length > 0 ? results[0] : null;
   });
 
-  execute = jest.fn(async (sql: string, params: any[] = []): Promise<{ changes: number; lastID: number }> => {
-    if (!this.connected || this.readOnly) {
-      throw new Error('Database not writable');
+  execute = jest.fn(
+    async (sql: string, params: any[] = []): Promise<{ changes: number; lastID: number }> => {
+      if (!this.connected || this.readOnly) {
+        throw new Error('Database not writable');
+      }
+      return { changes: 1, lastID: 1 };
     }
-    return { changes: 1, lastID: 1 };
-  });
+  );
 
   isBearRunning = jest.fn(async (): Promise<boolean> => {
     return false; // Always return false in tests
@@ -218,7 +220,7 @@ export class MockBearDatabase {
     this.connected = false;
     this.readOnly = true;
     jest.clearAllMocks();
-    
+
     // Re-initialize all mock functions
     this.connect = jest.fn(async (readOnly: boolean = true): Promise<void> => {
       this.connected = true;
@@ -353,9 +355,9 @@ export class MockBearDatabase {
                 ? 'archived,old'
                 : note.Z_PK === 3
                   ? 'trash'
-                : note.Z_PK === 4
-                  ? 'important,pinned'
-                  : 'quick,untitled',
+                  : note.Z_PK === 4
+                    ? 'important,pinned'
+                    : 'quick,untitled',
         }));
 
         return notesWithTags;
@@ -369,12 +371,14 @@ export class MockBearDatabase {
       return results.length > 0 ? results[0] : null;
     });
 
-    this.execute = jest.fn(async (sql: string, params: any[] = []): Promise<{ changes: number; lastID: number }> => {
-      if (!this.connected || this.readOnly) {
-        throw new Error('Database not writable');
+    this.execute = jest.fn(
+      async (sql: string, params: any[] = []): Promise<{ changes: number; lastID: number }> => {
+        if (!this.connected || this.readOnly) {
+          throw new Error('Database not writable');
+        }
+        return { changes: 1, lastID: 1 };
       }
-      return { changes: 1, lastID: 1 };
-    });
+    );
 
     this.isBearRunning = jest.fn(async (): Promise<boolean> => {
       return false; // Always return false in tests

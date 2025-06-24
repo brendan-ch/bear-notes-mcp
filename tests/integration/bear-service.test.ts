@@ -6,7 +6,7 @@
 import { describe, it, expect, beforeEach, afterEach } from '@jest/globals';
 import { BearService } from '../../src/services/bear-service.js';
 import { createMockBearService, setupTestEnvironment } from '../utils/test-helpers.js';
-import { mockDatabaseStats } from '../fixtures/bear-data.js';
+// Removed unused import mockDatabaseStats
 
 describe('BearService Integration Tests', () => {
   let bearService: BearService;

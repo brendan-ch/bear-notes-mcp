@@ -5,7 +5,12 @@
 
 import { BearDatabase } from '../utils/database.js';
 import { DatabaseStats } from '../types/bear.js';
-import { IDatabaseService, ICacheService, IPerformanceService, SERVICE_TOKENS } from './interfaces/index.js';
+import {
+  IDatabaseService,
+  ICacheService,
+  IPerformanceService,
+  SERVICE_TOKENS,
+} from './interfaces/index.js';
 import { config } from '../config/index.js';
 import { SqlParameters } from '../types/database.js';
 import { CacheService } from './cache-service.js';
@@ -27,9 +32,15 @@ export class DatabaseService implements IDatabaseService {
     if (!this.cacheService) {
       try {
         // Use lazy loading to avoid circular dependencies
-        const containerModule = require('./container/service-container.js') as { globalContainer: { resolve: <T>(token: string) => T } };
-        this.cacheService = containerModule.globalContainer.resolve<ICacheService>(SERVICE_TOKENS.CACHE_SERVICE);
-        this.performanceService = containerModule.globalContainer.resolve<IPerformanceService>(SERVICE_TOKENS.PERFORMANCE_SERVICE);
+        const containerModule = require('./container/service-container.js') as {
+          globalContainer: { resolve: <T>(token: string) => T };
+        };
+        this.cacheService = containerModule.globalContainer.resolve<ICacheService>(
+          SERVICE_TOKENS.CACHE_SERVICE
+        );
+        this.performanceService = containerModule.globalContainer.resolve<IPerformanceService>(
+          SERVICE_TOKENS.PERFORMANCE_SERVICE
+        );
       } catch {
         // Services not available yet, will retry later
       }
@@ -77,7 +88,7 @@ export class DatabaseService implements IDatabaseService {
     if (this.cacheService && sql.trim().toLowerCase().startsWith('select')) {
       const cacheKey = CacheService.generateQueryKey(sql, params || []);
       const cachedResult = await this.cacheService.get<T[]>(cacheKey);
-      
+
       if (cachedResult) {
         cacheHit = true;
         result = cachedResult;
@@ -122,9 +133,9 @@ export class DatabaseService implements IDatabaseService {
 
     // Try cache first for SELECT queries
     if (this.cacheService && sql.trim().toLowerCase().startsWith('select')) {
-      const cacheKey = CacheService.generateQueryKey(sql + '_ONE', params || []);
+      const cacheKey = CacheService.generateQueryKey(`${sql}_ONE`, params || []);
       const cachedResult = await this.cacheService.get<T | null>(cacheKey);
-      
+
       if (cachedResult !== null) {
         cacheHit = true;
         result = cachedResult;
@@ -158,7 +169,7 @@ export class DatabaseService implements IDatabaseService {
    */
   async getDatabaseStats(): Promise<DatabaseStats> {
     const wasConnected = this._isConnected;
-    
+
     if (!wasConnected) {
       await this.connect(true); // Read-only connection
     }
@@ -217,7 +228,7 @@ export class DatabaseService implements IDatabaseService {
    */
   async getSchema(): Promise<{ name: string; sql: string }[]> {
     const wasConnected = this._isConnected;
-    
+
     if (!wasConnected) {
       await this.connect(true); // Read-only connection
     }
@@ -239,7 +250,7 @@ export class DatabaseService implements IDatabaseService {
    */
   async checkIntegrity(): Promise<boolean> {
     const wasConnected = this._isConnected;
-    
+
     if (!wasConnected) {
       await this.connect(true); // Read-only connection
     }
@@ -259,7 +270,7 @@ export class DatabaseService implements IDatabaseService {
    */
   async verifyAccess(): Promise<void> {
     const wasConnected = this._isConnected;
-    
+
     if (!wasConnected) {
       await this.connect(true); // Read-only connection
     }
@@ -280,7 +291,7 @@ export class DatabaseService implements IDatabaseService {
   async createBackup(): Promise<string> {
     const fs = await import('fs/promises');
     const path = await import('path');
-    
+
     const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
     const backupDir = config.database.backupDir;
     const dbPath = this.database['dbPath'];
@@ -312,7 +323,7 @@ export class DatabaseService implements IDatabaseService {
     }
 
     await this.query('BEGIN TRANSACTION');
-    
+
     try {
       const result = await callback();
       await this.query('COMMIT');
@@ -338,4 +349,4 @@ export class DatabaseService implements IDatabaseService {
       await this.disconnect();
     }
   }
-} 
+}

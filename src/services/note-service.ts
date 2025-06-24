@@ -25,7 +25,9 @@ export class NoteService implements INoteService {
   private databaseService: IDatabaseService;
 
   constructor() {
-    this.databaseService = globalContainer.resolve<IDatabaseService>(SERVICE_TOKENS.DATABASE_SERVICE);
+    this.databaseService = globalContainer.resolve<IDatabaseService>(
+      SERVICE_TOKENS.DATABASE_SERVICE
+    );
   }
 
   /**
@@ -141,7 +143,9 @@ export class NoteService implements INoteService {
         LIMIT 1
       `;
 
-      const row = await this.databaseService.queryOne<BearNote & { tag_names: string }>(sql, [title]);
+      const row = await this.databaseService.queryOne<BearNote & { tag_names: string }>(sql, [
+        title,
+      ]);
 
       if (!row) {
         return null;
@@ -176,21 +180,22 @@ export class NoteService implements INoteService {
     await this.databaseService.connect(true);
 
     try {
-      const [totalNotes, activeNotes, trashedNotes, archivedNotes, encryptedNotes] = await Promise.all([
-        this.databaseService.queryOne<{ count: number }>('SELECT COUNT(*) as count FROM ZSFNOTE'),
-        this.databaseService.queryOne<{ count: number }>(
-          'SELECT COUNT(*) as count FROM ZSFNOTE WHERE ZTRASHED = 0'
-        ),
-        this.databaseService.queryOne<{ count: number }>(
-          'SELECT COUNT(*) as count FROM ZSFNOTE WHERE ZTRASHED = 1'
-        ),
-        this.databaseService.queryOne<{ count: number }>(
-          'SELECT COUNT(*) as count FROM ZSFNOTE WHERE ZARCHIVED = 1'
-        ),
-        this.databaseService.queryOne<{ count: number }>(
-          'SELECT COUNT(*) as count FROM ZSFNOTE WHERE ZENCRYPTED = 1'
-        ),
-      ]);
+      const [totalNotes, activeNotes, trashedNotes, archivedNotes, encryptedNotes] =
+        await Promise.all([
+          this.databaseService.queryOne<{ count: number }>('SELECT COUNT(*) as count FROM ZSFNOTE'),
+          this.databaseService.queryOne<{ count: number }>(
+            'SELECT COUNT(*) as count FROM ZSFNOTE WHERE ZTRASHED = 0'
+          ),
+          this.databaseService.queryOne<{ count: number }>(
+            'SELECT COUNT(*) as count FROM ZSFNOTE WHERE ZTRASHED = 1'
+          ),
+          this.databaseService.queryOne<{ count: number }>(
+            'SELECT COUNT(*) as count FROM ZSFNOTE WHERE ZARCHIVED = 1'
+          ),
+          this.databaseService.queryOne<{ count: number }>(
+            'SELECT COUNT(*) as count FROM ZSFNOTE WHERE ZENCRYPTED = 1'
+          ),
+        ]);
 
       return {
         total: totalNotes?.count || 0,
@@ -276,7 +281,9 @@ export class NoteService implements INoteService {
         tagWarnings: tagWarnings.length > 0 ? tagWarnings : undefined,
       };
     } catch (error) {
-      throw new BearDatabaseError(`Failed to create note: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      throw new BearDatabaseError(
+        `Failed to create note: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
     } finally {
       await this.databaseService.disconnect();
     }
@@ -334,10 +341,7 @@ export class NoteService implements INoteService {
 
       if (options.isArchived !== undefined) {
         updateFields.push('ZARCHIVED = ?', 'ZARCHIVEDDATE = ?');
-        updateParams.push(
-          options.isArchived ? 1 : 0,
-          options.isArchived ? now : null
-        );
+        updateParams.push(options.isArchived ? 1 : 0, options.isArchived ? now : null);
       }
 
       if (options.isPinned !== undefined) {
@@ -353,7 +357,8 @@ export class NoteService implements INoteService {
       updateParams.push(noteId);
 
       // Execute update if there are fields to update
-      if (updateFields.length > 1) { // > 1 because we always have ZMODIFICATIONDATE
+      if (updateFields.length > 1) {
+        // > 1 because we always have ZMODIFICATIONDATE
         const updateSql = `UPDATE ZSFNOTE SET ${updateFields.join(', ')} WHERE Z_PK = ?`;
         await this.databaseService.query(updateSql, updateParams);
       }
@@ -378,7 +383,9 @@ export class NoteService implements INoteService {
         tagWarnings: tagWarnings.length > 0 ? tagWarnings : undefined,
       };
     } catch (error) {
-      throw new BearDatabaseError(`Failed to update note: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      throw new BearDatabaseError(
+        `Failed to update note: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
     } finally {
       await this.databaseService.disconnect();
     }
@@ -422,7 +429,9 @@ export class NoteService implements INoteService {
 
       // Create the duplicate
       const suffix = options.titleSuffix || ' Copy';
-      const duplicateTitle = originalNote.ZTITLE ? `${originalNote.ZTITLE}${suffix}` : `Untitled${suffix}`;
+      const duplicateTitle = originalNote.ZTITLE
+        ? `${originalNote.ZTITLE}${suffix}`
+        : `Untitled${suffix}`;
 
       const result = await this.createNote({
         title: duplicateTitle,
@@ -437,7 +446,9 @@ export class NoteService implements INoteService {
         success: result.success,
       };
     } catch (error) {
-      throw new BearDatabaseError(`Failed to duplicate note: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      throw new BearDatabaseError(
+        `Failed to duplicate note: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
     } finally {
       await this.databaseService.disconnect();
     }
@@ -457,16 +468,13 @@ export class NoteService implements INoteService {
         WHERE Z_PK = ?
       `;
 
-      await this.databaseService.query(sql, [
-        archived ? 1 : 0,
-        archived ? now : null,
-        now,
-        noteId,
-      ]);
+      await this.databaseService.query(sql, [archived ? 1 : 0, archived ? now : null, now, noteId]);
 
       return { success: true };
     } catch (error) {
-      throw new BearDatabaseError(`Failed to ${archived ? 'archive' : 'unarchive'} note: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      throw new BearDatabaseError(
+        `Failed to ${archived ? 'archive' : 'unarchive'} note: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
     } finally {
       await this.databaseService.disconnect();
     }
@@ -494,7 +502,7 @@ export class NoteService implements INoteService {
       }
 
       const sanitizedTag = this.sanitizeTagName(tag.trim());
-      
+
       if (!sanitizedTag) {
         warnings.push(`Tag "${tag}" resulted in empty string after sanitization`);
         continue;
@@ -518,7 +526,10 @@ export class NoteService implements INoteService {
   }
 
   private sanitizeTagName(tagName: string): string {
-    return tagName.replace(/[^\w\s-]/g, '').replace(/\s+/g, ' ').trim();
+    return tagName
+      .replace(/[^\w\s-]/g, '')
+      .replace(/\s+/g, ' ')
+      .trim();
   }
 
   private async createNoteTags(noteId: number, tags: string[]): Promise<void> {
@@ -553,4 +564,4 @@ export class NoteService implements INoteService {
       }
     }
   }
-} 
+}

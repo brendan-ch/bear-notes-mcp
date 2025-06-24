@@ -45,7 +45,7 @@ export class ServiceContainer implements IServiceContainer {
    */
   resolve<T>(token: string): T {
     const registration = this.services.get(token);
-    
+
     if (!registration) {
       throw new Error(`Service not registered: ${token}`);
     }
@@ -61,7 +61,7 @@ export class ServiceContainer implements IServiceContainer {
     // Store singleton instance
     if (registration.singleton) {
       registration.instance = instance;
-      
+
       // Track disposable services
       if (instance && typeof instance.dispose === 'function') {
         this.disposables.push(instance);
@@ -131,7 +131,7 @@ export class ServiceContainer implements IServiceContainer {
    */
   createChild(): ServiceContainer {
     const child = new ServiceContainer();
-    
+
     // Copy all registrations to child
     for (const [token, registration] of this.services.entries()) {
       child.services.set(token, {
@@ -153,7 +153,7 @@ export class ServiceContainer implements IServiceContainer {
     hasInstance: boolean;
   } | null {
     const registration = this.services.get(token);
-    
+
     if (!registration) {
       return null;
     }
@@ -170,4 +170,4 @@ export class ServiceContainer implements IServiceContainer {
  * Global service container instance
  * Can be used throughout the application
  */
-export const globalContainer = new ServiceContainer(); 
+export const globalContainer = new ServiceContainer();

@@ -6,7 +6,7 @@ import { SqlParameters } from '../types/database.js';
 
 /**
  * SearchService - Handles all search and filtering operations for Bear notes
- * 
+ *
  * Responsibilities:
  * - Basic and advanced note searching
  * - Full-text search with relevance scoring
@@ -631,20 +631,25 @@ export class SearchService implements ISearchService {
 
     try {
       // Get the source note's tags and content keywords
-      const sourceNote = await this.database.queryOne<any & { tag_names: string }>(`
+      const sourceNote = await this.database.queryOne<any & { tag_names: string }>(
+        `
         SELECT n.*, GROUP_CONCAT(DISTINCT t.ZTITLE) as tag_names
         FROM ZSFNOTE n
         LEFT JOIN Z_5TAGS nt ON n.Z_PK = nt.Z_5NOTES
         LEFT JOIN ZSFNOTETAG t ON nt.Z_13TAGS = t.Z_PK
         WHERE n.Z_PK = ?
         GROUP BY n.Z_PK
-      `, [noteId]);
+      `,
+        [noteId]
+      );
 
       if (!sourceNote) {
         return { byTags: [], byContent: [] };
       }
 
-      const sourceTags = sourceNote.tag_names ? sourceNote.tag_names.split(',').filter(Boolean) : [];
+      const sourceTags = sourceNote.tag_names
+        ? sourceNote.tag_names.split(',').filter(Boolean)
+        : [];
 
       // Find notes with shared tags
       const relatedByTags =
@@ -882,4 +887,4 @@ export class SearchService implements ISearchService {
     // Clean up any resources if needed
     // SearchService doesn't maintain persistent connections
   }
-} 
+}

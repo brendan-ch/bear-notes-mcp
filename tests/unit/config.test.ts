@@ -1,5 +1,4 @@
 import {
-  config,
   getConfig,
   isDevelopment,
   isProduction,

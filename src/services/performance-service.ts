@@ -125,7 +125,7 @@ export class PerformanceService implements IPerformanceService {
    */
   async getPerformanceReport(since?: Date): Promise<PerformanceReport> {
     const cutoffDate = since || new Date(Date.now() - 24 * 60 * 60 * 1000); // Last 24 hours
-    
+
     const relevantQueries = this.queryHistory.filter(q => q.timestamp >= cutoffDate);
     const relevantMetrics = this.systemMetricsHistory.filter(m => m.timestamp >= cutoffDate);
 
@@ -135,13 +135,13 @@ export class PerformanceService implements IPerformanceService {
     const averageQueryTime = totalQueries > 0 ? totalExecutionTime / totalQueries : 0;
 
     const slowestQuery = relevantQueries.reduce(
-      (slowest, current) => 
+      (slowest, current) =>
         !slowest || current.executionTime > slowest.executionTime ? current : slowest,
       null as QueryPerformance | null
     );
 
     const fastestQuery = relevantQueries.reduce(
-      (fastest, current) => 
+      (fastest, current) =>
         !fastest || current.executionTime < fastest.executionTime ? current : fastest,
       null as QueryPerformance | null
     );
@@ -165,11 +165,11 @@ export class PerformanceService implements IPerformanceService {
     };
 
     // Generate recommendations
-    const recommendations = await this.generateRecommendations(
-      relevantQueries,
-      latestMetrics,
-      { averageQueryTime, cacheHitRate, slowQueries: slowQueries.length }
-    );
+    const recommendations = await this.generateRecommendations(relevantQueries, latestMetrics, {
+      averageQueryTime,
+      cacheHitRate,
+      slowQueries: slowQueries.length,
+    });
 
     return {
       summary: {
@@ -194,7 +194,10 @@ export class PerformanceService implements IPerformanceService {
   /**
    * Get slow queries above threshold
    */
-  async getSlowQueries(limit: number = 10, threshold: number = this.slowQueryThreshold): Promise<QueryPerformance[]> {
+  async getSlowQueries(
+    limit: number = 10,
+    threshold: number = this.slowQueryThreshold
+  ): Promise<QueryPerformance[]> {
     return this.queryHistory
       .filter(q => q.executionTime > threshold)
       .sort((a, b) => b.executionTime - a.executionTime)
@@ -294,7 +297,9 @@ export class PerformanceService implements IPerformanceService {
 
     // General recommendations
     if (recommendations.length === 0) {
-      recommendations.push('Performance looks good! No specific optimizations recommended at this time.');
+      recommendations.push(
+        'Performance looks good! No specific optimizations recommended at this time.'
+      );
     }
 
     return recommendations;
@@ -327,7 +332,7 @@ export class PerformanceService implements IPerformanceService {
 
       try {
         const result = await fn(...args);
-        
+
         // Try to determine result count
         if (Array.isArray(result)) {
           resultCount = result.length;
@@ -366,4 +371,4 @@ export class PerformanceService implements IPerformanceService {
       }
     }) as T;
   }
-} 
+}

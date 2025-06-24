@@ -1,4 +1,8 @@
-import { PerformanceService, QueryPerformance, SystemMetrics } from '../../src/services/performance-service.js';
+import {
+  PerformanceService,
+  QueryPerformance,
+  SystemMetrics,
+} from '../../src/services/performance-service.js';
 
 describe('PerformanceService', () => {
   let performanceService: PerformanceService;
@@ -61,7 +65,7 @@ describe('PerformanceService', () => {
       const report = await performanceService.getPerformanceReport();
       expect(report.summary.totalQueries).toBe(3);
       expect(report.summary.averageQueryTime).toBeCloseTo(116.67, 2); // (100+200+50)/3
-      expect(report.summary.cacheHitRate).toBe(1/3); // 1 hit out of 3
+      expect(report.summary.cacheHitRate).toBe(1 / 3); // 1 hit out of 3
     });
 
     it('should identify slowest and fastest queries', async () => {
@@ -299,7 +303,7 @@ describe('PerformanceService', () => {
       }
 
       const recommendations = await performanceService.getRecommendations();
-      const hasQueryTimeRecommendation = recommendations.some(r => 
+      const hasQueryTimeRecommendation = recommendations.some(r =>
         r.includes('Average query time is high')
       );
 
@@ -316,9 +320,7 @@ describe('PerformanceService', () => {
       });
 
       const recommendations = await performanceService.getRecommendations();
-      const hasSlowQueryRecommendation = recommendations.some(r => 
-        r.includes('slow queries')
-      );
+      const hasSlowQueryRecommendation = recommendations.some(r => r.includes('slow queries'));
 
       expect(hasSlowQueryRecommendation).toBe(true);
     });
@@ -336,9 +338,7 @@ describe('PerformanceService', () => {
       }
 
       const recommendations = await performanceService.getRecommendations();
-      const hasCacheRecommendation = recommendations.some(r => 
-        r.includes('Cache hit rate is low')
-      );
+      const hasCacheRecommendation = recommendations.some(r => r.includes('Cache hit rate is low'));
 
       expect(hasCacheRecommendation).toBe(true);
     });
@@ -356,9 +356,7 @@ describe('PerformanceService', () => {
       }
 
       const recommendations = await performanceService.getRecommendations();
-      const hasLikeRecommendation = recommendations.some(r => 
-        r.includes('LIKE queries detected')
-      );
+      const hasLikeRecommendation = recommendations.some(r => r.includes('LIKE queries detected'));
 
       expect(hasLikeRecommendation).toBe(true);
     });
@@ -376,7 +374,7 @@ describe('PerformanceService', () => {
       }
 
       const recommendations = await performanceService.getRecommendations();
-      const hasCountRecommendation = recommendations.some(r => 
+      const hasCountRecommendation = recommendations.some(r =>
         r.includes('COUNT queries detected')
       );
 
@@ -396,7 +394,7 @@ describe('PerformanceService', () => {
       }
 
       const recommendations = await performanceService.getRecommendations();
-      const hasRepeatedQueryRecommendation = recommendations.some(r => 
+      const hasRepeatedQueryRecommendation = recommendations.some(r =>
         r.includes('repeated queries detected')
       );
 
@@ -418,9 +416,7 @@ describe('PerformanceService', () => {
       await performanceService.recordSystemMetrics();
 
       const recommendations = await performanceService.getRecommendations();
-      const hasPositiveFeedback = recommendations.some(r => 
-        r.includes('Performance looks good')
-      );
+      const hasPositiveFeedback = recommendations.some(r => r.includes('Performance looks good'));
 
       expect(hasPositiveFeedback).toBe(true);
     });
@@ -429,7 +425,7 @@ describe('PerformanceService', () => {
   describe('Performance Wrapper', () => {
     it('should create performance tracking wrapper', async () => {
       let executionCount = 0;
-      
+
       const testFunction = async (...args: unknown[]): Promise<string[]> => {
         executionCount++;
         await new Promise(resolve => setTimeout(resolve, 100)); // Simulate work
@@ -528,4 +524,4 @@ describe('PerformanceService', () => {
       expect(report.summary.totalQueries).toBe(100);
     });
   });
-}); 
+});

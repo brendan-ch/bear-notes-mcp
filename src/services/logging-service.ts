@@ -77,21 +77,21 @@ export class LoggingService implements ILoggingService {
 
     // Add service context
     formats.push(
-      winston.format.printf((info) => {
+      winston.format.printf(info => {
         const { timestamp, level, message } = info;
         const metadata = (info as any).metadata || {};
         const context = { ...this.childContext, ...metadata };
-        
+
         let logMessage = `[${timestamp}] ${level.toUpperCase()}: ${message}`;
-        
+
         // Add service name and environment
         logMessage += ` [${this.config.serviceName}:${this.config.environment}]`;
-        
+
         // Add context if present
         if (Object.keys(context).length > 0) {
           logMessage += ` ${JSON.stringify(context)}`;
         }
-        
+
         return logMessage;
       })
     );
@@ -103,7 +103,7 @@ export class LoggingService implements ILoggingService {
       transports.push(
         new winston.transports.Console({
           level: this.config.level,
-          format: this.config.enableColors 
+          format: this.config.enableColors
             ? winston.format.combine(winston.format.colorize(), ...formats)
             : winston.format.combine(...formats),
         })
@@ -181,7 +181,7 @@ export class LoggingService implements ILoggingService {
    */
   error(message: string, error?: Error | unknown, meta: Record<string, unknown> = {}): void {
     const errorMeta = { ...meta };
-    
+
     if (error) {
       if (error instanceof Error) {
         errorMeta.error = {
@@ -193,7 +193,7 @@ export class LoggingService implements ILoggingService {
         errorMeta.error = error;
       }
     }
-    
+
     this.logger.error(message, errorMeta);
   }
 
@@ -212,7 +212,7 @@ export class LoggingService implements ILoggingService {
   startTimer(label: string): () => void {
     const startTime = Date.now();
     this.debug(`Timer started: ${label}`);
-    
+
     return () => {
       const duration = Date.now() - startTime;
       this.logPerformance(label, duration);
@@ -379,7 +379,7 @@ export class LoggingService implements ILoggingService {
    * Close logger and cleanup resources
    */
   async close(): Promise<void> {
-    return new Promise<void>((resolve) => {
+    return new Promise<void>(resolve => {
       this.logger.close();
       resolve();
     });
@@ -405,4 +405,4 @@ export class LoggingService implements ILoggingService {
 /**
  * Export types for external use
  */
-export type { ILoggingService }; 
+export type { ILoggingService };

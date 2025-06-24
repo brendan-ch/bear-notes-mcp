@@ -160,7 +160,9 @@ export class CacheService implements ICacheService {
    */
   async has(key: string): Promise<boolean> {
     const entry = this.cache.get(key);
-    if (!entry) return false;
+    if (!entry) {
+      return false;
+    }
 
     if (this.isExpired(entry)) {
       this.cache.delete(key);
@@ -303,7 +305,7 @@ export class CacheService implements ICacheService {
    */
   private estimateMemoryUsage(): number {
     let totalSize = 0;
-    
+
     for (const [key, entry] of this.cache.entries()) {
       // Rough estimation: key size + JSON.stringify size of data
       totalSize += key.length * 2; // UTF-16 characters
@@ -327,4 +329,4 @@ export class CacheService implements ICacheService {
       this.metrics.memoryPeakUsage = currentUsage;
     }
   }
-} 
+}

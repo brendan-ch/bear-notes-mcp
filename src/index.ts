@@ -14,7 +14,7 @@ import {
   Tool,
 } from '@modelcontextprotocol/sdk/types.js';
 import { BearService } from './services/bear-service.js';
-import { BearDatabaseError, BearSafetyError } from './types/bear.js';
+// Error types imported for potential use in error handling
 
 /**
  * Bear MCP Server
@@ -2007,7 +2007,7 @@ ${topTagsData}`,
         throw new Error('archived parameter must be a boolean');
       }
 
-      const result = await this.bearService.archiveNote(noteId, archived);
+      await this.bearService.archiveNote(noteId, archived);
 
       return {
         content: [
@@ -2149,7 +2149,7 @@ ${topTagsData}`,
 
 // Start the server
 const server = new BearMCPServer();
-server.run().catch(error => {
+server.run().catch(() => {
   // Silent error handling to avoid JSON-RPC interference
   process.exit(1);
 });

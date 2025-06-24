@@ -5,17 +5,12 @@
  */
 
 import { BearDatabase, CoreDataUtils } from '../utils/database.js';
-import { v4 as uuidv4 } from 'uuid';
 import {
   BearNote,
-  BearTag,
-  BearNoteTag,
   NoteWithTags,
   TagWithCount,
   DatabaseStats,
   NoteSearchOptions,
-  BearDatabaseError,
-  BearSafetyError,
 } from '../types/bear.js';
 
 /**
@@ -1020,7 +1015,7 @@ export class BearService {
             contentLength: row.content_length,
           };
 
-          const analysis = this.analyzeSearchMatches(note, searchTerms, options);
+          const analysis = this.analyzeSearchMatches(note, searchTerms);
 
           return {
             ...note,
@@ -1229,8 +1224,7 @@ export class BearService {
    */
   private analyzeSearchMatches(
     note: NoteWithTags,
-    searchTerms: string[],
-    options: any
+    searchTerms: string[]
   ): {
     relevanceScore: number;
     matchedTerms: string[];
@@ -1870,8 +1864,8 @@ export class BearService {
         text.match(/\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b/g) || []
       ).length;
       patternCounts.urls += (text.match(/https?:\/\/[^\s\)]+/g) || []).length;
-      patternCounts.phoneNumbers += (text.match(/\b\d{3}[-.]?\d{3}[-.]?\d{4}\b/g) || []).length;
-      patternCounts.dates += (text.match(/\b\d{1,2}[\/\-]\d{1,2}[\/\-]\d{2,4}\b/g) || []).length;
+      patternCounts.phoneNumbers += (text.match(/\b\d{3}[.-]?\d{3}[.-]?\d{4}\b/g) || []).length;
+      patternCounts.dates += (text.match(/\b\d{1,2}[/-]\d{1,2}[/-]\d{2,4}\b/g) || []).length;
       patternCounts.times += (
         text.match(/\b\d{1,2}:\d{2}(?::\d{2})?\s?(?:AM|PM|am|pm)?\b/g) || []
       ).length;
@@ -1939,7 +1933,7 @@ export class BearService {
           }
 
           analysis.externalLinks++;
-        } catch (e) {
+        } catch {
           analysis.brokenLinks++;
         }
       });
@@ -2008,7 +2002,7 @@ export class BearService {
       if (text.match(/- \[[ x]\]/)) {
         analysis.notesWithTodos++;
       }
-      if (text.match(/\b\d{1,2}[\/\-]\d{1,2}[\/\-]\d{2,4}\b/)) {
+      if (text.match(/\b\d{1,2}[/-]\d{1,2}[/-]\d{2,4}\b/)) {
         analysis.notesWithDates++;
       }
       if (text.match(/\b\d+\b/)) {
@@ -2428,7 +2422,7 @@ export class BearService {
     // Generate a UUID v4 format that Bear uses
     return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
       const r = (Math.random() * 16) | 0;
-      const v = c == 'x' ? r : (r & 0x3) | 0x8;
+      const v = c === 'x' ? r : (r & 0x3) | 0x8;
       return v.toString(16).toUpperCase();
     });
   }
@@ -2439,7 +2433,7 @@ export class BearService {
   private async clearBearCache(): Promise<void> {
     try {
       await this.database.query(`DELETE FROM Z_MODELCACHE`);
-    } catch (error) {
+    } catch {
       // Cache clearing is optional - don't fail the operation if it doesn't work
       // Silent error handling to avoid JSON-RPC interference
     }
@@ -2492,7 +2486,7 @@ export class BearService {
       `,
         [originalContent, now, noteId]
       );
-    } catch (error) {
+    } catch {
       // Silent error handling to avoid JSON-RPC interference
     }
   }
@@ -2814,7 +2808,7 @@ export class BearService {
 
           // Small delay between notes to avoid overwhelming Bear
           await new Promise(resolve => setTimeout(resolve, 200));
-        } catch (error) {
+        } catch {
           // Silent error handling to avoid JSON-RPC interference
         }
       }

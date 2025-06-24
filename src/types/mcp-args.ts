@@ -236,7 +236,7 @@ export interface BatchTriggerHashtagParsingArgs extends BaseMcpArgs {
 /**
  * Union type of all possible MCP argument types
  */
-export type McpArgs = 
+export type McpArgs =
   | GetRecentNotesArgs
   | SearchNotesArgs
   | GetNoteByIdArgs
@@ -256,4 +256,4 @@ export type McpArgs =
   | DuplicateNoteArgs
   | ArchiveNoteArgs
   | TriggerHashtagParsingArgs
-  | BatchTriggerHashtagParsingArgs; 
+  | BatchTriggerHashtagParsingArgs;

@@ -4,12 +4,16 @@
  */
 
 import { HealthService } from '../../src/services/health-service.js';
-import { IHealthService, IDatabaseService, ICacheService } from '../../src/services/interfaces/index.js';
+import {
+  IHealthService,
+  IDatabaseService,
+  ICacheService,
+} from '../../src/services/interfaces/index.js';
 
 // Mock os module
 jest.mock('os', () => ({
   totalmem: jest.fn(() => 8000000000), // 8GB
-  freemem: jest.fn(() => 2000000000),  // 2GB free
+  freemem: jest.fn(() => 2000000000), // 2GB free
   loadavg: jest.fn(() => [0.5, 0.3, 0.2]), // Load averages
 }));
 
@@ -100,13 +104,15 @@ describe('HealthService', () => {
     it('should perform comprehensive health check', async () => {
       const result = await healthService.checkHealth();
 
-      expect(result).toEqual(expect.objectContaining({
-        status: expect.any(String),
-        timestamp: expect.any(Date),
-        uptime: expect.any(Number),
-        services: expect.any(Object),
-        system: expect.any(Object),
-      }));
+      expect(result).toEqual(
+        expect.objectContaining({
+          status: expect.any(String),
+          timestamp: expect.any(Date),
+          uptime: expect.any(Number),
+          services: expect.any(Object),
+          system: expect.any(Object),
+        })
+      );
 
       expect(result.services).toHaveProperty('database');
       expect(result.services).toHaveProperty('bear');
@@ -149,16 +155,18 @@ describe('HealthService', () => {
     it('should include system metrics in health check', async () => {
       const result = await healthService.checkHealth();
 
-      expect(result.system).toEqual(expect.objectContaining({
-        memory: expect.objectContaining({
-          used: expect.any(Number),
-          total: expect.any(Number),
-          percentage: expect.any(Number),
-        }),
-        cpu: expect.objectContaining({
-          usage: expect.any(Number),
-        }),
-      }));
+      expect(result.system).toEqual(
+        expect.objectContaining({
+          memory: expect.objectContaining({
+            used: expect.any(Number),
+            total: expect.any(Number),
+            percentage: expect.any(Number),
+          }),
+          cpu: expect.objectContaining({
+            usage: expect.any(Number),
+          }),
+        })
+      );
     });
 
     it('should calculate uptime correctly', async () => {
@@ -416,13 +424,15 @@ describe('HealthService', () => {
     it('should get current configuration', () => {
       const config = healthService.getConfig();
 
-      expect(config).toEqual(expect.objectContaining({
-        checkInterval: expect.any(Number),
-        enableAutoChecks: expect.any(Boolean),
-        healthyThreshold: expect.any(Number),
-        degradedThreshold: expect.any(Number),
-        timeoutMs: expect.any(Number),
-      }));
+      expect(config).toEqual(
+        expect.objectContaining({
+          checkInterval: expect.any(Number),
+          enableAutoChecks: expect.any(Boolean),
+          healthyThreshold: expect.any(Number),
+          degradedThreshold: expect.any(Number),
+          timeoutMs: expect.any(Number),
+        })
+      );
     });
 
     it('should update configuration', () => {
@@ -466,10 +476,10 @@ describe('HealthService', () => {
 
     it('should update last health check on subsequent checks', async () => {
       const first = await healthService.checkHealth();
-      
+
       // Wait a moment
       await new Promise(resolve => setTimeout(resolve, 10));
-      
+
       const second = await healthService.checkHealth();
       const lastCheck = healthService.getLastHealthCheck();
 
@@ -489,7 +499,7 @@ describe('HealthService', () => {
 
     it('should stop health checks on dispose', () => {
       healthService.startHealthChecks();
-      
+
       const config = healthService.getConfig();
       expect(config.enableAutoChecks).toBe(true);
 
@@ -502,15 +512,17 @@ describe('HealthService', () => {
 
   describe('Interface Compliance', () => {
     it('should implement IHealthService interface', () => {
-      expect(healthService).toEqual(expect.objectContaining({
-        checkHealth: expect.any(Function),
-        checkDatabaseHealth: expect.any(Function),
-        checkBearHealth: expect.any(Function),
-        checkCacheHealth: expect.any(Function),
-        setHealthCheckInterval: expect.any(Function),
-        startHealthChecks: expect.any(Function),
-        stopHealthChecks: expect.any(Function),
-      }));
+      expect(healthService).toEqual(
+        expect.objectContaining({
+          checkHealth: expect.any(Function),
+          checkDatabaseHealth: expect.any(Function),
+          checkBearHealth: expect.any(Function),
+          checkCacheHealth: expect.any(Function),
+          setHealthCheckInterval: expect.any(Function),
+          startHealthChecks: expect.any(Function),
+          stopHealthChecks: expect.any(Function),
+        })
+      );
     });
 
     it('should satisfy IHealthService type', () => {
@@ -551,4 +563,4 @@ describe('HealthService', () => {
       expect(result.services.database.error).toBe('Database health check failed');
     });
   });
-}); 
+});

@@ -1,6 +1,6 @@
 /**
  * Comprehensive Validation Service for Bear Notes MCP
- * 
+ *
  * This service provides type-safe validation for all input parameters,
  * data sanitization, and consistent error reporting across the application.
  */
@@ -40,12 +40,21 @@ export interface IValidationService {
   /**
    * Validate data against a schema
    */
-  validate(data: Record<string, unknown>, schema: ValidationSchema, context?: ErrorContext): ValidationResult;
+  validate(
+    data: Record<string, unknown>,
+    schema: ValidationSchema,
+    context?: ErrorContext
+  ): ValidationResult;
 
   /**
    * Validate a single field
    */
-  validateField(name: string, value: unknown, rule: ValidationRule, context?: ErrorContext): ValidationError | null;
+  validateField(
+    name: string,
+    value: unknown,
+    rule: ValidationRule,
+    context?: ErrorContext
+  ): ValidationError | null;
 
   /**
    * Sanitize input data
@@ -150,22 +159,31 @@ export class ValidationService implements IValidationService {
       type: 'string',
       minLength: 1,
       maxLength: 1000,
-      sanitize: (value: unknown) => typeof value === 'string' ? value.trim() : value,
+      sanitize: (value: unknown) => (typeof value === 'string' ? value.trim() : value),
     },
     text: {
       type: 'string',
       maxLength: 1000000,
-      sanitize: (value: unknown) => typeof value === 'string' ? value.trim() : value,
+      sanitize: (value: unknown) => (typeof value === 'string' ? value.trim() : value),
     },
     tags: {
       type: 'array',
       custom: (value: unknown) => {
-        if (!Array.isArray(value)) return 'Tags must be an array';
-        if (value.some(tag => typeof tag !== 'string')) return 'All tags must be strings';
-        if (value.some((tag: unknown) => typeof tag === 'string' && tag.length > 100)) return 'Tag names cannot exceed 100 characters';
+        if (!Array.isArray(value)) {
+          return 'Tags must be an array';
+        }
+        if (value.some(tag => typeof tag !== 'string')) {
+          return 'All tags must be strings';
+        }
+        if (value.some((tag: unknown) => typeof tag === 'string' && tag.length > 100)) {
+          return 'Tag names cannot exceed 100 characters';
+        }
         return true;
       },
-      sanitize: (value: unknown) => Array.isArray(value) ? value.map(tag => typeof tag === 'string' ? tag.trim().toLowerCase() : tag) : value,
+      sanitize: (value: unknown) =>
+        Array.isArray(value)
+          ? value.map(tag => (typeof tag === 'string' ? tag.trim().toLowerCase() : tag))
+          : value,
     },
     open_note: { type: 'boolean' },
   };
@@ -176,7 +194,7 @@ export class ValidationService implements IValidationService {
       type: 'string',
       minLength: 1,
       maxLength: 1000,
-      sanitize: (value: unknown) => typeof value === 'string' ? value.trim() : value,
+      sanitize: (value: unknown) => (typeof value === 'string' ? value.trim() : value),
     },
     limit: {
       type: 'number',
@@ -199,7 +217,8 @@ export class ValidationService implements IValidationService {
       minLength: 1,
       maxLength: 100,
       pattern: /^[a-zA-Z0-9_\-\s]+$/,
-      sanitize: (value: unknown) => typeof value === 'string' ? value.trim().toLowerCase() : value,
+      sanitize: (value: unknown) =>
+        typeof value === 'string' ? value.trim().toLowerCase() : value,
     },
     limit: {
       type: 'number',
@@ -262,12 +281,7 @@ export class ValidationService implements IValidationService {
 
     // Type validation
     if (rule.type && !this.isValidType(value, rule.type)) {
-      return new InvalidTypeError(
-        name,
-        rule.type,
-        typeof value,
-        fieldContext
-      );
+      return new InvalidTypeError(name, rule.type, typeof value, fieldContext);
     }
 
     // String validations
@@ -326,7 +340,9 @@ export class ValidationService implements IValidationService {
       const customResult = rule.custom(value);
       if (customResult !== true) {
         return new ValidationError(
-          typeof customResult === 'string' ? customResult : `Field '${name}' failed custom validation`,
+          typeof customResult === 'string'
+            ? customResult
+            : `Field '${name}' failed custom validation`,
           name,
           value,
           fieldContext
@@ -362,12 +378,10 @@ export class ValidationService implements IValidationService {
       return {
         isValid: false,
         errors: [
-          new ValidationError(
-            `Unknown MCP method: ${method}`,
-            'method',
+          new ValidationError(`Unknown MCP method: ${method}`, 'method', method, {
+            operation: 'validateMcpArgs',
             method,
-            { operation: 'validateMcpArgs', method }
-          ),
+          }),
         ],
       };
     }
@@ -471,29 +485,45 @@ export class ValidationUtils {
    */
   static safeConvert = {
     toNumber: (value: unknown, fieldName: string): number => {
-      if (typeof value === 'number') return value;
+      if (typeof value === 'number') {
+        return value;
+      }
       if (typeof value === 'string') {
         const num = Number(value);
-        if (!isNaN(num)) return num;
+        if (!isNaN(num)) {
+          return num;
+        }
       }
       throw new InvalidTypeError(fieldName, 'number', typeof value);
     },
 
     toString: (value: unknown, fieldName: string): string => {
-      if (typeof value === 'string') return value;
-      if (value != null) return String(value);
+      if (typeof value === 'string') {
+        return value;
+      }
+      if (value != null) {
+        return String(value);
+      }
       throw new InvalidTypeError(fieldName, 'string', typeof value);
     },
 
     toBoolean: (value: unknown, fieldName: string): boolean => {
-      if (typeof value === 'boolean') return value;
-      if (value === 'true' || value === '1' || value === 1) return true;
-      if (value === 'false' || value === '0' || value === 0) return false;
+      if (typeof value === 'boolean') {
+        return value;
+      }
+      if (value === 'true' || value === '1' || value === 1) {
+        return true;
+      }
+      if (value === 'false' || value === '0' || value === 0) {
+        return false;
+      }
       throw new InvalidTypeError(fieldName, 'boolean', typeof value);
     },
 
     toArray: <T>(value: unknown, fieldName: string): T[] => {
-      if (Array.isArray(value)) return value as T[];
+      if (Array.isArray(value)) {
+        return value as T[];
+      }
       throw new InvalidTypeError(fieldName, 'array', typeof value);
     },
   };
@@ -517,9 +547,16 @@ export class ValidationUtils {
     lowercase: (value: string): string => value.toLowerCase(),
     uppercase: (value: string): string => value.toUpperCase(),
     alphanumeric: (value: string): string => value.replace(/[^a-zA-Z0-9]/g, ''),
-    slug: (value: string): string => 
-      value.toLowerCase().trim().replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-'),
-    tag: (value: string): string => 
-      value.trim().toLowerCase().replace(/[^a-zA-Z0-9_\-\s]/g, ''),
+    slug: (value: string): string =>
+      value
+        .toLowerCase()
+        .trim()
+        .replace(/[^a-z0-9\s-]/g, '')
+        .replace(/\s+/g, '-'),
+    tag: (value: string): string =>
+      value
+        .trim()
+        .toLowerCase()
+        .replace(/[^a-zA-Z0-9_\-\s]/g, ''),
   };
-} 
+}
