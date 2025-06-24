@@ -11,7 +11,7 @@ import {
   DatabaseStats,
 } from '../../src/types/bear.js';
 // Create a mock CoreDataUtils for testing
-const MockCoreDataUtils = {
+export const MockCoreDataUtils = {
   toDate: (timestamp: number) => new Date(timestamp * 1000 + Date.parse('2001-01-01T00:00:00Z')),
   fromDate: (date: Date) => (date.getTime() - Date.parse('2001-01-01T00:00:00Z')) / 1000,
   now: () => (Date.now() - Date.parse('2001-01-01T00:00:00Z')) / 1000,
