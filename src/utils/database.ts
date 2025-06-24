@@ -18,10 +18,12 @@ export class BearDatabase {
 
   constructor(dbPath?: string) {
     // Default to standard Bear database location on macOS
-    this.dbPath = dbPath || path.join(
-      os.homedir(),
-      'Library/Group Containers/9K33E3U3T4.net.shinyfrog.bear/Application Data/database.sqlite'
-    );
+    this.dbPath =
+      dbPath ||
+      path.join(
+        os.homedir(),
+        'Library/Group Containers/9K33E3U3T4.net.shinyfrog.bear/Application Data/database.sqlite'
+      );
     // Use user's Documents directory for backups - much more accessible
     this.backupDir = path.join(os.homedir(), 'Documents', 'Bear MCP Backups');
   }
@@ -33,11 +35,13 @@ export class BearDatabase {
   async isBearRunning(): Promise<boolean> {
     try {
       // Use AppleScript to check if Bear is running - more reliable on macOS
-      const { stdout } = await execAsync('osascript -e \'tell application "System Events" to get name of every process whose name is "Bear"\'');
-      
+      const { stdout } = await execAsync(
+        'osascript -e \'tell application "System Events" to get name of every process whose name is "Bear"\''
+      );
+
       // If AppleScript returns "Bear", the app is running
       const isRunning = stdout.trim().includes('Bear');
-      
+
       return isRunning;
     } catch (error) {
       // If AppleScript fails, fall back to process check
@@ -58,11 +62,11 @@ export class BearDatabase {
     try {
       await access(this.dbPath, constants.R_OK | constants.W_OK);
       const stats = await stat(this.dbPath);
-      
+
       if (stats.size === 0) {
         throw new BearDatabaseError('Database file is empty');
       }
-      
+
       // Database verified successfully
     } catch (error) {
       throw new BearDatabaseError(
@@ -77,17 +81,17 @@ export class BearDatabase {
   async createBackup(): Promise<string> {
     const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
     const backupPath = path.join(this.backupDir, `bear_backup_${timestamp}.sqlite`);
-    
+
     try {
       // Ensure backup directory exists
       await mkdir(this.backupDir, { recursive: true });
-      
+
       // Copy database file
       await copyFile(this.dbPath, backupPath);
-      
+
       const stats = await stat(backupPath);
       // Backup created successfully
-      
+
       return backupPath;
     } catch (error) {
       throw new BearDatabaseError(
@@ -102,7 +106,7 @@ export class BearDatabase {
   async performSafetyChecks(requireWriteAccess: boolean = false): Promise<void> {
     // Only check if Bear is running for direct database write operations
     // Note: Modern write operations use sync-safe Bear API, so this check is rarely triggered
-    if (requireWriteAccess && await this.isBearRunning()) {
+    if (requireWriteAccess && (await this.isBearRunning())) {
       throw new BearSafetyError(
         'Direct database writes are not allowed while Bear is running. Use sync-safe Bear API instead.'
       );
@@ -132,8 +136,8 @@ export class BearDatabase {
 
     return new Promise((resolve, reject) => {
       const mode = readOnly ? sqlite3.OPEN_READONLY : sqlite3.OPEN_READWRITE;
-      
-      this.db = new sqlite3.Database(this.dbPath, mode, (err) => {
+
+      this.db = new sqlite3.Database(this.dbPath, mode, err => {
         if (err) {
           reject(new BearDatabaseError(`Failed to connect to database: ${err.message}`));
         } else {
@@ -153,7 +157,7 @@ export class BearDatabase {
     }
 
     return new Promise((resolve, reject) => {
-      this.db!.close((err) => {
+      this.db!.close(err => {
         if (err) {
           reject(new BearDatabaseError(`Failed to close database: ${err.message}`));
         } else {
@@ -197,7 +201,7 @@ export class BearDatabase {
         if (err) {
           reject(new BearDatabaseError(`Query failed: ${err.message}\nSQL: ${sql}`));
         } else {
-          resolve(row as T || null);
+          resolve((row as T) || null);
         }
       });
     });
@@ -212,7 +216,7 @@ export class BearDatabase {
     }
 
     return new Promise((resolve, reject) => {
-      this.db!.run(sql, params, function(err) {
+      this.db!.run(sql, params, function (err) {
         if (err) {
           reject(new BearDatabaseError(`Execute failed: ${err.message}\nSQL: ${sql}`));
         } else {
@@ -248,7 +252,7 @@ export class BearDatabase {
    */
   async transaction<T>(operations: () => Promise<T>): Promise<T> {
     await this.beginTransaction();
-    
+
     try {
       const result = await operations();
       await this.commitTransaction();
@@ -292,7 +296,7 @@ export class CoreDataUtils {
    * Convert Core Data timestamp to JavaScript Date
    */
   static toDate(coreDataTimestamp: number): Date {
-    return new Date(this.CORE_DATA_EPOCH + (coreDataTimestamp * 1000));
+    return new Date(this.CORE_DATA_EPOCH + coreDataTimestamp * 1000);
   }
 
   /**
@@ -308,4 +312,4 @@ export class CoreDataUtils {
   static now(): number {
     return this.fromDate(new Date());
   }
-} 
+}

@@ -14,7 +14,7 @@ import {
   Tool,
 } from '@modelcontextprotocol/sdk/types.js';
 import { BearService } from './services/bear-service.js';
-import { BearDatabaseError, BearSafetyError } from './types/bear.js';
+// Error types imported for potential use in error handling
 
 /**
  * Bear MCP Server
@@ -25,12 +25,10 @@ class BearMCPServer {
   private bearService: BearService;
 
   constructor() {
-    this.server = new Server(
-      {
-        name: 'bear-mcp-server',
-        version: '1.0.0',
-      }
-    );
+    this.server = new Server({
+      name: 'bear-mcp-server',
+      version: '1.0.0',
+    });
 
     this.bearService = new BearService();
     this.setupHandlers();
@@ -45,23 +43,23 @@ class BearMCPServer {
     });
 
     // Handle tool calls
-    this.server.setRequestHandler(CallToolRequestSchema, async (request) => {
+    this.server.setRequestHandler(CallToolRequestSchema, async request => {
       const { name, arguments: args } = request.params;
 
       try {
         switch (name) {
           case 'get_database_stats':
             return await this.getDatabaseStats();
-          
+
           case 'get_database_schema':
             return await this.getDatabaseSchema();
-          
+
           case 'check_bear_status':
             return await this.checkBearStatus();
-          
+
           case 'verify_database_access':
             return await this.verifyDatabaseAccess();
-          
+
           case 'create_backup':
             return await this.createBackup();
 
@@ -167,7 +165,8 @@ class BearMCPServer {
     return [
       {
         name: 'get_database_stats',
-        description: 'Get comprehensive statistics about the Bear database including note counts, tags, and database health',
+        description:
+          'Get comprehensive statistics about the Bear database including note counts, tags, and database health',
         inputSchema: {
           type: 'object',
           properties: {},
@@ -185,7 +184,8 @@ class BearMCPServer {
       },
       {
         name: 'check_bear_status',
-        description: 'Check if Bear app is currently running (informational - write operations now use sync-safe Bear API)',
+        description:
+          'Check if Bear app is currently running (informational - write operations now use sync-safe Bear API)',
         inputSchema: {
           type: 'object',
           properties: {},
@@ -283,549 +283,548 @@ class BearMCPServer {
           required: [],
         },
       },
-              {
-          name: 'get_notes_by_tag',
-          description: 'Get all notes that have a specific tag',
-          inputSchema: {
-            type: 'object',
-            properties: {
-              tag: {
-                type: 'string',
-                description: 'The tag name to search for',
-              },
-            },
-            required: ['tag'],
-          },
-        },
-        {
-          name: 'get_notes_advanced',
-          description: 'Advanced note search with filtering, sorting, and pagination',
-          inputSchema: {
-            type: 'object',
-            properties: {
-              query: {
-                type: 'string',
-                description: 'Search query for title and content',
-              },
-              tags: {
-                type: 'array',
-                items: { type: 'string' },
-                description: 'Tags that notes must have (AND logic)',
-              },
-              excludeTags: {
-                type: 'array',
-                items: { type: 'string' },
-                description: 'Tags to exclude from results',
-              },
-              sortBy: {
-                type: 'string',
-                enum: ['created', 'modified', 'title', 'size'],
-                description: 'Sort notes by field',
-              },
-              sortOrder: {
-                type: 'string',
-                enum: ['asc', 'desc'],
-                description: 'Sort order',
-              },
-              limit: {
-                type: 'number',
-                description: 'Maximum number of results',
-                minimum: 1,
-                maximum: 100,
-              },
-            },
-            required: [],
-          },
-        },
-        {
-          name: 'get_notes_with_criteria',
-          description: 'Find notes using complex criteria with AND/OR logic',
-          inputSchema: {
-            type: 'object',
-            properties: {
-              titleContains: {
-                type: 'array',
-                items: { type: 'string' },
-                description: 'Terms that must appear in title (OR logic)',
-              },
-              contentContains: {
-                type: 'array',
-                items: { type: 'string' },
-                description: 'Terms that must appear in content (OR logic)',
-              },
-              hasAllTags: {
-                type: 'array',
-                items: { type: 'string' },
-                description: 'Tags that notes must have (AND logic)',
-              },
-              hasAnyTags: {
-                type: 'array',
-                items: { type: 'string' },
-                description: 'Tags that notes can have (OR logic)',
-              },
-              isPinned: {
-                type: 'boolean',
-                description: 'Filter by pinned status',
-              },
-              isArchived: {
-                type: 'boolean',
-                description: 'Filter by archived status',
-              },
-              minLength: {
-                type: 'number',
-                description: 'Minimum content length',
-              },
-              maxLength: {
-                type: 'number',
-                description: 'Maximum content length',
-              },
-            },
-            required: [],
-          },
-        },
-        {
-          name: 'get_note_analytics',
-          description: 'Get comprehensive analytics and statistics about notes',
-          inputSchema: {
-            type: 'object',
-            properties: {},
-            required: [],
-          },
-        },
-        {
-          name: 'get_related_notes',
-          description: 'Find notes related to a specific note by tags and content',
-          inputSchema: {
-            type: 'object',
-            properties: {
-              noteId: {
-                type: 'number',
-                description: 'The ID of the note to find related notes for',
-              },
-              limit: {
-                type: 'number',
-                description: 'Maximum number of related notes to return',
-                minimum: 1,
-                maximum: 20,
-              },
-            },
-            required: ['noteId'],
-          },
-        },
-        {
-          name: 'search_notes_fulltext',
-          description: 'Advanced full-text search with relevance scoring and snippets',
-          inputSchema: {
-            type: 'object',
-            properties: {
-              query: {
-                type: 'string',
-                description: 'Search query string',
-              },
-              limit: {
-                type: 'number',
-                description: 'Maximum number of results',
-                minimum: 1,
-                maximum: 50,
-              },
-              includeSnippets: {
-                type: 'boolean',
-                description: 'Include content snippets around matches',
-              },
-              searchFields: {
-                type: 'array',
-                items: { type: 'string', enum: ['title', 'content', 'both'] },
-                description: 'Fields to search in',
-              },
-              fuzzyMatch: {
-                type: 'boolean',
-                description: 'Enable fuzzy matching for typos',
-              },
-              caseSensitive: {
-                type: 'boolean',
-                description: 'Case sensitive search',
-              },
-            },
-            required: ['query'],
-          },
-        },
-        {
-          name: 'get_search_suggestions',
-          description: 'Get auto-complete suggestions for search queries',
-          inputSchema: {
-            type: 'object',
-            properties: {
-              partialQuery: {
-                type: 'string',
-                description: 'Partial search query for suggestions',
-              },
-              limit: {
-                type: 'number',
-                description: 'Maximum number of suggestions',
-                minimum: 1,
-                maximum: 20,
-              },
-            },
-            required: ['partialQuery'],
-          },
-        },
-        {
-          name: 'find_similar_notes',
-          description: 'Find notes similar to given text using content analysis',
-          inputSchema: {
-            type: 'object',
-            properties: {
-              referenceText: {
-                type: 'string',
-                description: 'Text to find similar notes for',
-              },
-              limit: {
-                type: 'number',
-                description: 'Maximum number of similar notes',
-                minimum: 1,
-                maximum: 20,
-              },
-              minSimilarity: {
-                type: 'number',
-                description: 'Minimum similarity score (0.0 to 1.0)',
-                minimum: 0,
-                maximum: 1,
-              },
-              excludeNoteId: {
-                type: 'number',
-                description: 'Note ID to exclude from results',
-              },
-            },
-            required: ['referenceText'],
-          },
-        },
-        {
-          name: 'search_notes_regex',
-          description: 'Search notes using regular expressions',
-          inputSchema: {
-            type: 'object',
-            properties: {
-              pattern: {
-                type: 'string',
-                description: 'Regular expression pattern',
-              },
-              flags: {
-                type: 'string',
-                description: 'Regex flags (e.g., "gi" for global case-insensitive)',
-              },
-              searchIn: {
-                type: 'string',
-                enum: ['title', 'content', 'both'],
-                description: 'Where to search for the pattern',
-              },
-              limit: {
-                type: 'number',
-                description: 'Maximum number of results',
-                minimum: 1,
-                maximum: 50,
-              },
-              includeContext: {
-                type: 'boolean',
-                description: 'Include context around matches',
-              },
-            },
-            required: ['pattern'],
-          },
-        },
-        {
-          name: 'get_tag_hierarchy',
-          description: 'Get comprehensive tag hierarchy and relationships',
-          inputSchema: {
-            type: 'object',
-            properties: {},
-          },
-        },
-        {
-          name: 'get_tag_analytics',
-          description: 'Get detailed tag statistics and usage patterns',
-          inputSchema: {
-            type: 'object',
-            properties: {},
-          },
-        },
-        {
-          name: 'analyze_tag_relationships',
-          description: 'Analyze tag relationships and suggest improvements',
-          inputSchema: {
-            type: 'object',
-            properties: {},
-          },
-        },
-        {
-          name: 'get_tag_usage_trends',
-          description: 'Get tag usage timeline and trends',
-          inputSchema: {
-            type: 'object',
-            properties: {
-              tagName: {
-                type: 'string',
-                description: 'Specific tag to analyze (optional)',
-              },
-              months: {
-                type: 'number',
-                description: 'Number of months to analyze',
-                minimum: 1,
-                maximum: 24,
-              },
+      {
+        name: 'get_notes_by_tag',
+        description: 'Get all notes that have a specific tag',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            tag: {
+              type: 'string',
+              description: 'The tag name to search for',
             },
           },
+          required: ['tag'],
         },
-        {
-          name: 'get_file_attachments',
-          description: 'Get comprehensive file attachment information',
-          inputSchema: {
-            type: 'object',
-            properties: {
-              noteId: {
-                type: 'number',
-                description: 'Specific note ID to get attachments for',
-              },
-              fileType: {
-                type: 'string',
-                description: 'Filter by file extension (e.g., "jpg", "pdf")',
-              },
-              includeMetadata: {
-                type: 'boolean',
-                description: 'Include detailed file metadata',
-              },
-              limit: {
-                type: 'number',
-                description: 'Maximum number of attachments to return',
-                minimum: 1,
-                maximum: 100,
-              },
+      },
+      {
+        name: 'get_notes_advanced',
+        description: 'Advanced note search with filtering, sorting, and pagination',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            query: {
+              type: 'string',
+              description: 'Search query for title and content',
+            },
+            tags: {
+              type: 'array',
+              items: { type: 'string' },
+              description: 'Tags that notes must have (AND logic)',
+            },
+            excludeTags: {
+              type: 'array',
+              items: { type: 'string' },
+              description: 'Tags to exclude from results',
+            },
+            sortBy: {
+              type: 'string',
+              enum: ['created', 'modified', 'title', 'size'],
+              description: 'Sort notes by field',
+            },
+            sortOrder: {
+              type: 'string',
+              enum: ['asc', 'desc'],
+              description: 'Sort order',
+            },
+            limit: {
+              type: 'number',
+              description: 'Maximum number of results',
+              minimum: 1,
+              maximum: 100,
+            },
+          },
+          required: [],
+        },
+      },
+      {
+        name: 'get_notes_with_criteria',
+        description: 'Find notes using complex criteria with AND/OR logic',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            titleContains: {
+              type: 'array',
+              items: { type: 'string' },
+              description: 'Terms that must appear in title (OR logic)',
+            },
+            contentContains: {
+              type: 'array',
+              items: { type: 'string' },
+              description: 'Terms that must appear in content (OR logic)',
+            },
+            hasAllTags: {
+              type: 'array',
+              items: { type: 'string' },
+              description: 'Tags that notes must have (AND logic)',
+            },
+            hasAnyTags: {
+              type: 'array',
+              items: { type: 'string' },
+              description: 'Tags that notes can have (OR logic)',
+            },
+            isPinned: {
+              type: 'boolean',
+              description: 'Filter by pinned status',
+            },
+            isArchived: {
+              type: 'boolean',
+              description: 'Filter by archived status',
+            },
+            minLength: {
+              type: 'number',
+              description: 'Minimum content length',
+            },
+            maxLength: {
+              type: 'number',
+              description: 'Maximum content length',
+            },
+          },
+          required: [],
+        },
+      },
+      {
+        name: 'get_note_analytics',
+        description: 'Get comprehensive analytics and statistics about notes',
+        inputSchema: {
+          type: 'object',
+          properties: {},
+          required: [],
+        },
+      },
+      {
+        name: 'get_related_notes',
+        description: 'Find notes related to a specific note by tags and content',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            noteId: {
+              type: 'number',
+              description: 'The ID of the note to find related notes for',
+            },
+            limit: {
+              type: 'number',
+              description: 'Maximum number of related notes to return',
+              minimum: 1,
+              maximum: 20,
+            },
+          },
+          required: ['noteId'],
+        },
+      },
+      {
+        name: 'search_notes_fulltext',
+        description: 'Advanced full-text search with relevance scoring and snippets',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            query: {
+              type: 'string',
+              description: 'Search query string',
+            },
+            limit: {
+              type: 'number',
+              description: 'Maximum number of results',
+              minimum: 1,
+              maximum: 50,
+            },
+            includeSnippets: {
+              type: 'boolean',
+              description: 'Include content snippets around matches',
+            },
+            searchFields: {
+              type: 'array',
+              items: { type: 'string', enum: ['title', 'content', 'both'] },
+              description: 'Fields to search in',
+            },
+            fuzzyMatch: {
+              type: 'boolean',
+              description: 'Enable fuzzy matching for typos',
+            },
+            caseSensitive: {
+              type: 'boolean',
+              description: 'Case sensitive search',
+            },
+          },
+          required: ['query'],
+        },
+      },
+      {
+        name: 'get_search_suggestions',
+        description: 'Get auto-complete suggestions for search queries',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            partialQuery: {
+              type: 'string',
+              description: 'Partial search query for suggestions',
+            },
+            limit: {
+              type: 'number',
+              description: 'Maximum number of suggestions',
+              minimum: 1,
+              maximum: 20,
+            },
+          },
+          required: ['partialQuery'],
+        },
+      },
+      {
+        name: 'find_similar_notes',
+        description: 'Find notes similar to given text using content analysis',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            referenceText: {
+              type: 'string',
+              description: 'Text to find similar notes for',
+            },
+            limit: {
+              type: 'number',
+              description: 'Maximum number of similar notes',
+              minimum: 1,
+              maximum: 20,
+            },
+            minSimilarity: {
+              type: 'number',
+              description: 'Minimum similarity score (0.0 to 1.0)',
+              minimum: 0,
+              maximum: 1,
+            },
+            excludeNoteId: {
+              type: 'number',
+              description: 'Note ID to exclude from results',
+            },
+          },
+          required: ['referenceText'],
+        },
+      },
+      {
+        name: 'search_notes_regex',
+        description: 'Search notes using regular expressions',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            pattern: {
+              type: 'string',
+              description: 'Regular expression pattern',
+            },
+            flags: {
+              type: 'string',
+              description: 'Regex flags (e.g., "gi" for global case-insensitive)',
+            },
+            searchIn: {
+              type: 'string',
+              enum: ['title', 'content', 'both'],
+              description: 'Where to search for the pattern',
+            },
+            limit: {
+              type: 'number',
+              description: 'Maximum number of results',
+              minimum: 1,
+              maximum: 50,
+            },
+            includeContext: {
+              type: 'boolean',
+              description: 'Include context around matches',
+            },
+          },
+          required: ['pattern'],
+        },
+      },
+      {
+        name: 'get_tag_hierarchy',
+        description: 'Get comprehensive tag hierarchy and relationships',
+        inputSchema: {
+          type: 'object',
+          properties: {},
+        },
+      },
+      {
+        name: 'get_tag_analytics',
+        description: 'Get detailed tag statistics and usage patterns',
+        inputSchema: {
+          type: 'object',
+          properties: {},
+        },
+      },
+      {
+        name: 'analyze_tag_relationships',
+        description: 'Analyze tag relationships and suggest improvements',
+        inputSchema: {
+          type: 'object',
+          properties: {},
+        },
+      },
+      {
+        name: 'get_tag_usage_trends',
+        description: 'Get tag usage timeline and trends',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            tagName: {
+              type: 'string',
+              description: 'Specific tag to analyze (optional)',
+            },
+            months: {
+              type: 'number',
+              description: 'Number of months to analyze',
+              minimum: 1,
+              maximum: 24,
             },
           },
         },
-        {
-          name: 'analyze_note_metadata',
-          description: 'Analyze note metadata and content patterns',
-          inputSchema: {
-            type: 'object',
-            properties: {
-              includeContentAnalysis: {
-                type: 'boolean',
-                description: 'Include markdown and content pattern analysis',
-              },
-              includeLinkAnalysis: {
-                type: 'boolean',
-                description: 'Include link analysis and domain statistics',
-              },
-              includeStructureAnalysis: {
-                type: 'boolean',
-                description: 'Include note structure and title pattern analysis',
-              },
+      },
+      {
+        name: 'get_file_attachments',
+        description: 'Get comprehensive file attachment information',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            noteId: {
+              type: 'number',
+              description: 'Specific note ID to get attachments for',
+            },
+            fileType: {
+              type: 'string',
+              description: 'Filter by file extension (e.g., "jpg", "pdf")',
+            },
+            includeMetadata: {
+              type: 'boolean',
+              description: 'Include detailed file metadata',
+            },
+            limit: {
+              type: 'number',
+              description: 'Maximum number of attachments to return',
+              minimum: 1,
+              maximum: 100,
             },
           },
         },
-        {
-          name: 'get_notes_with_metadata',
-          description: 'Get notes filtered by metadata characteristics',
-          inputSchema: {
-            type: 'object',
-            properties: {
-              hasAttachments: {
-                type: 'boolean',
-                description: 'Filter notes with/without attachments',
-              },
-              hasLinks: {
-                type: 'boolean',
-                description: 'Filter notes with/without external links',
-              },
-              hasImages: {
-                type: 'boolean',
-                description: 'Filter notes with/without images',
-              },
-              hasTodos: {
-                type: 'boolean',
-                description: 'Filter notes with/without todo items',
-              },
-              hasCodeBlocks: {
-                type: 'boolean',
-                description: 'Filter notes with/without code blocks',
-              },
-              hasTables: {
-                type: 'boolean',
-                description: 'Filter notes with/without tables',
-              },
-              minWordCount: {
-                type: 'number',
-                description: 'Minimum word count',
-                minimum: 1,
-              },
-              maxWordCount: {
-                type: 'number',
-                description: 'Maximum word count',
-                minimum: 1,
-              },
-              limit: {
-                type: 'number',
-                description: 'Maximum number of results',
-                minimum: 1,
-                maximum: 100,
-              },
-                        },
-          },
-        },
-        {
-          name: 'create_note',
-          description: 'Create a new note with title, content, and tags using sync-safe Bear API',
-          inputSchema: {
-            type: 'object',
-            properties: {
-              title: {
-                type: 'string',
-                description: 'Title of the new note',
-              },
-              content: {
-                type: 'string',
-                description: 'Content/body of the note (optional)',
-              },
-              tags: {
-                type: 'array',
-                items: { type: 'string' },
-                description: 'Array of tag names to apply to the note. Tags are automatically sanitized: lowercase only, no spaces/hyphens (underscores allowed, use forward slashes for nested tags like "work/project")',
-              },
-              isArchived: {
-                type: 'boolean',
-                description: 'Whether the note should be archived',
-              },
-              isPinned: {
-                type: 'boolean',
-                description: 'Whether the note should be pinned',
-              },
+      },
+      {
+        name: 'analyze_note_metadata',
+        description: 'Analyze note metadata and content patterns',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            includeContentAnalysis: {
+              type: 'boolean',
+              description: 'Include markdown and content pattern analysis',
             },
-            required: ['title'],
-          },
-        },
-        {
-          name: 'update_note',
-          description: 'Update an existing note using sync-safe Bear API',
-          inputSchema: {
-            type: 'object',
-            properties: {
-              noteId: {
-                type: 'number',
-                description: 'ID of the note to update',
-              },
-              title: {
-                type: 'string',
-                description: 'New title for the note',
-              },
-              content: {
-                type: 'string',
-                description: 'New content for the note',
-              },
-              tags: {
-                type: 'array',
-                items: { type: 'string' },
-                description: 'New array of tag names (replaces existing tags). Tags are automatically sanitized: lowercase only, no spaces/hyphens (underscores allowed, use forward slashes for nested tags like "work/project")',
-              },
-              isArchived: {
-                type: 'boolean',
-                description: 'Whether the note should be archived',
-              },
-              isPinned: {
-                type: 'boolean',
-                description: 'Whether the note should be pinned',
-              },
+            includeLinkAnalysis: {
+              type: 'boolean',
+              description: 'Include link analysis and domain statistics',
             },
-            required: ['noteId'],
-          },
-        },
-        {
-          name: 'duplicate_note',
-          description: 'Create a duplicate of an existing note using sync-safe Bear API',
-          inputSchema: {
-            type: 'object',
-            properties: {
-              noteId: {
-                type: 'number',
-                description: 'ID of the note to duplicate',
-              },
-              titleSuffix: {
-                type: 'string',
-                description: 'Suffix to add to the duplicated note title (default: " (Copy)")',
-              },
-              copyTags: {
-                type: 'boolean',
-                description: 'Whether to copy tags from the original note (default: true)',
-              },
+            includeStructureAnalysis: {
+              type: 'boolean',
+              description: 'Include note structure and title pattern analysis',
             },
-            required: ['noteId'],
           },
         },
-        {
-          name: 'archive_note',
-          description: 'Archive or unarchive a note using sync-safe Bear API',
-          inputSchema: {
-            type: 'object',
-            properties: {
-              noteId: {
-                type: 'number',
-                description: 'ID of the note to archive/unarchive',
-              },
-              archived: {
-                type: 'boolean',
-                description: 'True to archive, false to unarchive',
-              },
+      },
+      {
+        name: 'get_notes_with_metadata',
+        description: 'Get notes filtered by metadata characteristics',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            hasAttachments: {
+              type: 'boolean',
+              description: 'Filter notes with/without attachments',
             },
-            required: ['noteId', 'archived'],
-          },
-        },
-        {
-          name: 'trigger_hashtag_parsing',
-          description: 'Trigger Bear to reparse hashtags in a note using sync-safe API',
-          inputSchema: {
-            type: 'object',
-            properties: {
-              note_id: {
-                type: 'string',
-                description: 'Note ID to trigger parsing for'
-              },
-              note_title: {
-                type: 'string', 
-                description: 'Note title to trigger parsing for (alternative to note_id)'
-              }
+            hasLinks: {
+              type: 'boolean',
+              description: 'Filter notes with/without external links',
             },
-            oneOf: [
-              { required: ["note_id"] },
-              { required: ["note_title"] }
-            ]
+            hasImages: {
+              type: 'boolean',
+              description: 'Filter notes with/without images',
+            },
+            hasTodos: {
+              type: 'boolean',
+              description: 'Filter notes with/without todo items',
+            },
+            hasCodeBlocks: {
+              type: 'boolean',
+              description: 'Filter notes with/without code blocks',
+            },
+            hasTables: {
+              type: 'boolean',
+              description: 'Filter notes with/without tables',
+            },
+            minWordCount: {
+              type: 'number',
+              description: 'Minimum word count',
+              minimum: 1,
+            },
+            maxWordCount: {
+              type: 'number',
+              description: 'Maximum word count',
+              minimum: 1,
+            },
+            limit: {
+              type: 'number',
+              description: 'Maximum number of results',
+              minimum: 1,
+              maximum: 100,
+            },
           },
         },
-        {
-          name: 'batch_trigger_hashtag_parsing',
-          description: 'Trigger hashtag parsing for multiple notes using sync-safe API',
-          inputSchema: {
-            type: 'object',
-            properties: {
-              tag_filter: {
-                type: 'string',
-                description: 'Filter notes by tag name'
-              },
-              title_pattern: {
-                type: 'string',
-                description: 'Filter notes by title pattern'
-              },
-              limit: {
-                type: 'number',
-                description: 'Maximum number of notes to process'
-              },
-              created_after: {
-                type: 'string',
-                description: 'Filter notes created after this date (ISO string)'
-              }
-            }
+      },
+      {
+        name: 'create_note',
+        description: 'Create a new note with title, content, and tags using sync-safe Bear API',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            title: {
+              type: 'string',
+              description: 'Title of the new note',
+            },
+            content: {
+              type: 'string',
+              description: 'Content/body of the note (optional)',
+            },
+            tags: {
+              type: 'array',
+              items: { type: 'string' },
+              description:
+                'Array of tag names to apply to the note. Tags are automatically sanitized: lowercase only, no spaces/hyphens (underscores allowed, use forward slashes for nested tags like "work/project")',
+            },
+            isArchived: {
+              type: 'boolean',
+              description: 'Whether the note should be archived',
+            },
+            isPinned: {
+              type: 'boolean',
+              description: 'Whether the note should be pinned',
+            },
+          },
+          required: ['title'],
+        },
+      },
+      {
+        name: 'update_note',
+        description: 'Update an existing note using sync-safe Bear API',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            noteId: {
+              type: 'number',
+              description: 'ID of the note to update',
+            },
+            title: {
+              type: 'string',
+              description: 'New title for the note',
+            },
+            content: {
+              type: 'string',
+              description: 'New content for the note',
+            },
+            tags: {
+              type: 'array',
+              items: { type: 'string' },
+              description:
+                'New array of tag names (replaces existing tags). Tags are automatically sanitized: lowercase only, no spaces/hyphens (underscores allowed, use forward slashes for nested tags like "work/project")',
+            },
+            isArchived: {
+              type: 'boolean',
+              description: 'Whether the note should be archived',
+            },
+            isPinned: {
+              type: 'boolean',
+              description: 'Whether the note should be pinned',
+            },
+          },
+          required: ['noteId'],
+        },
+      },
+      {
+        name: 'duplicate_note',
+        description: 'Create a duplicate of an existing note using sync-safe Bear API',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            noteId: {
+              type: 'number',
+              description: 'ID of the note to duplicate',
+            },
+            titleSuffix: {
+              type: 'string',
+              description: 'Suffix to add to the duplicated note title (default: " (Copy)")',
+            },
+            copyTags: {
+              type: 'boolean',
+              description: 'Whether to copy tags from the original note (default: true)',
+            },
+          },
+          required: ['noteId'],
+        },
+      },
+      {
+        name: 'archive_note',
+        description: 'Archive or unarchive a note using sync-safe Bear API',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            noteId: {
+              type: 'number',
+              description: 'ID of the note to archive/unarchive',
+            },
+            archived: {
+              type: 'boolean',
+              description: 'True to archive, false to unarchive',
+            },
+          },
+          required: ['noteId', 'archived'],
+        },
+      },
+      {
+        name: 'trigger_hashtag_parsing',
+        description: 'Trigger Bear to reparse hashtags in a note using sync-safe API',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            note_id: {
+              type: 'string',
+              description: 'Note ID to trigger parsing for',
+            },
+            note_title: {
+              type: 'string',
+              description: 'Note title to trigger parsing for (alternative to note_id)',
+            },
+          },
+          oneOf: [{ required: ['note_id'] }, { required: ['note_title'] }],
+        },
+      },
+      {
+        name: 'batch_trigger_hashtag_parsing',
+        description: 'Trigger hashtag parsing for multiple notes using sync-safe API',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            tag_filter: {
+              type: 'string',
+              description: 'Filter notes by tag name',
+            },
+            title_pattern: {
+              type: 'string',
+              description: 'Filter notes by title pattern',
+            },
+            limit: {
+              type: 'number',
+              description: 'Maximum number of notes to process',
+            },
+            created_after: {
+              type: 'string',
+              description: 'Filter notes created after this date (ISO string)',
+            },
           },
         },
-      ];
-    }
+      },
+    ];
+  }
 
   private async getDatabaseStats() {
     try {
@@ -862,9 +861,12 @@ class BearMCPServer {
   private async getDatabaseSchema() {
     try {
       const schema = await this.bearService.getSchema();
-      
+
       const schemaText = schema
-        .map((table: { name: string; sql: string }) => `Table: ${table.name}\n${table.sql || 'No schema available'}\n`)
+        .map(
+          (table: { name: string; sql: string }) =>
+            `Table: ${table.name}\n${table.sql || 'No schema available'}\n`
+        )
         .join('\n');
 
       return {
@@ -890,7 +892,7 @@ class BearMCPServer {
   private async checkBearStatus() {
     try {
       const isRunning = await this.bearService.isBearRunning();
-      
+
       return {
         content: [
           {
@@ -915,7 +917,7 @@ ${isRunning ? '✅ Write operations use sync-safe Bear API' : '✅ All database 
   private async verifyDatabaseAccess() {
     try {
       await this.bearService.verifyDatabaseAccess();
-      
+
       return {
         content: [
           {
@@ -939,7 +941,7 @@ ${isRunning ? '✅ Write operations use sync-safe Bear API' : '✅ All database 
   private async createBackup() {
     try {
       const backupPath = await this.bearService.createBackup();
-      
+
       return {
         content: [
           {
@@ -964,7 +966,7 @@ ${isRunning ? '✅ Write operations use sync-safe Bear API' : '✅ All database 
     try {
       const limit = args?.limit || 10;
       const notes = await this.bearService.getRecentNotes(limit);
-      
+
       if (notes.length === 0) {
         return {
           content: [
@@ -976,11 +978,13 @@ ${isRunning ? '✅ Write operations use sync-safe Bear API' : '✅ All database 
         };
       }
 
-      const notesList = notes.map(note => {
-        const preview = note.ZTEXT ? note.ZTEXT.substring(0, 100) + '...' : '';
-        const tags = note.tags.length > 0 ? ` [${note.tags.join(', ')}]` : '';
-        return `📝 **${note.ZTITLE || 'Untitled'}**${tags}\n   ${preview}`;
-      }).join('\n\n');
+      const notesList = notes
+        .map(note => {
+          const preview = note.ZTEXT ? `${note.ZTEXT.substring(0, 100)}...` : '';
+          const tags = note.tags.length > 0 ? ` [${note.tags.join(', ')}]` : '';
+          return `📝 **${note.ZTITLE || 'Untitled'}**${tags}\n   ${preview}`;
+        })
+        .join('\n\n');
 
       return {
         content: [
@@ -1006,13 +1010,13 @@ ${isRunning ? '✅ Write operations use sync-safe Bear API' : '✅ All database 
     try {
       const query = args?.query;
       const limit = args?.limit || 20;
-      
+
       if (!query) {
         throw new Error('Search query is required');
       }
 
       const notes = await this.bearService.searchNotes(query, { limit });
-      
+
       if (notes.length === 0) {
         return {
           content: [
@@ -1024,11 +1028,13 @@ ${isRunning ? '✅ Write operations use sync-safe Bear API' : '✅ All database 
         };
       }
 
-      const notesList = notes.map(note => {
-        const preview = note.ZTEXT ? note.ZTEXT.substring(0, 100) + '...' : '';
-        const tags = note.tags.length > 0 ? ` [${note.tags.join(', ')}]` : '';
-        return `📝 **${note.ZTITLE || 'Untitled'}** (ID: ${note.Z_PK})${tags}\n   ${preview}`;
-      }).join('\n\n');
+      const notesList = notes
+        .map(note => {
+          const preview = note.ZTEXT ? `${note.ZTEXT.substring(0, 100)}...` : '';
+          const tags = note.tags.length > 0 ? ` [${note.tags.join(', ')}]` : '';
+          return `📝 **${note.ZTITLE || 'Untitled'}** (ID: ${note.Z_PK})${tags}\n   ${preview}`;
+        })
+        .join('\n\n');
 
       return {
         content: [
@@ -1053,13 +1059,13 @@ ${isRunning ? '✅ Write operations use sync-safe Bear API' : '✅ All database 
   private async getNoteById(args: any) {
     try {
       const id = args?.id;
-      
+
       if (!id) {
         throw new Error('Note ID is required');
       }
 
       const note = await this.bearService.getNoteById(id);
-      
+
       if (!note) {
         return {
           content: [
@@ -1097,13 +1103,13 @@ ${isRunning ? '✅ Write operations use sync-safe Bear API' : '✅ All database 
   private async getNoteByTitle(args: any) {
     try {
       const title = args?.title;
-      
+
       if (!title) {
         throw new Error('Note title is required');
       }
 
       const note = await this.bearService.getNoteByTitle(title);
-      
+
       if (!note) {
         return {
           content: [
@@ -1141,7 +1147,7 @@ ${isRunning ? '✅ Write operations use sync-safe Bear API' : '✅ All database 
   private async getAllTags() {
     try {
       const tags = await this.bearService.getTags();
-      
+
       if (tags.length === 0) {
         return {
           content: [
@@ -1153,9 +1159,7 @@ ${isRunning ? '✅ Write operations use sync-safe Bear API' : '✅ All database 
         };
       }
 
-      const tagsList = tags.map(tag => 
-        `🏷️ **${tag.ZTITLE}** (${tag.noteCount} notes)`
-      ).join('\n');
+      const tagsList = tags.map(tag => `🏷️ **${tag.ZTITLE}** (${tag.noteCount} notes)`).join('\n');
 
       return {
         content: [
@@ -1180,13 +1184,13 @@ ${isRunning ? '✅ Write operations use sync-safe Bear API' : '✅ All database 
   private async getNotesByTag(args: any) {
     try {
       const tag = args?.tag;
-      
+
       if (!tag) {
         throw new Error('Tag name is required');
       }
 
       const notes = await this.bearService.getNotesByTag(tag);
-      
+
       if (notes.length === 0) {
         return {
           content: [
@@ -1198,12 +1202,14 @@ ${isRunning ? '✅ Write operations use sync-safe Bear API' : '✅ All database 
         };
       }
 
-      const notesList = notes.map(note => {
-        const preview = note.ZTEXT ? note.ZTEXT.substring(0, 100) + '...' : '';
-        const otherTags = note.tags.filter(t => t !== tag);
-        const tagInfo = otherTags.length > 0 ? ` [+${otherTags.join(', ')}]` : '';
-        return `📝 **${note.ZTITLE || 'Untitled'}** (ID: ${note.Z_PK})${tagInfo}\n   ${preview}`;
-      }).join('\n\n');
+      const notesList = notes
+        .map(note => {
+          const preview = note.ZTEXT ? `${note.ZTEXT.substring(0, 100)}...` : '';
+          const otherTags = note.tags.filter(t => t !== tag);
+          const tagInfo = otherTags.length > 0 ? ` [+${otherTags.join(', ')}]` : '';
+          return `📝 **${note.ZTITLE || 'Untitled'}** (ID: ${note.Z_PK})${tagInfo}\n   ${preview}`;
+        })
+        .join('\n\n');
 
       return {
         content: [
@@ -1237,7 +1243,7 @@ ${isRunning ? '✅ Write operations use sync-safe Bear API' : '✅ All database 
       };
 
       const notes = await this.bearService.getNotesAdvanced(options);
-      
+
       if (notes.length === 0) {
         return {
           content: [
@@ -1249,12 +1255,14 @@ ${isRunning ? '✅ Write operations use sync-safe Bear API' : '✅ All database 
         };
       }
 
-      const notesList = notes.map(note => {
-        const preview = note.preview || (note.ZTEXT ? note.ZTEXT.substring(0, 100) + '...' : '');
-        const tags = note.tags.length > 0 ? ` [${note.tags.join(', ')}]` : '';
-        const length = note.contentLength ? ` (${note.contentLength} chars)` : '';
-        return `📝 **${note.ZTITLE || 'Untitled'}** (ID: ${note.Z_PK})${tags}${length}\n   ${preview}`;
-      }).join('\n\n');
+      const notesList = notes
+        .map(note => {
+          const preview = note.preview || (note.ZTEXT ? `${note.ZTEXT.substring(0, 100)}...` : '');
+          const tags = note.tags.length > 0 ? ` [${note.tags.join(', ')}]` : '';
+          const length = note.contentLength ? ` (${note.contentLength} chars)` : '';
+          return `📝 **${note.ZTITLE || 'Untitled'}** (ID: ${note.Z_PK})${tags}${length}\n   ${preview}`;
+        })
+        .join('\n\n');
 
       return {
         content: [
@@ -1290,7 +1298,7 @@ ${isRunning ? '✅ Write operations use sync-safe Bear API' : '✅ All database 
       };
 
       const notes = await this.bearService.getNotesWithCriteria(criteria);
-      
+
       if (notes.length === 0) {
         return {
           content: [
@@ -1302,18 +1310,26 @@ ${isRunning ? '✅ Write operations use sync-safe Bear API' : '✅ All database 
         };
       }
 
-      const notesList = notes.map(note => {
-        const preview = note.ZTEXT ? note.ZTEXT.substring(0, 100) + '...' : '';
-        const tags = note.tags.length > 0 ? ` [${note.tags.join(', ')}]` : '';
-        const length = note.contentLength ? ` (${note.contentLength} chars)` : '';
-        const status = [];
-        if (note.ZPINNED) status.push('📌');
-        if (note.ZARCHIVED) status.push('📦');
-        if (note.ZENCRYPTED) status.push('🔒');
-        const statusStr = status.length > 0 ? ` ${status.join('')}` : '';
-        
-        return `📝 **${note.ZTITLE || 'Untitled'}** (ID: ${note.Z_PK})${tags}${length}${statusStr}\n   ${preview}`;
-      }).join('\n\n');
+      const notesList = notes
+        .map(note => {
+          const preview = note.ZTEXT ? `${note.ZTEXT.substring(0, 100)}...` : '';
+          const tags = note.tags.length > 0 ? ` [${note.tags.join(', ')}]` : '';
+          const length = note.contentLength ? ` (${note.contentLength} chars)` : '';
+          const status = [];
+          if (note.ZPINNED) {
+            status.push('📌');
+          }
+          if (note.ZARCHIVED) {
+            status.push('📦');
+          }
+          if (note.ZENCRYPTED) {
+            status.push('🔒');
+          }
+          const statusStr = status.length > 0 ? ` ${status.join('')}` : '';
+
+          return `📝 **${note.ZTITLE || 'Untitled'}** (ID: ${note.Z_PK})${tags}${length}${statusStr}\n   ${preview}`;
+        })
+        .join('\n\n');
 
       return {
         content: [
@@ -1338,14 +1354,16 @@ ${isRunning ? '✅ Write operations use sync-safe Bear API' : '✅ All database 
   private async getNoteAnalytics() {
     try {
       const analytics = await this.bearService.getNoteAnalytics();
-      
-      const monthlyData = analytics.notesPerMonth.slice(0, 6).map(stat => 
-        `   ${stat.month}: ${stat.count} notes`
-      ).join('\n');
 
-      const topTagsData = analytics.topTags.slice(0, 8).map(tag => 
-        `   ${tag.tag}: ${tag.count} notes`
-      ).join('\n');
+      const monthlyData = analytics.notesPerMonth
+        .slice(0, 6)
+        .map(stat => `   ${stat.month}: ${stat.count} notes`)
+        .join('\n');
+
+      const topTagsData = analytics.topTags
+        .slice(0, 8)
+        .map(tag => `   ${tag.tag}: ${tag.count} notes`)
+        .join('\n');
 
       return {
         content: [
@@ -1393,13 +1411,13 @@ ${topTagsData}`,
     try {
       const noteId = args?.noteId;
       const limit = args?.limit || 5;
-      
+
       if (!noteId) {
         throw new Error('Note ID is required');
       }
 
       const related = await this.bearService.getRelatedNotes(noteId, limit);
-      
+
       if (related.byTags.length === 0 && related.byContent.length === 0) {
         return {
           content: [
@@ -1452,57 +1470,71 @@ ${topTagsData}`,
 
   private async searchNotesFullText(args: any) {
     try {
-      const { 
-        query, 
-        limit = 20, 
-        includeSnippets = true, 
+      const {
+        query,
+        limit = 20,
+        includeSnippets = true,
         searchFields = ['both'],
         fuzzyMatch = false,
-        caseSensitive = false 
+        caseSensitive = false,
       } = args;
-      
+
       const results = await this.bearService.searchNotesFullText(query, {
         limit,
         includeSnippets,
         searchFields,
         fuzzyMatch,
-        caseSensitive
+        caseSensitive,
       });
-      
+
       return {
-        content: [{
-          type: 'text',
-          text: JSON.stringify({
-            success: true,
-            data: {
-              query,
-              totalFound: results.length,
-              results: results.map(result => ({
-                id: result.Z_PK,
-                title: result.ZTITLE,
-                content: result.ZTEXT?.substring(0, 500) + (result.ZTEXT && result.ZTEXT.length > 500 ? '...' : ''),
-                tags: result.tags,
-                createdAt: result.ZCREATIONDATE,
-                modifiedAt: result.ZMODIFICATIONDATE,
-                relevanceScore: result.relevanceScore,
-                matchedTerms: result.matchedTerms,
-                snippets: result.snippets,
-                titleMatches: result.titleMatches,
-                contentMatches: result.contentMatches
-              }))
-            }
-          }, null, 2)
-        }]
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify(
+              {
+                success: true,
+                data: {
+                  query,
+                  totalFound: results.length,
+                  results: results.map(result => ({
+                    id: result.Z_PK,
+                    title: result.ZTITLE,
+                    content:
+                      result.ZTEXT?.substring(0, 500) +
+                      (result.ZTEXT && result.ZTEXT.length > 500 ? '...' : ''),
+                    tags: result.tags,
+                    createdAt: result.ZCREATIONDATE,
+                    modifiedAt: result.ZMODIFICATIONDATE,
+                    relevanceScore: result.relevanceScore,
+                    matchedTerms: result.matchedTerms,
+                    snippets: result.snippets,
+                    titleMatches: result.titleMatches,
+                    contentMatches: result.contentMatches,
+                  })),
+                },
+              },
+              null,
+              2
+            ),
+          },
+        ],
       };
     } catch (error) {
       return {
-        content: [{
-          type: 'text',
-          text: JSON.stringify({
-            success: false,
-            error: error instanceof Error ? error.message : 'Unknown error occurred'
-          }, null, 2)
-        }]
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify(
+              {
+                success: false,
+                error: error instanceof Error ? error.message : 'Unknown error occurred',
+              },
+              null,
+              2
+            ),
+          },
+        ],
       };
     }
   }
@@ -1511,28 +1543,40 @@ ${topTagsData}`,
     try {
       const { partialQuery, limit = 10 } = args;
       const suggestions = await this.bearService.getSearchSuggestions(partialQuery, limit);
-      
+
       return {
-        content: [{
-          type: 'text',
-          text: JSON.stringify({
-            success: true,
-            data: {
-              partialQuery,
-              suggestions
-            }
-          }, null, 2)
-        }]
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify(
+              {
+                success: true,
+                data: {
+                  partialQuery,
+                  suggestions,
+                },
+              },
+              null,
+              2
+            ),
+          },
+        ],
       };
     } catch (error) {
       return {
-        content: [{
-          type: 'text',
-          text: JSON.stringify({
-            success: false,
-            error: error instanceof Error ? error.message : 'Unknown error occurred'
-          }, null, 2)
-        }]
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify(
+              {
+                success: false,
+                error: error instanceof Error ? error.message : 'Unknown error occurred',
+              },
+              null,
+              2
+            ),
+          },
+        ],
       };
     }
   }
@@ -1543,40 +1587,55 @@ ${topTagsData}`,
       const results = await this.bearService.findSimilarNotes(referenceText, {
         limit,
         minSimilarity,
-        excludeNoteId
+        excludeNoteId,
       });
-      
+
       return {
-        content: [{
-          type: 'text',
-          text: JSON.stringify({
-            success: true,
-            data: {
-              referenceText: referenceText.substring(0, 200) + (referenceText.length > 200 ? '...' : ''),
-              totalFound: results.length,
-              similarNotes: results.map(result => ({
-                id: result.Z_PK,
-                title: result.ZTITLE,
-                content: result.ZTEXT?.substring(0, 300) + (result.ZTEXT && result.ZTEXT.length > 300 ? '...' : ''),
-                tags: result.tags,
-                createdAt: result.ZCREATIONDATE,
-                modifiedAt: result.ZMODIFICATIONDATE,
-                similarityScore: result.similarityScore,
-                commonKeywords: result.commonKeywords
-              }))
-            }
-          }, null, 2)
-        }]
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify(
+              {
+                success: true,
+                data: {
+                  referenceText:
+                    referenceText.substring(0, 200) + (referenceText.length > 200 ? '...' : ''),
+                  totalFound: results.length,
+                  similarNotes: results.map(result => ({
+                    id: result.Z_PK,
+                    title: result.ZTITLE,
+                    content:
+                      result.ZTEXT?.substring(0, 300) +
+                      (result.ZTEXT && result.ZTEXT.length > 300 ? '...' : ''),
+                    tags: result.tags,
+                    createdAt: result.ZCREATIONDATE,
+                    modifiedAt: result.ZMODIFICATIONDATE,
+                    similarityScore: result.similarityScore,
+                    commonKeywords: result.commonKeywords,
+                  })),
+                },
+              },
+              null,
+              2
+            ),
+          },
+        ],
       };
     } catch (error) {
       return {
-        content: [{
-          type: 'text',
-          text: JSON.stringify({
-            success: false,
-            error: error instanceof Error ? error.message : 'Unknown error occurred'
-          }, null, 2)
-        }]
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify(
+              {
+                success: false,
+                error: error instanceof Error ? error.message : 'Unknown error occurred',
+              },
+              null,
+              2
+            ),
+          },
+        ],
       };
     }
   }
@@ -1588,63 +1647,87 @@ ${topTagsData}`,
         noteId,
         fileType,
         includeMetadata,
-        limit
+        limit,
       });
-      
+
       return {
-        content: [{
-          type: 'text',
-          text: JSON.stringify({
-            success: true,
-            data: attachments
-          }, null, 2)
-        }]
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify(
+              {
+                success: true,
+                data: attachments,
+              },
+              null,
+              2
+            ),
+          },
+        ],
       };
     } catch (error) {
       return {
-        content: [{
-          type: 'text',
-          text: JSON.stringify({
-            success: false,
-            error: error instanceof Error ? error.message : 'Unknown error occurred'
-          }, null, 2)
-        }]
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify(
+              {
+                success: false,
+                error: error instanceof Error ? error.message : 'Unknown error occurred',
+              },
+              null,
+              2
+            ),
+          },
+        ],
       };
     }
   }
 
   private async analyzeNoteMetadata(args: any) {
     try {
-      const { 
-        includeContentAnalysis = false, 
-        includeLinkAnalysis = false, 
-        includeStructureAnalysis = false 
+      const {
+        includeContentAnalysis = false,
+        includeLinkAnalysis = false,
+        includeStructureAnalysis = false,
       } = args;
-      
+
       const analysis = await this.bearService.analyzeNoteMetadata({
         includeContentAnalysis,
         includeLinkAnalysis,
-        includeStructureAnalysis
+        includeStructureAnalysis,
       });
-      
+
       return {
-        content: [{
-          type: 'text',
-          text: JSON.stringify({
-            success: true,
-            data: analysis
-          }, null, 2)
-        }]
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify(
+              {
+                success: true,
+                data: analysis,
+              },
+              null,
+              2
+            ),
+          },
+        ],
       };
     } catch (error) {
       return {
-        content: [{
-          type: 'text',
-          text: JSON.stringify({
-            success: false,
-            error: error instanceof Error ? error.message : 'Unknown error occurred'
-          }, null, 2)
-        }]
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify(
+              {
+                success: false,
+                error: error instanceof Error ? error.message : 'Unknown error occurred',
+              },
+              null,
+              2
+            ),
+          },
+        ],
       };
     }
   }
@@ -1660,47 +1743,61 @@ ${topTagsData}`,
         hasTables: args.hasTables,
         minWordCount: args.minWordCount,
         maxWordCount: args.maxWordCount,
-        limit: args.limit || 20
+        limit: args.limit || 20,
       };
-      
+
       const notes = await this.bearService.getNotesWithMetadata(criteria);
-      
+
       return {
-        content: [{
-          type: 'text',
-          text: JSON.stringify({
-            success: true,
-            data: {
-              totalFound: notes.length,
-              notes: notes.map(note => ({
-                id: note.Z_PK,
-                title: note.ZTITLE,
-                content: note.ZTEXT?.substring(0, 300) + (note.ZTEXT && note.ZTEXT.length > 300 ? '...' : ''),
-                tags: note.tags,
-                createdAt: note.ZCREATIONDATE,
-                modifiedAt: note.ZMODIFICATIONDATE,
-                wordCount: note.wordCount,
-                attachmentCount: note.attachmentCount,
-                linkCount: note.linkCount,
-                imageCount: note.imageCount,
-                todoCount: note.todoCount,
-                codeBlockCount: note.codeBlockCount,
-                tableCount: note.tableCount,
-                metadata: note.metadata
-              }))
-            }
-          }, null, 2)
-        }]
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify(
+              {
+                success: true,
+                data: {
+                  totalFound: notes.length,
+                  notes: notes.map(note => ({
+                    id: note.Z_PK,
+                    title: note.ZTITLE,
+                    content:
+                      note.ZTEXT?.substring(0, 300) +
+                      (note.ZTEXT && note.ZTEXT.length > 300 ? '...' : ''),
+                    tags: note.tags,
+                    createdAt: note.ZCREATIONDATE,
+                    modifiedAt: note.ZMODIFICATIONDATE,
+                    wordCount: note.wordCount,
+                    attachmentCount: note.attachmentCount,
+                    linkCount: note.linkCount,
+                    imageCount: note.imageCount,
+                    todoCount: note.todoCount,
+                    codeBlockCount: note.codeBlockCount,
+                    tableCount: note.tableCount,
+                    metadata: note.metadata,
+                  })),
+                },
+              },
+              null,
+              2
+            ),
+          },
+        ],
       };
     } catch (error) {
       return {
-        content: [{
-          type: 'text',
-          text: JSON.stringify({
-            success: false,
-            error: error instanceof Error ? error.message : 'Unknown error occurred'
-          }, null, 2)
-        }]
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify(
+              {
+                success: false,
+                error: error instanceof Error ? error.message : 'Unknown error occurred',
+              },
+              null,
+              2
+            ),
+          },
+        ],
       };
     }
   }
@@ -1708,109 +1805,141 @@ ${topTagsData}`,
   private async createNote(args: any) {
     try {
       const { title, content, tags, isArchived = false, isPinned = false } = args;
-      
+
       if (!title || title.trim().length === 0) {
         throw new Error('Title is required and cannot be empty');
       }
-      
+
       const result = await this.bearService.createNote({
         title: title.trim(),
         content: content || '',
         tags: tags || [],
         isArchived,
-        isPinned
+        isPinned,
       });
-      
+
       return {
-        content: [{
-          type: 'text',
-          text: JSON.stringify({
-            success: true,
-            data: {
-              noteId: result.noteId,
-              title: title.trim(),
-              message: `Note created successfully with ID ${result.noteId}`,
-              tagWarnings: result.tagWarnings
-            }
-          }, null, 2)
-        }]
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify(
+              {
+                success: true,
+                data: {
+                  noteId: result.noteId,
+                  title: title.trim(),
+                  message: `Note created successfully with ID ${result.noteId}`,
+                  tagWarnings: result.tagWarnings,
+                },
+              },
+              null,
+              2
+            ),
+          },
+        ],
       };
     } catch (error) {
       return {
-        content: [{
-          type: 'text',
-          text: JSON.stringify({
-            success: false,
-            error: error instanceof Error ? error.message : 'Unknown error occurred'
-          }, null, 2)
-        }]
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify(
+              {
+                success: false,
+                error: error instanceof Error ? error.message : 'Unknown error occurred',
+              },
+              null,
+              2
+            ),
+          },
+        ],
       };
     }
   }
 
   private async updateNote(args: any) {
     try {
-      const { 
-        noteId, 
-        title, 
-        content, 
-        tags, 
-        isArchived, 
-        isPinned, 
-        expectedModificationDate 
-      } = args;
-      
+      const { noteId, title, content, tags, isArchived, isPinned, expectedModificationDate } = args;
+
       if (!noteId || typeof noteId !== 'number') {
         throw new Error('Valid noteId is required');
       }
-      
+
       const options: any = {};
-      if (title !== undefined) options.title = title;
-      if (content !== undefined) options.content = content;
-      if (tags !== undefined) options.tags = tags;
-      if (isArchived !== undefined) options.isArchived = isArchived;
-      if (isPinned !== undefined) options.isPinned = isPinned;
+      if (title !== undefined) {
+        options.title = title;
+      }
+      if (content !== undefined) {
+        options.content = content;
+      }
+      if (tags !== undefined) {
+        options.tags = tags;
+      }
+      if (isArchived !== undefined) {
+        options.isArchived = isArchived;
+      }
+      if (isPinned !== undefined) {
+        options.isPinned = isPinned;
+      }
       if (expectedModificationDate) {
         options.expectedModificationDate = new Date(expectedModificationDate);
       }
-      
+
       const result = await this.bearService.updateNote(noteId, options);
-      
+
       if (result.conflictDetected) {
         return {
-          content: [{
-            type: 'text',
-            text: JSON.stringify({
-              success: false,
-              error: 'Conflict detected: Note was modified by another process',
-              conflictDetected: true
-            }, null, 2)
-          }]
+          content: [
+            {
+              type: 'text',
+              text: JSON.stringify(
+                {
+                  success: false,
+                  error: 'Conflict detected: Note was modified by another process',
+                  conflictDetected: true,
+                },
+                null,
+                2
+              ),
+            },
+          ],
         };
       }
-      
+
       return {
-        content: [{
-          type: 'text',
-          text: JSON.stringify({
-            success: true,
-            data: {
-              noteId,
-              message: `Note ${noteId} updated successfully`,
-              tagWarnings: result.tagWarnings
-            }
-          }, null, 2)
-        }]
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify(
+              {
+                success: true,
+                data: {
+                  noteId,
+                  message: `Note ${noteId} updated successfully`,
+                  tagWarnings: result.tagWarnings,
+                },
+              },
+              null,
+              2
+            ),
+          },
+        ],
       };
     } catch (error) {
       return {
-        content: [{
-          type: 'text',
-          text: JSON.stringify({
-            success: false,
-            error: error instanceof Error ? error.message : 'Unknown error occurred'
-          }, null, 2)
-        }]
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify(
+              {
+                success: false,
+                error: error instanceof Error ? error.message : 'Unknown error occurred',
+              },
+              null,
+              2
+            ),
+          },
+        ],
       };
     }
   }
@@ -1818,38 +1947,50 @@ ${topTagsData}`,
   private async duplicateNote(args: any) {
     try {
       const { noteId, titleSuffix, copyTags = true } = args;
-      
+
       if (!noteId || typeof noteId !== 'number') {
         throw new Error('Valid noteId is required');
       }
-      
+
       const result = await this.bearService.duplicateNote(noteId, {
         titleSuffix,
-        copyTags
+        copyTags,
       });
-      
+
       return {
-        content: [{
-          type: 'text',
-          text: JSON.stringify({
-            success: true,
-            data: {
-              originalNoteId: noteId,
-              newNoteId: result.newNoteId,
-              message: `Note ${noteId} duplicated successfully as note ${result.newNoteId}`
-            }
-          }, null, 2)
-        }]
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify(
+              {
+                success: true,
+                data: {
+                  originalNoteId: noteId,
+                  newNoteId: result.newNoteId,
+                  message: `Note ${noteId} duplicated successfully as note ${result.newNoteId}`,
+                },
+              },
+              null,
+              2
+            ),
+          },
+        ],
       };
     } catch (error) {
       return {
-        content: [{
-          type: 'text',
-          text: JSON.stringify({
-            success: false,
-            error: error instanceof Error ? error.message : 'Unknown error occurred'
-          }, null, 2)
-        }]
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify(
+              {
+                success: false,
+                error: error instanceof Error ? error.message : 'Unknown error occurred',
+              },
+              null,
+              2
+            ),
+          },
+        ],
       };
     }
   }
@@ -1857,39 +1998,51 @@ ${topTagsData}`,
   private async archiveNote(args: any) {
     try {
       const { noteId, archived } = args;
-      
+
       if (!noteId || typeof noteId !== 'number') {
         throw new Error('Valid noteId is required');
       }
-      
+
       if (typeof archived !== 'boolean') {
         throw new Error('archived parameter must be a boolean');
       }
-      
-      const result = await this.bearService.archiveNote(noteId, archived);
-      
+
+      await this.bearService.archiveNote(noteId, archived);
+
       return {
-        content: [{
-          type: 'text',
-          text: JSON.stringify({
-            success: true,
-            data: {
-              noteId,
-              archived,
-              message: `Note ${noteId} ${archived ? 'archived' : 'unarchived'} successfully`
-            }
-          }, null, 2)
-        }]
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify(
+              {
+                success: true,
+                data: {
+                  noteId,
+                  archived,
+                  message: `Note ${noteId} ${archived ? 'archived' : 'unarchived'} successfully`,
+                },
+              },
+              null,
+              2
+            ),
+          },
+        ],
       };
     } catch (error) {
       return {
-        content: [{
-          type: 'text',
-          text: JSON.stringify({
-            success: false,
-            error: error instanceof Error ? error.message : 'Unknown error occurred'
-          }, null, 2)
-        }]
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify(
+              {
+                success: false,
+                error: error instanceof Error ? error.message : 'Unknown error occurred',
+              },
+              null,
+              2
+            ),
+          },
+        ],
       };
     }
   }
@@ -1897,33 +2050,45 @@ ${topTagsData}`,
   private async triggerHashtagParsing(args: any) {
     try {
       const { note_id, note_title } = args;
-      
+
       if (!note_id && !note_title) {
         throw new Error('Either note_id or note_title is required');
       }
-      
+
       const result = await this.bearService.triggerHashtagParsing(note_id, note_title);
-      
+
       return {
-        content: [{
-          type: 'text',
-          text: JSON.stringify({
-            success: true,
-            data: {
-              message: result
-            }
-          }, null, 2)
-        }]
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify(
+              {
+                success: true,
+                data: {
+                  message: result,
+                },
+              },
+              null,
+              2
+            ),
+          },
+        ],
       };
     } catch (error) {
       return {
-        content: [{
-          type: 'text',
-          text: JSON.stringify({
-            success: false,
-            error: error instanceof Error ? error.message : 'Unknown error occurred'
-          }, null, 2)
-        }]
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify(
+              {
+                success: false,
+                error: error instanceof Error ? error.message : 'Unknown error occurred',
+              },
+              null,
+              2
+            ),
+          },
+        ],
       };
     }
   }
@@ -1931,34 +2096,46 @@ ${topTagsData}`,
   private async batchTriggerHashtagParsing(args: any) {
     try {
       const { tag_filter, title_pattern, limit = 10, created_after } = args;
-      
+
       const result = await this.bearService.batchTriggerHashtagParsing({
         tag_filter,
         title_pattern,
         limit,
-        created_after
+        created_after,
       });
-      
+
       return {
-        content: [{
-          type: 'text',
-          text: JSON.stringify({
-            success: true,
-            data: {
-              message: result
-            }
-          }, null, 2)
-        }]
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify(
+              {
+                success: true,
+                data: {
+                  message: result,
+                },
+              },
+              null,
+              2
+            ),
+          },
+        ],
       };
     } catch (error) {
       return {
-        content: [{
-          type: 'text',
-          text: JSON.stringify({
-            success: false,
-            error: error instanceof Error ? error.message : 'Unknown error occurred'
-          }, null, 2)
-        }]
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify(
+              {
+                success: false,
+                error: error instanceof Error ? error.message : 'Unknown error occurred',
+              },
+              null,
+              2
+            ),
+          },
+        ],
       };
     }
   }
@@ -1972,7 +2149,7 @@ ${topTagsData}`,
 
 // Start the server
 const server = new BearMCPServer();
-server.run().catch((error) => {
+server.run().catch(() => {
   // Silent error handling to avoid JSON-RPC interference
   process.exit(1);
-}); 
+});
