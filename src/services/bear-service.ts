@@ -1785,7 +1785,25 @@ export class BearService {
             },
           };
         })
-        .filter(Boolean) as any[];
+        .filter(Boolean) as Array<
+        NoteWithTags & {
+          wordCount: number;
+          attachmentCount: number;
+          linkCount: number;
+          imageCount: number;
+          todoCount: number;
+          codeBlockCount: number;
+          tableCount: number;
+          metadata: {
+            hasAttachments: boolean;
+            hasLinks: boolean;
+            hasImages: boolean;
+            hasTodos: boolean;
+            hasCodeBlocks: boolean;
+            hasTables: boolean;
+          };
+        }
+      >;
 
       return results;
     } finally {

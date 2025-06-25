@@ -17,6 +17,165 @@ import { BearService } from './services/bear-service.js';
 
 // Error types imported for potential use in error handling
 
+// MCP tool argument interfaces
+interface GetRecentNotesArgs {
+  limit?: number;
+}
+
+interface SearchNotesArgs {
+  query: string;
+  limit?: number;
+}
+
+interface GetNoteByIdArgs {
+  id: number;
+}
+
+interface GetNoteByTitleArgs {
+  title: string;
+}
+
+interface GetNotesByTagArgs {
+  tag: string;
+}
+
+interface GetNotesAdvancedArgs {
+  query?: string;
+  tags?: string[];
+  excludeTags?: string[];
+  dateFrom?: string;
+  dateTo?: string;
+  modifiedAfter?: string;
+  modifiedBefore?: string;
+  includeContent?: boolean;
+  includeTrashed?: boolean;
+  includeArchived?: boolean;
+  includeEncrypted?: boolean;
+  sortBy?: 'created' | 'modified' | 'title' | 'size';
+  sortOrder?: 'asc' | 'desc';
+  limit?: number;
+  offset?: number;
+}
+
+interface GetNotesWithCriteriaArgs {
+  titleContains?: string[];
+  contentContains?: string[];
+  hasAllTags?: string[];
+  hasAnyTags?: string[];
+  createdAfter?: string;
+  createdBefore?: string;
+  modifiedAfter?: string;
+  modifiedBefore?: string;
+  minLength?: number;
+  maxLength?: number;
+  isPinned?: boolean;
+  isArchived?: boolean;
+  isTrashed?: boolean;
+  isEncrypted?: boolean;
+}
+
+interface GetRelatedNotesArgs {
+  noteId: number;
+  limit?: number;
+}
+
+interface SearchNotesFullTextArgs {
+  query: string;
+  limit?: number;
+  includeSnippets?: boolean;
+  searchFields?: ('title' | 'content' | 'both')[];
+  fuzzyMatch?: boolean;
+  caseSensitive?: boolean;
+  wholeWords?: boolean;
+  includeArchived?: boolean;
+  includeTrashed?: boolean;
+  tags?: string[];
+  dateFrom?: string;
+  dateTo?: string;
+}
+
+interface GetSearchSuggestionsArgs {
+  partialQuery: string;
+  limit?: number;
+}
+
+interface FindSimilarNotesArgs {
+  referenceText: string;
+  limit?: number;
+  minSimilarity?: number;
+  excludeNoteId?: number;
+}
+
+interface GetFileAttachmentsArgs {
+  noteId?: number;
+  fileType?: string;
+  includeMetadata?: boolean;
+  limit?: number;
+}
+
+interface AnalyzeNoteMetadataArgs {
+  includeContentAnalysis?: boolean;
+  includeLinkAnalysis?: boolean;
+  includeStructureAnalysis?: boolean;
+}
+
+interface GetNotesWithMetadataArgs {
+  hasAttachments?: boolean;
+  hasLinks?: boolean;
+  hasImages?: boolean;
+  hasTodos?: boolean;
+  hasCodeBlocks?: boolean;
+  hasTables?: boolean;
+  minWordCount?: number;
+  maxWordCount?: number;
+  createdAfter?: string;
+  createdBefore?: string;
+  modifiedAfter?: string;
+  modifiedBefore?: string;
+  limit?: number;
+}
+
+interface CreateNoteArgs {
+  title: string;
+  content?: string;
+  tags?: string[];
+  isArchived?: boolean;
+  isPinned?: boolean;
+}
+
+interface UpdateNoteArgs {
+  noteId: number;
+  title?: string;
+  content?: string;
+  tags?: string[];
+  isArchived?: boolean;
+  isPinned?: boolean;
+  expectedModificationDate?: string;
+}
+
+interface DuplicateNoteArgs {
+  noteId: number;
+  titleSuffix?: string;
+  copyTags?: boolean;
+}
+
+interface ArchiveNoteArgs {
+  noteId: number;
+  archived: boolean;
+}
+
+interface TriggerHashtagParsingArgs {
+  noteId?: string;
+  noteTitle?: string;
+}
+
+interface BatchTriggerHashtagParsingArgs {
+  tag_filter?: string;
+  title_pattern?: string;
+  limit?: number;
+  created_after?: string;
+}
+
 /**
  * Bear MCP Server
  * Provides MCP tools for interfacing with Bear's SQLite database
@@ -65,43 +224,43 @@ class BearMCPServer {
             return await this.createBackup();
 
           case 'get_recent_notes':
-            return await this.getRecentNotes(args);
+            return await this.getRecentNotes(args as unknown as GetRecentNotesArgs);
 
           case 'search_notes':
-            return await this.searchNotes(args);
+            return await this.searchNotes(args as unknown as SearchNotesArgs);
 
           case 'get_note_by_id':
-            return await this.getNoteById(args);
+            return await this.getNoteById(args as unknown as GetNoteByIdArgs);
 
           case 'get_note_by_title':
-            return await this.getNoteByTitle(args);
+            return await this.getNoteByTitle(args as unknown as GetNoteByTitleArgs);
 
           case 'get_all_tags':
             return await this.getAllTags();
 
           case 'get_notes_by_tag':
-            return await this.getNotesByTag(args);
+            return await this.getNotesByTag(args as unknown as GetNotesByTagArgs);
 
           case 'get_notes_advanced':
-            return await this.getNotesAdvanced(args);
+            return await this.getNotesAdvanced(args as unknown as GetNotesAdvancedArgs);
 
           case 'get_notes_with_criteria':
-            return await this.getNotesWithCriteria(args);
+            return await this.getNotesWithCriteria(args as unknown as GetNotesWithCriteriaArgs);
 
           case 'get_note_analytics':
             return await this.getNoteAnalytics();
 
           case 'get_related_notes':
-            return await this.getRelatedNotes(args);
+            return await this.getRelatedNotes(args as unknown as GetRelatedNotesArgs);
 
           case 'search_notes_fulltext':
-            return await this.searchNotesFullText(args);
+            return await this.searchNotesFullText(args as unknown as SearchNotesFullTextArgs);
 
           case 'get_search_suggestions':
-            return await this.getSearchSuggestions(args);
+            return await this.getSearchSuggestions(args as unknown as GetSearchSuggestionsArgs);
 
           case 'find_similar_notes':
-            return await this.findSimilarNotes(args);
+            return await this.findSimilarNotes(args as unknown as FindSimilarNotesArgs);
 
           // case 'search_notes_regex':
           //   return await this.searchNotesRegex(args);
@@ -120,31 +279,33 @@ class BearMCPServer {
           //   return await this.getTagUsageTrends(args);
 
           case 'get_file_attachments':
-            return await this.getFileAttachments(args);
+            return await this.getFileAttachments(args as unknown as GetFileAttachmentsArgs);
 
           case 'analyze_note_metadata':
-            return await this.analyzeNoteMetadata(args);
+            return await this.analyzeNoteMetadata(args as unknown as AnalyzeNoteMetadataArgs);
 
           case 'get_notes_with_metadata':
-            return await this.getNotesWithMetadata(args);
+            return await this.getNotesWithMetadata(args as unknown as GetNotesWithMetadataArgs);
 
           case 'create_note':
-            return await this.createNote(args);
+            return await this.createNote(args as unknown as CreateNoteArgs);
 
           case 'update_note':
-            return await this.updateNote(args);
+            return await this.updateNote(args as unknown as UpdateNoteArgs);
 
           case 'duplicate_note':
-            return await this.duplicateNote(args);
+            return await this.duplicateNote(args as unknown as DuplicateNoteArgs);
 
           case 'archive_note':
-            return await this.archiveNote(args);
+            return await this.archiveNote(args as unknown as ArchiveNoteArgs);
 
           case 'trigger_hashtag_parsing':
-            return await this.triggerHashtagParsing(args);
+            return await this.triggerHashtagParsing(args as unknown as TriggerHashtagParsingArgs);
 
           case 'batch_trigger_hashtag_parsing':
-            return await this.batchTriggerHashtagParsing(args);
+            return await this.batchTriggerHashtagParsing(
+              args as unknown as BatchTriggerHashtagParsingArgs
+            );
 
           default:
             throw new Error(`Unknown tool: ${name}`);
@@ -963,7 +1124,7 @@ ${isRunning ? '✅ Write operations use sync-safe Bear API' : '✅ All database 
     }
   }
 
-  private async getRecentNotes(args: any) {
+  private async getRecentNotes(args: GetRecentNotesArgs) {
     try {
       const limit = args?.limit || 10;
       const notes = await this.bearService.getRecentNotes(limit);
@@ -1007,7 +1168,7 @@ ${isRunning ? '✅ Write operations use sync-safe Bear API' : '✅ All database 
     }
   }
 
-  private async searchNotes(args: any) {
+  private async searchNotes(args: SearchNotesArgs) {
     try {
       const query = args?.query;
       const limit = args?.limit || 20;
@@ -1057,7 +1218,7 @@ ${isRunning ? '✅ Write operations use sync-safe Bear API' : '✅ All database 
     }
   }
 
-  private async getNoteById(args: any) {
+  private async getNoteById(args: GetNoteByIdArgs) {
     try {
       const id = args?.id;
 
@@ -1101,7 +1262,7 @@ ${isRunning ? '✅ Write operations use sync-safe Bear API' : '✅ All database 
     }
   }
 
-  private async getNoteByTitle(args: any) {
+  private async getNoteByTitle(args: GetNoteByTitleArgs) {
     try {
       const title = args?.title;
 
@@ -1182,7 +1343,7 @@ ${isRunning ? '✅ Write operations use sync-safe Bear API' : '✅ All database 
     }
   }
 
-  private async getNotesByTag(args: any) {
+  private async getNotesByTag(args: GetNotesByTagArgs) {
     try {
       const tag = args?.tag;
 
@@ -1232,7 +1393,7 @@ ${isRunning ? '✅ Write operations use sync-safe Bear API' : '✅ All database 
     }
   }
 
-  private async getNotesAdvanced(args: any) {
+  private async getNotesAdvanced(args: GetNotesAdvancedArgs) {
     try {
       const options = {
         query: args?.query,
@@ -1285,7 +1446,7 @@ ${isRunning ? '✅ Write operations use sync-safe Bear API' : '✅ All database 
     }
   }
 
-  private async getNotesWithCriteria(args: any) {
+  private async getNotesWithCriteria(args: GetNotesWithCriteriaArgs) {
     try {
       const criteria = {
         titleContains: args?.titleContains,
@@ -1408,7 +1569,7 @@ ${topTagsData}`,
     }
   }
 
-  private async getRelatedNotes(args: any) {
+  private async getRelatedNotes(args: GetRelatedNotesArgs) {
     try {
       const noteId = args?.noteId;
       const limit = args?.limit || 5;
@@ -1469,7 +1630,7 @@ ${topTagsData}`,
     }
   }
 
-  private async searchNotesFullText(args: any) {
+  private async searchNotesFullText(args: SearchNotesFullTextArgs) {
     try {
       const {
         query,
@@ -1540,7 +1701,7 @@ ${topTagsData}`,
     }
   }
 
-  private async getSearchSuggestions(args: any) {
+  private async getSearchSuggestions(args: GetSearchSuggestionsArgs) {
     try {
       const { partialQuery, limit = 10 } = args;
       const suggestions = await this.bearService.getSearchSuggestions(partialQuery, limit);
@@ -1582,7 +1743,7 @@ ${topTagsData}`,
     }
   }
 
-  private async findSimilarNotes(args: any) {
+  private async findSimilarNotes(args: FindSimilarNotesArgs) {
     try {
       const { referenceText, limit = 10, minSimilarity = 0.1, excludeNoteId } = args;
       const results = await this.bearService.findSimilarNotes(referenceText, {
@@ -1641,7 +1802,7 @@ ${topTagsData}`,
     }
   }
 
-  private async getFileAttachments(args: any) {
+  private async getFileAttachments(args: GetFileAttachmentsArgs) {
     try {
       const { noteId, fileType, includeMetadata = false, limit } = args;
       const attachments = await this.bearService.getFileAttachments({
@@ -1685,7 +1846,7 @@ ${topTagsData}`,
     }
   }
 
-  private async analyzeNoteMetadata(args: any) {
+  private async analyzeNoteMetadata(args: AnalyzeNoteMetadataArgs) {
     try {
       const {
         includeContentAnalysis = false,
@@ -1733,7 +1894,7 @@ ${topTagsData}`,
     }
   }
 
-  private async getNotesWithMetadata(args: any) {
+  private async getNotesWithMetadata(args: GetNotesWithMetadataArgs) {
     try {
       const criteria = {
         hasAttachments: args.hasAttachments,
@@ -1803,7 +1964,7 @@ ${topTagsData}`,
     }
   }
 
-  private async createNote(args: any) {
+  private async createNote(args: CreateNoteArgs) {
     try {
       const { title, content, tags, isArchived = false, isPinned = false } = args;
 
@@ -1858,7 +2019,7 @@ ${topTagsData}`,
     }
   }
 
-  private async updateNote(args: any) {
+  private async updateNote(args: UpdateNoteArgs) {
     try {
       const { noteId, title, content, tags, isArchived, isPinned, expectedModificationDate } = args;
 
@@ -1866,7 +2027,14 @@ ${topTagsData}`,
         throw new Error('Valid noteId is required');
       }
 
-      const options: any = {};
+      const options: {
+        title?: string;
+        content?: string;
+        tags?: string[];
+        isArchived?: boolean;
+        isPinned?: boolean;
+        expectedModificationDate?: Date;
+      } = {};
 
       if (title !== undefined) {
         options.title = title;
@@ -1946,7 +2114,7 @@ ${topTagsData}`,
     }
   }
 
-  private async duplicateNote(args: any) {
+  private async duplicateNote(args: DuplicateNoteArgs) {
     try {
       const { noteId, titleSuffix, copyTags = true } = args;
 
@@ -1997,7 +2165,7 @@ ${topTagsData}`,
     }
   }
 
-  private async archiveNote(args: any) {
+  private async archiveNote(args: ArchiveNoteArgs) {
     try {
       const { noteId, archived } = args;
 
@@ -2049,15 +2217,15 @@ ${topTagsData}`,
     }
   }
 
-  private async triggerHashtagParsing(args: any) {
+  private async triggerHashtagParsing(args: TriggerHashtagParsingArgs) {
     try {
-      const { note_id, note_title } = args;
+      const { noteId, noteTitle } = args;
 
-      if (!note_id && !note_title) {
-        throw new Error('Either note_id or note_title is required');
+      if (!noteId && !noteTitle) {
+        throw new Error('Either noteId or noteTitle is required');
       }
 
-      const result = await this.bearService.triggerHashtagParsing(note_id, note_title);
+      const result = await this.bearService.triggerHashtagParsing(noteId, noteTitle);
 
       return {
         content: [
@@ -2095,7 +2263,7 @@ ${topTagsData}`,
     }
   }
 
-  private async batchTriggerHashtagParsing(args: any) {
+  private async batchTriggerHashtagParsing(args: BatchTriggerHashtagParsingArgs) {
     try {
       const { tag_filter, title_pattern, limit = 10, created_after } = args;
 
