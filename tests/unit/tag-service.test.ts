@@ -6,7 +6,7 @@ import {
 } from '../utils/test-helpers.js';
 import { globalContainer } from '../../src/services/container/service-container.js';
 import { SERVICE_TOKENS } from '../../src/services/interfaces/index.js';
-import { TagWithCount, NoteWithTags } from '../../src/types/bear.js';
+import { TagWithCount } from '../../src/types/bear.js';
 
 // Mock child_process
 jest.mock('child_process', () => ({
@@ -327,7 +327,7 @@ describe('TagService', () => {
     });
 
     it('should apply title pattern filter', async () => {
-      const result = await tagService.batchTriggerHashtagParsing({
+      await tagService.batchTriggerHashtagParsing({
         title_pattern: 'Project',
       });
 
@@ -338,7 +338,7 @@ describe('TagService', () => {
     });
 
     it('should apply created_after filter', async () => {
-      const result = await tagService.batchTriggerHashtagParsing({
+      await tagService.batchTriggerHashtagParsing({
         created_after: '2023-01-01T00:00:00.000Z',
       });
 
@@ -349,7 +349,7 @@ describe('TagService', () => {
     });
 
     it('should apply limit', async () => {
-      const result = await tagService.batchTriggerHashtagParsing({
+      await tagService.batchTriggerHashtagParsing({
         limit: 10,
       });
 

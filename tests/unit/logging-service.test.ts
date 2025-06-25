@@ -24,7 +24,7 @@ jest.mock('winston', () => ({
     timestamp: jest.fn(() => ({ transform: jest.fn() })),
     metadata: jest.fn(() => ({ transform: jest.fn() })),
     printf: jest.fn(() => ({ transform: jest.fn() })),
-    combine: jest.fn((...args) => ({ transform: jest.fn() })),
+    combine: jest.fn(() => ({ transform: jest.fn() })),
     colorize: jest.fn(() => ({ transform: jest.fn() })),
   },
   transports: {

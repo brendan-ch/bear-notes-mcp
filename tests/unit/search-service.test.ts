@@ -1,6 +1,5 @@
 import { SearchService } from '../../src/services/search-service.js';
-import { IDatabaseService, SERVICE_TOKENS } from '../../src/services/interfaces/index.js';
-import { globalContainer } from '../../src/services/container/service-container.js';
+import { SERVICE_TOKENS } from '../../src/services/interfaces/index.js';
 import { mockBearNotes } from '../fixtures/bear-data.js';
 import { MockBearDatabase } from '../utils/test-helpers.js';
 
@@ -659,7 +658,7 @@ describe('SearchService', () => {
 
       try {
         await searchService.searchNotes('test');
-      } catch (error) {
+      } catch {
         // Expected error
       }
 

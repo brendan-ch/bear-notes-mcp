@@ -1728,7 +1728,7 @@ export class BearService {
 
           // Count various content elements
           const wordCount = content.split(/\s+/).filter(word => word.length > 0).length;
-          const linkCount = (content.match(/https?:\/\/[^\s\)]+/g) || []).length;
+          const linkCount = (content.match(/https?:\/\/[^\s)]+/g) || []).length;
           const imageCount = (content.match(/!\[.*?\]\(.*?\)/g) || []).length;
           const todoCount = (content.match(/- \[[ x]\]/g) || []).length;
           const codeBlockCount = (content.match(/```/g) || []).length / 2;
@@ -1863,7 +1863,7 @@ export class BearService {
       patternCounts.emails += (
         text.match(/\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b/g) || []
       ).length;
-      patternCounts.urls += (text.match(/https?:\/\/[^\s\)]+/g) || []).length;
+      patternCounts.urls += (text.match(/https?:\/\/[^\s)]+/g) || []).length;
       patternCounts.phoneNumbers += (text.match(/\b\d{3}[.-]?\d{3}[.-]?\d{4}\b/g) || []).length;
       patternCounts.dates += (text.match(/\b\d{1,2}[/-]\d{1,2}[/-]\d{2,4}\b/g) || []).length;
       patternCounts.times += (
@@ -1908,7 +1908,7 @@ export class BearService {
 
     texts.forEach(text => {
       // Extract all URLs
-      const urls = text.match(/https?:\/\/[^\s\)\]]+/g) || [];
+      const urls = text.match(/https?:\/\/[^\s)\]]+/g) || [];
 
       urls.forEach(url => {
         try {

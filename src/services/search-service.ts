@@ -155,7 +155,7 @@ export class SearchService implements ISearchService {
             contentLength: row.content_length,
           };
 
-          const analysis = this.analyzeSearchMatches(note, searchTerms, options);
+          const analysis = this.analyzeSearchMatches(note, searchTerms);
 
           return {
             ...note,
@@ -793,11 +793,7 @@ export class SearchService implements ISearchService {
    */
   private analyzeSearchMatches(
     note: NoteWithTags,
-    searchTerms: string[],
-    options: {
-      caseSensitive?: boolean;
-      includeSnippets?: boolean;
-    }
+    searchTerms: string[]
   ): {
     relevanceScore: number;
     matchedTerms: string[];

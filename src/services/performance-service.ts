@@ -1,5 +1,5 @@
 import { getConfig } from '../config/index.js';
-import { PerformanceMetrics } from '../types/database.js';
+// Removed unused import PerformanceMetrics
 
 export interface QueryPerformance {
   sql: string;
