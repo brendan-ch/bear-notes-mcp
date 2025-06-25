@@ -11,6 +11,13 @@ import {
   TagWithCount,
   DatabaseStats,
   NoteSearchOptions,
+  SQLParameter,
+  FileMetadata,
+  ContentAnalysis,
+  LinkAnalysis,
+  StructureAnalysis,
+  DatabaseFileRecord,
+  DatabaseFileWithNote,
 } from '../types/bear.js';
 
 /**
@@ -92,7 +99,7 @@ export class BearService {
         WHERE 1=1
       `;
 
-      const params: any[] = [];
+      const params: SQLParameter[] = [];
 
       // Apply filters
       if (!options.includeTrashed) {
@@ -376,7 +383,7 @@ export class BearService {
         WHERE 1=1
       `;
 
-      const params: any[] = [];
+      const params: SQLParameter[] = [];
 
       // Basic filters
       if (!options.includeTrashed) {
@@ -518,7 +525,7 @@ export class BearService {
         WHERE 1=1
       `;
 
-      const params: any[] = [];
+      const params: SQLParameter[] = [];
 
       // Title search (OR logic for multiple terms)
       if (criteria.titleContains && criteria.titleContains.length > 0) {
@@ -593,7 +600,7 @@ export class BearService {
       if (criteria.hasAllTags && criteria.hasAllTags.length > 0) {
         const allTagConditions = criteria.hasAllTags.map(() => 'tag_names LIKE ?').join(' AND ');
         sql += ` HAVING ${allTagConditions}`;
-        criteria.hasAllTags.forEach(tag => params.push(`%${tag}%`));
+        criteria.hasAllTags.forEach(tag => params.push(tag, tag));
       }
 
       if (criteria.hasAnyTags && criteria.hasAnyTags.length > 0) {
@@ -602,7 +609,7 @@ export class BearService {
           ? ` AND (${anyTagConditions})`
           : ` HAVING (${anyTagConditions})`;
         sql += havingClause;
-        criteria.hasAnyTags.forEach(tag => params.push(`%${tag}%`));
+        criteria.hasAnyTags.forEach(tag => params.push(tag, tag));
       }
 
       sql += ' ORDER BY n.ZMODIFICATIONDATE DESC';
@@ -933,7 +940,7 @@ export class BearService {
         WHERE 1=1
       `;
 
-      const params: any[] = [];
+      const params: SQLParameter[] = [];
 
       // Basic filters
       if (!options.includeTrashed) {
@@ -953,7 +960,7 @@ export class BearService {
         );
         if (titleConditions.length > 0) {
           searchConditions.push(`(${titleConditions.join(' OR ')})`);
-          searchTerms.forEach(term => params.push(`%${term}%`));
+          searchTerms.forEach(term => params.push(term, term));
         }
       }
 
@@ -963,7 +970,7 @@ export class BearService {
         );
         if (contentConditions.length > 0) {
           searchConditions.push(`(${contentConditions.join(' OR ')})`);
-          searchTerms.forEach(term => params.push(`%${term}%`));
+          searchTerms.forEach(term => params.push(term, term));
         }
       }
 
@@ -976,7 +983,7 @@ export class BearService {
         sql += ' GROUP BY n.Z_PK HAVING ';
         const tagConditions = options.tags.map(() => 'tag_names LIKE ?').join(' AND ');
         sql += tagConditions;
-        options.tags.forEach(tag => params.push(`%${tag}%`));
+        options.tags.forEach(tag => params.push(tag, tag));
       } else {
         sql += ' GROUP BY n.Z_PK';
       }
@@ -1130,7 +1137,7 @@ export class BearService {
         WHERE n.ZTRASHED = 0 AND n.ZTEXT IS NOT NULL
       `;
 
-      const params: any[] = [];
+      const params: SQLParameter[] = [];
 
       if (options.excludeNoteId) {
         sql += ' AND n.Z_PK != ?';
@@ -1142,7 +1149,7 @@ export class BearService {
         .map(() => 'LOWER(n.ZTEXT) LIKE LOWER(?)')
         .join(' OR ');
       sql += ` AND (${keywordConditions})`;
-      referenceKeywords.forEach(keyword => params.push(`%${keyword}%`));
+      referenceKeywords.forEach(keyword => params.push(keyword, keyword));
 
       sql += ' GROUP BY n.Z_PK ORDER BY n.ZMODIFICATIONDATE DESC';
 
@@ -1330,7 +1337,7 @@ export class BearService {
       noteTitle: string;
       filePath: string;
       contentType: string;
-      metadata?: any;
+      metadata?: FileMetadata;
     }>;
     attachmentsByType: Array<{ type: string; count: number; totalSize: number }>;
   }> {
@@ -1344,7 +1351,7 @@ export class BearService {
         WHERE n.ZTRASHED = 0
       `;
 
-      const params: any[] = [];
+      const params: SQLParameter[] = [];
 
       if (options.noteId) {
         sql += ' AND f.ZNOTE = ?';
@@ -1363,7 +1370,7 @@ export class BearService {
         params.push(options.limit);
       }
 
-      const files = await this.database.query<any>(sql, params);
+      const files = await this.database.query<DatabaseFileWithNote>(sql, params);
 
       // Get attachment statistics by type
       const typeStats = await this.database.query<{
@@ -1394,7 +1401,7 @@ export class BearService {
         ORDER BY count DESC
       `);
 
-      const attachments = files.map((file: any) => {
+      const attachments = files.map((file: DatabaseFileWithNote) => {
         const filename = file.ZFILENAME || 'unknown';
         const extension = filename.split('.').pop()?.toLowerCase() || '';
 
@@ -1468,33 +1475,9 @@ export class BearService {
       creationPatterns: Array<{ hour: number; count: number }>;
       modificationPatterns: Array<{ hour: number; count: number }>;
     };
-    contentAnalysis?: {
-      markdownUsage: {
-        headings: number;
-        lists: number;
-        codeBlocks: number;
-        links: number;
-        images: number;
-        tables: number;
-      };
-      languagePatterns: Array<{ language: string; count: number }>;
-      commonPatterns: Array<{ pattern: string; description: string; count: number }>;
-    };
-    linkAnalysis?: {
-      internalLinks: number;
-      externalLinks: number;
-      brokenLinks: number;
-      topDomains: Array<{ domain: string; count: number }>;
-      linkTypes: Array<{ type: string; count: number }>;
-    };
-    structureAnalysis?: {
-      titlePatterns: Array<{ pattern: string; count: number; examples: string[] }>;
-      averageWordsPerNote: number;
-      averageParagraphsPerNote: number;
-      notesWithTodos: number;
-      notesWithDates: number;
-      notesWithNumbers: number;
-    };
+    contentAnalysis?: ContentAnalysis;
+    linkAnalysis?: LinkAnalysis;
+    structureAnalysis?: StructureAnalysis;
   }> {
     await this.database.connect(true);
 
@@ -1567,7 +1550,18 @@ export class BearService {
         ORDER BY hour
       `);
 
-      const result: any = {
+      const result: {
+        overview: {
+          totalNotes: number;
+          averageLength: number;
+          lengthDistribution: Array<{ range: string; count: number }>;
+          creationPatterns: Array<{ hour: number; count: number }>;
+          modificationPatterns: Array<{ hour: number; count: number }>;
+        };
+        contentAnalysis?: ContentAnalysis;
+        linkAnalysis?: LinkAnalysis;
+        structureAnalysis?: StructureAnalysis;
+      } = {
         overview: {
           totalNotes: overview.total_notes,
           averageLength: Math.round(overview.avg_length || 0),
@@ -1672,7 +1666,7 @@ export class BearService {
         WHERE n.ZTRASHED = 0
       `;
 
-      const params: any[] = [];
+      const params: SQLParameter[] = [];
 
       // Date filters
       if (criteria.createdAfter) {
@@ -1802,7 +1796,7 @@ export class BearService {
   /**
    * Extract file metadata from database record
    */
-  private extractFileMetadata(file: any): any {
+  private extractFileMetadata(file: DatabaseFileRecord): FileMetadata {
     return {
       creationDate: CoreDataUtils.toDate(file.ZCREATIONDATE),
       modificationDate: CoreDataUtils.toDate(file.ZMODIFICATIONDATE),
@@ -1816,7 +1810,7 @@ export class BearService {
   /**
    * Analyze content patterns in notes
    */
-  private analyzeContent(texts: string[]): any {
+  private analyzeContent(texts: string[]): ContentAnalysis {
     const analysis = {
       markdownUsage: {
         headings: 0,
@@ -1894,7 +1888,7 @@ export class BearService {
   /**
    * Analyze links in notes
    */
-  private analyzeLinks(texts: string[]): any {
+  private analyzeLinks(texts: string[]): LinkAnalysis {
     const analysis = {
       internalLinks: 0,
       externalLinks: 0,
@@ -1959,7 +1953,7 @@ export class BearService {
   /**
    * Analyze note structure patterns
    */
-  private analyzeStructure(notes: Array<{ title: string; text: string }>): any {
+  private analyzeStructure(notes: Array<{ title: string; text: string }>): StructureAnalysis {
     const analysis = {
       titlePatterns: [] as Array<{ pattern: string; count: number; examples: string[] }>,
       averageWordsPerNote: 0,
@@ -2643,7 +2637,7 @@ export class BearService {
 
       // Find the note
       let query: string;
-      let params: any[];
+      let params: SQLParameter[];
 
       if (noteId) {
         query =
@@ -2754,11 +2748,11 @@ export class BearService {
 
       // Build query to find notes
       let query = 'SELECT Z_PK, ZUNIQUEIDENTIFIER, ZTITLE FROM ZSFNOTE WHERE ZTRASHED = 0';
-      const params: any[] = [];
+      const params: SQLParameter[] = [];
 
       if (options.title_pattern) {
         query += ' AND ZTITLE LIKE ?';
-        params.push(`%${options.title_pattern}%`);
+        params.push(options.title_pattern);
       }
 
       if (options.created_after) {

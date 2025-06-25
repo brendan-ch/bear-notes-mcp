@@ -1,4 +1,5 @@
 import { getConfig } from '../config/index.js';
+import { LoggingService } from './logging-service.js';
 
 export interface CacheEntry<T = unknown> {
   data: T;
@@ -222,7 +223,8 @@ export class CacheService implements ICacheService {
   async warmup(keys: string[]): Promise<void> {
     // This would be implemented to pre-populate cache with frequently accessed data
     // For now, it's a placeholder for the interface
-    console.log(`Cache warmup requested for ${keys.length} keys`);
+    const logger = new LoggingService();
+    logger.info(`Cache warmup requested for ${keys.length} keys`);
   }
 
   /**

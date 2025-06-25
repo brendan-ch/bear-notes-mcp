@@ -442,12 +442,12 @@ export class ValidationUtils {
    * Create a method decorator for automatic validation
    */
   static validateArgs(schema: ValidationSchema) {
-    return function (target: any, propertyKey: string, descriptor: PropertyDescriptor) {
+    return function (target: object, propertyKey: string, descriptor: PropertyDescriptor) {
       const originalMethod = descriptor.value;
 
-      descriptor.value = async function (...args: any[]) {
+      descriptor.value = async function (...args: unknown[]) {
         const validationService = new ValidationService();
-        const argsObject = args[0] || {};
+        const argsObject = (args[0] as Record<string, unknown>) || {};
 
         const result = validationService.validate(argsObject, schema, {
           operation: propertyKey,

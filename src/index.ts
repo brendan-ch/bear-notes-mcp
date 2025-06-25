@@ -14,6 +14,7 @@ import {
   Tool,
 } from '@modelcontextprotocol/sdk/types.js';
 import { BearService } from './services/bear-service.js';
+
 // Error types imported for potential use in error handling
 
 /**
@@ -1866,6 +1867,7 @@ ${topTagsData}`,
       }
 
       const options: any = {};
+
       if (title !== undefined) {
         options.title = title;
       }

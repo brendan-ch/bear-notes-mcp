@@ -11,6 +11,10 @@ export interface BaseMcpArgs {
 }
 
 /**
+ * MCP argument types for Bear service methods
+ */
+
+/**
  * Arguments for getRecentNotes method
  */
 export interface GetRecentNotesArgs extends BaseMcpArgs {
@@ -23,11 +27,9 @@ export interface GetRecentNotesArgs extends BaseMcpArgs {
 export interface SearchNotesArgs extends BaseMcpArgs {
   query: string;
   limit?: number;
-  includeArchived?: boolean;
-  includeTrashed?: boolean;
+  includeContent?: boolean;
+  caseSensitive?: boolean;
   tags?: string[];
-  dateFrom?: string;
-  dateTo?: string;
 }
 
 /**
@@ -48,7 +50,7 @@ export interface GetNoteByTitleArgs extends BaseMcpArgs {
  * Arguments for getNotesByTag method
  */
 export interface GetNotesByTagArgs extends BaseMcpArgs {
-  tagName: string;
+  tag: string;
 }
 
 /**
@@ -69,7 +71,6 @@ export interface GetNotesAdvancedArgs extends BaseMcpArgs {
   sortBy?: 'created' | 'modified' | 'title' | 'size';
   sortOrder?: 'asc' | 'desc';
   limit?: number;
-  offset?: number;
 }
 
 /**
@@ -78,18 +79,18 @@ export interface GetNotesAdvancedArgs extends BaseMcpArgs {
 export interface GetNotesWithCriteriaArgs extends BaseMcpArgs {
   titleContains?: string[];
   contentContains?: string[];
-  hasAllTags?: string[];
-  hasAnyTags?: string[];
+  tags?: string[];
+  excludeTags?: string[];
   createdAfter?: string;
   createdBefore?: string;
   modifiedAfter?: string;
   modifiedBefore?: string;
-  minLength?: number;
-  maxLength?: number;
-  isPinned?: boolean;
-  isArchived?: boolean;
-  isTrashed?: boolean;
-  isEncrypted?: boolean;
+  includeArchived?: boolean;
+  includeTrashed?: boolean;
+  includeEncrypted?: boolean;
+  limit?: number;
+  sortBy?: 'created' | 'modified' | 'title';
+  sortOrder?: 'asc' | 'desc';
 }
 
 /**
@@ -97,6 +98,7 @@ export interface GetNotesWithCriteriaArgs extends BaseMcpArgs {
  */
 export interface GetRelatedNotesArgs extends BaseMcpArgs {
   noteId: number;
+  includeContent?: boolean;
   limit?: number;
 }
 
@@ -105,24 +107,17 @@ export interface GetRelatedNotesArgs extends BaseMcpArgs {
  */
 export interface SearchNotesFullTextArgs extends BaseMcpArgs {
   query: string;
-  limit?: number;
-  includeSnippets?: boolean;
-  searchFields?: ('title' | 'content' | 'both')[];
-  fuzzyMatch?: boolean;
+  includeContent?: boolean;
   caseSensitive?: boolean;
-  wholeWords?: boolean;
-  includeArchived?: boolean;
-  includeTrashed?: boolean;
-  tags?: string[];
-  dateFrom?: string;
-  dateTo?: string;
+  includeSnippets?: boolean;
+  limit?: number;
 }
 
 /**
  * Arguments for getSearchSuggestions method
  */
 export interface GetSearchSuggestionsArgs extends BaseMcpArgs {
-  partialQuery: string;
+  query: string;
   limit?: number;
 }
 
@@ -130,19 +125,18 @@ export interface GetSearchSuggestionsArgs extends BaseMcpArgs {
  * Arguments for findSimilarNotes method
  */
 export interface FindSimilarNotesArgs extends BaseMcpArgs {
-  referenceText: string;
+  noteId: number;
   limit?: number;
-  minSimilarity?: number;
-  excludeNoteId?: number;
 }
 
 /**
  * Arguments for getFileAttachments method
  */
 export interface GetFileAttachmentsArgs extends BaseMcpArgs {
-  noteId?: number;
-  fileType?: string;
   includeMetadata?: boolean;
+  fileTypes?: string[];
+  sortBy?: 'name' | 'size' | 'created' | 'modified';
+  sortOrder?: 'asc' | 'desc';
   limit?: number;
 }
 
@@ -150,27 +144,22 @@ export interface GetFileAttachmentsArgs extends BaseMcpArgs {
  * Arguments for analyzeNoteMetadata method
  */
 export interface AnalyzeNoteMetadataArgs extends BaseMcpArgs {
-  includeContentAnalysis?: boolean;
-  includeLinkAnalysis?: boolean;
-  includeStructureAnalysis?: boolean;
+  includeContent?: boolean;
+  includeLinks?: boolean;
+  includeStructure?: boolean;
 }
 
 /**
  * Arguments for getNotesWithMetadata method
  */
 export interface GetNotesWithMetadataArgs extends BaseMcpArgs {
-  hasAttachments?: boolean;
-  hasLinks?: boolean;
-  hasImages?: boolean;
-  hasTodos?: boolean;
-  hasCodeBlocks?: boolean;
-  hasTables?: boolean;
-  minWordCount?: number;
-  maxWordCount?: number;
-  createdAfter?: string;
-  createdBefore?: string;
-  modifiedAfter?: string;
-  modifiedBefore?: string;
+  includeWordCount?: boolean;
+  includeCharCount?: boolean;
+  includeCreationDate?: boolean;
+  includeModificationDate?: boolean;
+  includeTagCount?: boolean;
+  sortBy?: 'created' | 'modified' | 'wordCount' | 'charCount';
+  sortOrder?: 'asc' | 'desc';
   limit?: number;
 }
 
@@ -203,8 +192,8 @@ export interface UpdateNoteArgs extends BaseMcpArgs {
  */
 export interface DuplicateNoteArgs extends BaseMcpArgs {
   noteId: number;
-  titleSuffix?: string;
-  copyTags?: boolean;
+  newTitle?: string;
+  includeTags?: boolean;
 }
 
 /**
@@ -212,14 +201,14 @@ export interface DuplicateNoteArgs extends BaseMcpArgs {
  */
 export interface ArchiveNoteArgs extends BaseMcpArgs {
   noteId: number;
-  archived: boolean;
+  archive?: boolean;
 }
 
 /**
  * Arguments for triggerHashtagParsing method
  */
 export interface TriggerHashtagParsingArgs extends BaseMcpArgs {
-  noteId?: string;
+  noteId?: number;
   noteTitle?: string;
 }
 
@@ -227,16 +216,15 @@ export interface TriggerHashtagParsingArgs extends BaseMcpArgs {
  * Arguments for batchTriggerHashtagParsing method
  */
 export interface BatchTriggerHashtagParsingArgs extends BaseMcpArgs {
-  tag_filter?: string;
   title_pattern?: string;
-  limit?: number;
   created_after?: string;
+  limit?: number;
 }
 
 /**
- * Union type of all possible MCP argument types
+ * Union type for all possible MCP method arguments
  */
-export type McpArgs =
+export type MCPMethodArgs =
   | GetRecentNotesArgs
   | SearchNotesArgs
   | GetNoteByIdArgs

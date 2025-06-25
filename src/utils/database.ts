@@ -4,7 +4,7 @@ import { access, constants, copyFile, stat, mkdir } from 'fs/promises';
 import { exec } from 'child_process';
 import path from 'path';
 import os from 'os';
-import { BearDatabaseError, BearSafetyError } from '../types/bear.js';
+import { BearDatabaseError, BearSafetyError, SQLParameter } from '../types/bear.js';
 
 const execAsync = promisify(exec);
 
@@ -172,7 +172,7 @@ export class BearDatabase {
   /**
    * Execute a SELECT query
    */
-  async query<T = any>(sql: string, params: any[] = []): Promise<T[]> {
+  async query<T = Record<string, unknown>>(sql: string, params: SQLParameter[] = []): Promise<T[]> {
     if (!this.db) {
       throw new BearDatabaseError('Database not connected');
     }
@@ -191,7 +191,10 @@ export class BearDatabase {
   /**
    * Execute a single SELECT query that returns one row
    */
-  async queryOne<T = any>(sql: string, params: any[] = []): Promise<T | null> {
+  async queryOne<T = Record<string, unknown>>(
+    sql: string,
+    params: SQLParameter[] = []
+  ): Promise<T | null> {
     if (!this.db) {
       throw new BearDatabaseError('Database not connected');
     }
@@ -210,7 +213,10 @@ export class BearDatabase {
   /**
    * Execute an INSERT, UPDATE, or DELETE query
    */
-  async execute(sql: string, params: any[] = []): Promise<{ changes: number; lastID: number }> {
+  async execute(
+    sql: string,
+    params: SQLParameter[] = []
+  ): Promise<{ changes: number; lastID: number }> {
     if (!this.db) {
       throw new BearDatabaseError('Database not connected');
     }

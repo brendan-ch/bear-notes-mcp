@@ -1,6 +1,6 @@
 import { ISearchService, IDatabaseService, SERVICE_TOKENS } from './interfaces/index.js';
 import { globalContainer } from './container/service-container.js';
-import { NoteWithTags, NoteSearchOptions } from '../types/bear.js';
+import { NoteWithTags, NoteSearchOptions, DatabaseSearchResult } from '../types/bear.js';
 import { CoreDataUtils } from '../utils/database.js';
 import { SqlParameters } from '../types/database.js';
 
@@ -139,12 +139,7 @@ export class SearchService implements ISearchService {
         params.push(options.limit);
       }
 
-      const rows = await this.database.query<
-        any & {
-          tag_names: string;
-          content_length: number;
-        }
-      >(sql, params);
+      const rows = await this.database.query<DatabaseSearchResult>(sql, params);
 
       // Calculate relevance scores and extract snippets
       return rows
@@ -291,12 +286,7 @@ export class SearchService implements ISearchService {
         params.push(options.limit * 3); // Get more results for similarity filtering
       }
 
-      const rows = await this.database.query<
-        any & {
-          tag_names: string;
-          content_length: number;
-        }
-      >(sql, params);
+      const rows = await this.database.query<DatabaseSearchResult>(sql, params);
 
       // Calculate similarity scores
       const results = rows
@@ -461,13 +451,7 @@ export class SearchService implements ISearchService {
         }
       }
 
-      const rows = await this.database.query<
-        any & {
-          tag_names: string;
-          content_length: number;
-          preview: string;
-        }
-      >(sql, params);
+      const rows = await this.database.query<DatabaseSearchResult>(sql, params);
 
       return rows.map(row => ({
         ...row,
@@ -600,12 +584,7 @@ export class SearchService implements ISearchService {
 
       sql += ' ORDER BY n.ZMODIFICATIONDATE DESC';
 
-      const rows = await this.database.query<
-        any & {
-          tag_names: string;
-          content_length: number;
-        }
-      >(sql, params);
+      const rows = await this.database.query<DatabaseSearchResult>(sql, params);
 
       return rows.map(row => ({
         ...row,
@@ -631,7 +610,7 @@ export class SearchService implements ISearchService {
 
     try {
       // Get the source note's tags and content keywords
-      const sourceNote = await this.database.queryOne<any & { tag_names: string }>(
+      const sourceNote = await this.database.queryOne<DatabaseSearchResult>(
         `
         SELECT n.*, GROUP_CONCAT(DISTINCT t.ZTITLE) as tag_names
         FROM ZSFNOTE n
@@ -654,7 +633,7 @@ export class SearchService implements ISearchService {
       // Find notes with shared tags
       const relatedByTags =
         sourceTags.length > 0
-          ? await this.database.query<any & { tag_names: string; shared_tags: number }>(
+          ? await this.database.query<DatabaseSearchResult & { shared_tags: number }>(
               `
         SELECT n.*, GROUP_CONCAT(DISTINCT t.ZTITLE) as tag_names,
                COUNT(DISTINCT CASE WHEN t.ZTITLE IN (${sourceTags.map(() => '?').join(',')}) THEN t.ZTITLE END) as shared_tags
@@ -675,7 +654,7 @@ export class SearchService implements ISearchService {
       const contentKeywords = this.extractKeywords(sourceNote.ZTEXT || '');
       const relatedByContent =
         contentKeywords.length > 0
-          ? await this.database.query<any & { tag_names: string }>(
+          ? await this.database.query<DatabaseSearchResult>(
               `
         SELECT n.*, GROUP_CONCAT(DISTINCT t.ZTITLE) as tag_names
         FROM ZSFNOTE n

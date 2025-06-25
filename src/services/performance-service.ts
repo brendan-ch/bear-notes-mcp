@@ -1,4 +1,5 @@
 import { getConfig } from '../config/index.js';
+import { LoggingService } from './logging-service.js';
 // Removed unused import PerformanceMetrics
 
 export interface QueryPerformance {
@@ -312,7 +313,8 @@ export class PerformanceService implements IPerformanceService {
     // Collect metrics every 30 seconds
     setInterval(() => {
       this.recordSystemMetrics().catch(error => {
-        console.error('Error collecting system metrics:', error);
+        const logger = new LoggingService();
+        logger.error('Error collecting system metrics:', error);
       });
     }, 30000);
   }
@@ -362,7 +364,8 @@ export class PerformanceService implements IPerformanceService {
 
         // Log performance for debugging
         if (executionTime > 1000 || error) {
-          console.log(`Performance: ${operationName} took ${executionTime}ms`, {
+          const logger = new LoggingService();
+          logger.info(`Performance: ${operationName} took ${executionTime}ms`, {
             resultCount,
             error: error?.message,
             args: args.length,

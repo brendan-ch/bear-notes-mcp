@@ -4,7 +4,7 @@
  */
 
 import { globalContainer } from './container/service-container.js';
-import { SERVICE_TOKENS } from './interfaces/index.js';
+import { SERVICE_TOKENS, IDatabaseService, ICacheService } from './interfaces/index.js';
 import { DatabaseService } from './database-service.js';
 import { NoteService } from './note-service.js';
 import { SearchService } from './search-service.js';
@@ -74,8 +74,10 @@ export function bootstrapServices(): void {
 
   // Register HealthService as singleton (with dependencies)
   globalContainer.registerSingleton(SERVICE_TOKENS.HEALTH_SERVICE, () => {
-    const databaseService = globalContainer.resolve(SERVICE_TOKENS.DATABASE_SERVICE) as any;
-    const cacheService = globalContainer.resolve(SERVICE_TOKENS.CACHE_SERVICE) as any;
+    const databaseService = globalContainer.resolve(
+      SERVICE_TOKENS.DATABASE_SERVICE
+    ) as IDatabaseService;
+    const cacheService = globalContainer.resolve(SERVICE_TOKENS.CACHE_SERVICE) as ICacheService;
     return new HealthService({}, databaseService, cacheService);
   });
 
