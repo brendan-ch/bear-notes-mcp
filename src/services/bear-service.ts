@@ -2643,10 +2643,12 @@ export class BearService {
         query =
           'SELECT Z_PK, ZUNIQUEIDENTIFIER, ZTITLE, ZTEXT FROM ZSFNOTE WHERE ZUNIQUEIDENTIFIER = ? AND ZTRASHED = 0';
         params = [noteId];
-      } else {
+      } else if (noteTitle) {
         query =
           'SELECT Z_PK, ZUNIQUEIDENTIFIER, ZTITLE, ZTEXT FROM ZSFNOTE WHERE ZTITLE = ? AND ZTRASHED = 0';
         params = [noteTitle];
+      } else {
+        throw new Error('Either noteId or noteTitle is required');
       }
 
       const note = await this.database.queryOne<{

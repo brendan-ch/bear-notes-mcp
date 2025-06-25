@@ -128,7 +128,7 @@ export class BearSafetyError extends Error {
 /**
  * Valid SQL parameter types for database queries
  */
-export type SQLParameter = string | number | boolean | Date | null | undefined;
+export type SQLParameter = string | number | boolean | Date | null | Buffer;
 
 /**
  * File metadata structure for attachments

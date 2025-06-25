@@ -4,7 +4,7 @@
  */
 
 import { BearDatabase } from '../utils/database.js';
-import { DatabaseStats } from '../types/bear.js';
+import { DatabaseStats, SQLParameter } from '../types/bear.js';
 import {
   IDatabaseService,
   ICacheService,
@@ -12,7 +12,6 @@ import {
   SERVICE_TOKENS,
 } from './interfaces/index.js';
 import { config } from '../config/index.js';
-import { SqlParameters } from '../types/database.js';
 import { CacheService } from './cache-service.js';
 
 export class DatabaseService implements IDatabaseService {
@@ -73,7 +72,7 @@ export class DatabaseService implements IDatabaseService {
   /**
    * Execute a query and return multiple results
    */
-  async query<T = unknown>(sql: string, params?: SqlParameters): Promise<T[]> {
+  async query<T = unknown>(sql: string, params?: SQLParameter[]): Promise<T[]> {
     if (!this._isConnected) {
       throw new Error('Database not connected. Call connect() first.');
     }
@@ -120,7 +119,7 @@ export class DatabaseService implements IDatabaseService {
   /**
    * Execute a query and return a single result
    */
-  async queryOne<T = unknown>(sql: string, params?: SqlParameters): Promise<T | null> {
+  async queryOne<T = unknown>(sql: string, params?: SQLParameter[]): Promise<T | null> {
     if (!this._isConnected) {
       throw new Error('Database not connected. Call connect() first.');
     }
