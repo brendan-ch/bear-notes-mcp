@@ -470,7 +470,7 @@ describe('Error Handling System', () => {
         // Should normalize thrown errors
         try {
           await wrappedFn(true);
-          fail('Should have thrown');
+          throw new Error('Should have thrown an error');
         } catch (error) {
           expect(error).toBeInstanceOf(BusinessError);
           expect((error as BusinessError).message).toBe('Original error');

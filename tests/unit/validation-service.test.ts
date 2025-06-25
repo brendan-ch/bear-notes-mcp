@@ -7,7 +7,6 @@ import {
   ValidationService,
   ValidationRule,
   ValidationSchema,
-  ValidationResult,
   ValidationUtils,
   IValidationService,
 } from '../../src/services/validation-service.js';

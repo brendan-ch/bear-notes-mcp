@@ -8,7 +8,6 @@ import { Server } from '@modelcontextprotocol/sdk/server/index.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { CallToolRequestSchema, ListToolsRequestSchema, } from '@modelcontextprotocol/sdk/types.js';
 import { BearService } from './services/bear-service.js';
-// Error types imported for potential use in error handling
 /**
  * Bear MCP Server
  * Provides MCP tools for interfacing with Bear's SQLite database
@@ -1823,11 +1822,11 @@ ${topTagsData}`,
     }
     async triggerHashtagParsing(args) {
         try {
-            const { note_id, note_title } = args;
-            if (!note_id && !note_title) {
-                throw new Error('Either note_id or note_title is required');
+            const { noteId, noteTitle } = args;
+            if (!noteId && !noteTitle) {
+                throw new Error('Either noteId or noteTitle is required');
             }
-            const result = await this.bearService.triggerHashtagParsing(note_id, note_title);
+            const result = await this.bearService.triggerHashtagParsing(noteId, noteTitle);
             return {
                 content: [
                     {

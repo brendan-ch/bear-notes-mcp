@@ -124,3 +124,115 @@ export class BearSafetyError extends Error {
     this.name = 'BearSafetyError';
   }
 }
+
+/**
+ * Valid SQL parameter types for database queries
+ */
+export type SQLParameter = string | number | boolean | Date | null | Buffer;
+
+/**
+ * File metadata structure for attachments
+ */
+export interface FileMetadata {
+  [key: string]: string | number | boolean | Date | null | undefined;
+}
+
+/**
+ * Content analysis result structure
+ */
+export interface ContentAnalysis {
+  markdownUsage: {
+    headings: number;
+    lists: number;
+    codeBlocks: number;
+    links: number;
+    images: number;
+    tables: number;
+  };
+  languagePatterns: Array<{ language: string; count: number }>;
+  commonPatterns: Array<{ pattern: string; description: string; count: number }>;
+}
+
+/**
+ * Link analysis result structure
+ */
+export interface LinkAnalysis {
+  internalLinks: number;
+  externalLinks: number;
+  brokenLinks: number;
+  topDomains: Array<{ domain: string; count: number }>;
+  linkTypes: Array<{ type: string; count: number }>;
+}
+
+/**
+ * Structure analysis result structure
+ */
+export interface StructureAnalysis {
+  titlePatterns: Array<{ pattern: string; count: number; examples: string[] }>;
+  averageWordsPerNote: number;
+  averageParagraphsPerNote: number;
+  notesWithTodos: number;
+  notesWithDates: number;
+  notesWithNumbers: number;
+}
+
+/**
+ * Database file record structure (from Bear's SQLite database)
+ */
+export interface DatabaseFileRecord {
+  Z_PK: number;
+  ZUNIQUEIDENTIFIER: string;
+  ZTITLE: string;
+  ZFILENAME: string;
+  ZFILETYPE: string;
+  ZFILESIZE: number;
+  ZCREATIONDATE: number;
+  ZMODIFICATIONDATE: number;
+  ZNOTE: number;
+  ZFILEPATH: string;
+  ZCONTENTTYPE: string;
+  [key: string]: unknown; // Allow additional database fields
+}
+
+/**
+ * Database note record structure (from Bear's SQLite database)
+ */
+export interface DatabaseNoteRecord {
+  Z_PK: number;
+  ZUNIQUEIDENTIFIER: string;
+  ZTITLE: string;
+  ZSUBTITLE?: string;
+  ZTEXT: string;
+  ZCREATIONDATE: number;
+  ZMODIFICATIONDATE: number;
+  ZORDERINDEX: number;
+  ZPINNED: number;
+  ZARCHIVED: number;
+  ZTRASHED: number;
+  ZENCRYPTED: number;
+  ZHASFILES: number;
+  ZHASIMAGES: number;
+  ZHASSOURCECODE: number;
+  ZHASTODOS: number;
+  ZORDER: number | null;
+  ZTRASHEDDATE: number | null;
+  ZARCHIVEDDATE: number | null;
+  [key: string]: unknown; // Allow additional database fields
+}
+
+/**
+ * Database search result with additional computed fields
+ */
+export interface DatabaseSearchResult extends DatabaseNoteRecord {
+  tag_names?: string;
+  content_length: number;
+  preview?: string;
+}
+
+/**
+ * Database file record with joined note information
+ */
+export interface DatabaseFileWithNote extends DatabaseFileRecord {
+  note_id: number;
+  note_title: string;
+}

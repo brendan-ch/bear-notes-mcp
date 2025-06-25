@@ -241,7 +241,10 @@ export class ValidationService implements IValidationService {
 
     // Check for required fields
     for (const [fieldName, rule] of Object.entries(schema)) {
-      if (rule.required && (!(fieldName in data) || data[fieldName] == null)) {
+      if (
+        rule.required &&
+        (!(fieldName in data) || data[fieldName] === null || data[fieldName] === undefined)
+      ) {
         errors.push(new RequiredFieldError(fieldName, { ...context, field: fieldName }));
         continue;
       }
@@ -360,7 +363,7 @@ export class ValidationService implements IValidationService {
     const sanitized: Record<string, unknown> = {};
 
     for (const [fieldName, rule] of Object.entries(schema)) {
-      if (fieldName in data && data[fieldName] != null) {
+      if (fieldName in data && data[fieldName] !== null && data[fieldName] !== undefined) {
         const value = data[fieldName];
         sanitized[fieldName] = rule.sanitize ? rule.sanitize(value) : value;
       }
@@ -439,12 +442,12 @@ export class ValidationUtils {
    * Create a method decorator for automatic validation
    */
   static validateArgs(schema: ValidationSchema) {
-    return function (target: any, propertyKey: string, descriptor: PropertyDescriptor) {
+    return function (target: object, propertyKey: string, descriptor: PropertyDescriptor) {
       const originalMethod = descriptor.value;
 
-      descriptor.value = async function (...args: any[]) {
+      descriptor.value = async function (...args: unknown[]) {
         const validationService = new ValidationService();
-        const argsObject = args[0] || {};
+        const argsObject = (args[0] as Record<string, unknown>) || {};
 
         const result = validationService.validate(argsObject, schema, {
           operation: propertyKey,
@@ -501,7 +504,7 @@ export class ValidationUtils {
       if (typeof value === 'string') {
         return value;
       }
-      if (value != null) {
+      if (value !== null && value !== undefined) {
         return String(value);
       }
       throw new InvalidTypeError(fieldName, 'string', typeof value);

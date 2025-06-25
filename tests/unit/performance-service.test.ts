@@ -1,8 +1,4 @@
-import {
-  PerformanceService,
-  QueryPerformance,
-  SystemMetrics,
-} from '../../src/services/performance-service.js';
+import { PerformanceService, QueryPerformance } from '../../src/services/performance-service.js';
 
 describe('PerformanceService', () => {
   let performanceService: PerformanceService;
@@ -13,6 +9,7 @@ describe('PerformanceService', () => {
 
   afterEach(async () => {
     await performanceService.clearMetrics();
+    performanceService.dispose();
   });
 
   describe('Query Performance Tracking', () => {

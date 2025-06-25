@@ -461,7 +461,7 @@ export class ErrorUtils {
   /**
    * Wrap function with error normalization
    */
-  static wrapAsync<T extends (...args: any[]) => Promise<any>>(
+  static wrapAsync<T extends (...args: unknown[]) => Promise<unknown>>(
     fn: T,
     context: ErrorContext = {}
   ): T {

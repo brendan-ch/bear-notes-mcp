@@ -281,7 +281,7 @@ export class TagService implements ITagService {
 
           // Small delay between notes to avoid overwhelming Bear
           await new Promise(resolve => setTimeout(resolve, 200));
-        } catch (error) {
+        } catch {
           // Silent error handling to avoid JSON-RPC interference
         }
       }

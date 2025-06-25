@@ -79,7 +79,8 @@ export class LoggingService implements ILoggingService {
     formats.push(
       winston.format.printf(info => {
         const { timestamp, level, message } = info;
-        const metadata = (info as any).metadata || {};
+        const metadata =
+          (info as winston.LogEntry & { metadata?: Record<string, unknown> }).metadata || {};
         const context = { ...this.childContext, ...metadata };
 
         let logMessage = `[${timestamp}] ${level.toUpperCase()}: ${message}`;

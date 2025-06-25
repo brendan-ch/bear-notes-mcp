@@ -3,8 +3,13 @@
  * Defines contracts for the decomposed service architecture
  */
 
-import { NoteWithTags, TagWithCount, DatabaseStats, NoteSearchOptions } from '../../types/bear.js';
-import { SqlParameters } from '../../types/database.js';
+import {
+  NoteWithTags,
+  TagWithCount,
+  DatabaseStats,
+  NoteSearchOptions,
+  SQLParameter,
+} from '../../types/bear.js';
 
 /**
  * Database service interface - handles low-level database operations
@@ -16,8 +21,8 @@ export interface IDatabaseService {
   isConnected(): boolean;
 
   // Database operations
-  query<T = unknown>(sql: string, params?: SqlParameters): Promise<T[]>;
-  queryOne<T = unknown>(sql: string, params?: SqlParameters): Promise<T | null>;
+  query<T = unknown>(sql: string, params?: SQLParameter[]): Promise<T[]>;
+  queryOne<T = unknown>(sql: string, params?: SQLParameter[]): Promise<T | null>;
 
   // Database maintenance
   getDatabaseStats(): Promise<DatabaseStats>;

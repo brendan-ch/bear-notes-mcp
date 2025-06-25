@@ -1,5 +1,6 @@
 import { getConfig } from '../config/index.js';
-import { PerformanceMetrics } from '../types/database.js';
+import { LoggingService } from './logging-service.js';
+// Removed unused import PerformanceMetrics
 
 export interface QueryPerformance {
   sql: string;
@@ -62,6 +63,7 @@ export class PerformanceService implements IPerformanceService {
   private readonly config = getConfig();
   private readonly maxHistorySize = 10000;
   private readonly slowQueryThreshold = 1000; // 1 second
+  private metricsInterval?: ReturnType<typeof setInterval>;
 
   constructor() {
     // Start periodic system metrics collection
@@ -310,9 +312,10 @@ export class PerformanceService implements IPerformanceService {
    */
   private startMetricsCollection(): void {
     // Collect metrics every 30 seconds
-    setInterval(() => {
+    this.metricsInterval = setInterval(() => {
       this.recordSystemMetrics().catch(error => {
-        console.error('Error collecting system metrics:', error);
+        const logger = new LoggingService();
+        logger.error('Error collecting system metrics:', error);
       });
     }, 30000);
   }
@@ -362,7 +365,8 @@ export class PerformanceService implements IPerformanceService {
 
         // Log performance for debugging
         if (executionTime > 1000 || error) {
-          console.log(`Performance: ${operationName} took ${executionTime}ms`, {
+          const logger = new LoggingService();
+          logger.info(`Performance: ${operationName} took ${executionTime}ms`, {
             resultCount,
             error: error?.message,
             args: args.length,
@@ -370,5 +374,15 @@ export class PerformanceService implements IPerformanceService {
         }
       }
     }) as T;
+  }
+
+  /**
+   * Cleanup resources and stop background tasks
+   */
+  dispose(): void {
+    if (this.metricsInterval) {
+      clearInterval(this.metricsInterval);
+      this.metricsInterval = undefined;
+    }
   }
 }
