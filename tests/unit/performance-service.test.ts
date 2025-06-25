@@ -9,6 +9,7 @@ describe('PerformanceService', () => {
 
   afterEach(async () => {
     await performanceService.clearMetrics();
+    performanceService.dispose();
   });
 
   describe('Query Performance Tracking', () => {

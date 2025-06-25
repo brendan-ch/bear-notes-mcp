@@ -63,6 +63,7 @@ export class PerformanceService implements IPerformanceService {
   private readonly config = getConfig();
   private readonly maxHistorySize = 10000;
   private readonly slowQueryThreshold = 1000; // 1 second
+  private metricsInterval?: ReturnType<typeof setInterval>;
 
   constructor() {
     // Start periodic system metrics collection
@@ -311,7 +312,7 @@ export class PerformanceService implements IPerformanceService {
    */
   private startMetricsCollection(): void {
     // Collect metrics every 30 seconds
-    setInterval(() => {
+    this.metricsInterval = setInterval(() => {
       this.recordSystemMetrics().catch(error => {
         const logger = new LoggingService();
         logger.error('Error collecting system metrics:', error);
@@ -373,5 +374,15 @@ export class PerformanceService implements IPerformanceService {
         }
       }
     }) as T;
+  }
+
+  /**
+   * Cleanup resources and stop background tasks
+   */
+  dispose(): void {
+    if (this.metricsInterval) {
+      clearInterval(this.metricsInterval);
+      this.metricsInterval = undefined;
+    }
   }
 }
