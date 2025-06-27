@@ -1,0 +1,91 @@
+{
+  "name": "bear-mcp-server",
+  "version": "1.0.0",
+  "description": "Model Context Protocol (MCP) server for interfacing with Bear's SQLite database using a hybrid sync-safe approach",
+  "author": {
+    "name": "Ben",
+    "username": "bejaminjones", 
+    "url": "https://github.com/bejaminjones",
+    "location": "Sunshine Coast, Australia",
+    "bio": "Product Design and Vibes"
+  },
+  "license": "MIT",
+  "homepage": "https://github.com/bejaminjones/bear-notes-mcp",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bejaminjones/bear-notes-mcp.git"
+  },
+  "bugs": {
+    "url": "https://github.com/bejaminjones/bear-notes-mcp/issues"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "bear",
+    "notes",
+    "sqlite",
+    "claude",
+    "ai-assistant",
+    "productivity",
+    "macos"
+  ],
+  "main": "dist/index.js",
+  "type": "module",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "os": [
+    "darwin"
+  ],
+  "mcp": {
+    "serverInfo": {
+      "name": "bear-mcp-server",
+      "version": "1.0.0",
+      "protocolVersion": "2024-11-05"
+    },
+    "capabilities": {
+      "tools": true,
+      "resources": false,
+      "prompts": false,
+      "logging": true
+    },
+    "tools": {
+      "read": 26,
+      "write": 6,
+      "total": 32
+    },
+    "features": [
+      "hybrid-sync-safe-approach",
+      "direct-database-reads",
+      "bear-api-writes",
+      "full-text-search",
+      "tag-management",
+      "note-organization",
+      "performance-caching",
+      "health-monitoring",
+      "comprehensive-logging"
+    ]
+  },
+  "categories": [
+    "productivity",
+    "notes",
+    "ai-tools",
+    "mcp-server"
+  ],
+  "platform": {
+    "supported": ["macOS"],
+    "required": ["Bear.app", "Claude Desktop"]
+  },
+  "configuration": {
+    "environment_variables": [
+      "BEAR_DB_PATH",
+      "BACKUP_DIR",
+      "NODE_ENV",
+      "LOG_LEVEL"
+    ],
+    "config_files": [
+      ".env",
+      "claude_desktop_config.json"
+    ]
+  }
+} 
