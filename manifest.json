@@ -1,26 +1,103 @@
 {
+  "dxt_version": "0.1",
   "name": "bear-mcp-server",
+  "display_name": "Bear Notes MCP Server",
   "version": "1.0.0",
   "description": "Model Context Protocol (MCP) server for interfacing with Bear's SQLite database using a hybrid sync-safe approach",
+  "long_description": "This MCP server provides AI assistants with read and write access to Bear notes through a hybrid approach that safely reads directly from Bear's SQLite database while using Bear's URL scheme for write operations. Features include full-text search, tag management, note organization, performance caching, and comprehensive health monitoring.",
   "author": {
     "name": "Ben",
-    "username": "bejaminjones", 
-    "url": "https://github.com/bejaminjones",
-    "location": "Sunshine Coast, Australia",
-    "bio": "Product Design and Vibes"
+    "email": "bejaminjones@icloud.com",
+    "url": "https://github.com/bejaminjones"
   },
-  "license": "MIT",
-  "homepage": "https://github.com/bejaminjones/bear-notes-mcp",
   "repository": {
     "type": "git",
-    "url": "https://github.com/bejaminjones/bear-notes-mcp.git"
+    "url": "https://github.com/bejaminjones/bear-notes-mcp"
   },
-  "bugs": {
-    "url": "https://github.com/bejaminjones/bear-notes-mcp/issues"
+  "homepage": "https://github.com/bejaminjones/bear-notes-mcp",
+  "documentation": "https://github.com/bejaminjones/bear-notes-mcp/blob/main/README.md",
+  "support": "https://github.com/bejaminjones/bear-notes-mcp/issues",
+  "icon": "assets/icon.png",
+  "server": {
+    "type": "node",
+    "entry_point": "dist/index.js",
+    "mcp_config": {
+      "command": "node",
+      "args": ["${__dirname}/dist/index.js"],
+      "env": {
+        "BEAR_DB_PATH": "${user_config.bear_db_path}",
+        "BACKUP_DIR": "${user_config.backup_dir}",
+        "LOG_LEVEL": "${user_config.log_level}",
+        "NODE_ENV": "production"
+      }
+    }
   },
+  "tools": [
+    {
+      "name": "search_notes",
+      "description": "Search Bear notes using full-text search"
+    },
+    {
+      "name": "get_note",
+      "description": "Get a specific note by ID or title"
+    },
+    {
+      "name": "list_notes",
+      "description": "List notes with optional filtering"
+    },
+    {
+      "name": "get_tags",
+      "description": "Get all tags or notes with specific tags"
+    },
+    {
+      "name": "create_note",
+      "description": "Create a new note in Bear"
+    },
+    {
+      "name": "update_note",
+      "description": "Update an existing note"
+    },
+    {
+      "name": "delete_note",
+      "description": "Delete a note from Bear"
+    },
+    {
+      "name": "add_tag",
+      "description": "Add tags to a note"
+    },
+    {
+      "name": "remove_tag",
+      "description": "Remove tags from a note"
+    },
+    {
+      "name": "archive_note",
+      "description": "Archive or unarchive a note"
+    },
+    {
+      "name": "trash_note",
+      "description": "Move a note to trash or restore from trash"
+    },
+    {
+      "name": "pin_note",
+      "description": "Pin or unpin a note"
+    },
+    {
+      "name": "get_note_stats",
+      "description": "Get statistics about notes"
+    },
+    {
+      "name": "backup_notes",
+      "description": "Create a backup of Bear notes"
+    },
+    {
+      "name": "health_check",
+      "description": "Check the health status of the MCP server"
+    }
+  ],
+  "tools_generated": true,
   "keywords": [
     "mcp",
-    "model-context-protocol",
+    "model-context-protocol", 
     "bear",
     "notes",
     "sqlite",
@@ -29,63 +106,47 @@
     "productivity",
     "macos"
   ],
-  "main": "dist/index.js",
-  "type": "module",
-  "engines": {
-    "node": ">=18.0.0"
+  "license": "MIT",
+  "compatibility": {
+    "claude_desktop": ">=1.0.0",
+    "platforms": ["darwin"],
+    "runtimes": {
+      "node": ">=18.0.0"
+    }
   },
-  "os": [
-    "darwin"
-  ],
-  "mcp": {
-    "serverInfo": {
-      "name": "bear-mcp-server",
-      "version": "1.0.0",
-      "protocolVersion": "2024-11-05"
+  "user_config": {
+    "bear_db_path": {
+      "type": "file",
+      "title": "Bear Database Path",
+      "description": "Path to Bear's SQLite database file (usually ~/Library/Group Containers/9K33E3U3T4.net.shinyfrog.bear/Application Data/database.sqlite)",
+      "required": false,
+      "default": "~/Library/Group Containers/9K33E3U3T4.net.shinyfrog.bear/Application Data/database.sqlite",
+      "file_types": ["sqlite", "sqlite3", "db"]
     },
-    "capabilities": {
-      "tools": true,
-      "resources": false,
-      "prompts": false,
-      "logging": true
+    "backup_dir": {
+      "type": "directory",
+      "title": "Backup Directory",
+      "description": "Directory where note backups will be stored",
+      "required": false,
+      "default": "~/Documents/Bear-Backups"
     },
-    "tools": {
-      "read": 26,
-      "write": 6,
-      "total": 32
-    },
-    "features": [
-      "hybrid-sync-safe-approach",
-      "direct-database-reads",
-      "bear-api-writes",
-      "full-text-search",
-      "tag-management",
-      "note-organization",
-      "performance-caching",
-      "health-monitoring",
-      "comprehensive-logging"
-    ]
+    "log_level": {
+      "type": "string",
+      "title": "Log Level",
+      "description": "Logging level for the MCP server",
+      "default": "info",
+      "choices": ["error", "warn", "info", "debug"],
+      "required": false
+    }
   },
-  "categories": [
-    "productivity",
-    "notes",
-    "ai-tools",
-    "mcp-server"
-  ],
-  "platform": {
-    "supported": ["macOS"],
-    "required": ["Bear.app", "Claude Desktop"]
-  },
-  "configuration": {
-    "environment_variables": [
-      "BEAR_DB_PATH",
-      "BACKUP_DIR",
-      "NODE_ENV",
-      "LOG_LEVEL"
-    ],
-    "config_files": [
-      ".env",
-      "claude_desktop_config.json"
-    ]
+  "requirements": {
+    "bear_app": {
+      "description": "Bear notes app must be installed",
+      "url": "https://bear.app"
+    },
+    "macos": {
+      "description": "This extension only works on macOS",
+      "min_version": "10.15"
+    }
   }
 } 
