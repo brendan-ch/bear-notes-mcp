@@ -1,10 +1,10 @@
 {
   "dxt_version": "0.1",
   "name": "bear-mcp-server",
-  "display_name": "Bear Notes MCP Server",
+  "display_name": "Bear Notes",
   "version": "1.0.0",
-  "description": "Model Context Protocol (MCP) server for interfacing with Bear's SQLite database using a hybrid sync-safe approach",
-  "long_description": "This MCP server provides AI assistants with read and write access to Bear notes through a hybrid approach that safely reads directly from Bear's SQLite database while using Bear's URL scheme for write operations. Features include full-text search, tag management, note organization, performance caching, and comprehensive health monitoring.",
+  "description": "Connect Claude to your Bear notes - search, read, create, and organize your notes with AI assistance",
+  "long_description": "This MCP server lets Claude access and manage your Bear notes directly. Claude can search through your existing notes, read their content, create new notes, organize them with tags, and help you manage your knowledge base. It safely reads from Bear's database and uses Bear's own URL scheme for creating and editing notes, ensuring your data stays secure while giving you powerful AI-assisted note management.",
   "author": {
     "name": "Ben",
     "email": "bejaminjones@icloud.com",
@@ -34,64 +34,132 @@
   },
   "tools": [
     {
+      "name": "get_database_stats",
+      "description": "Get insights about your notes collection (total count, tags, database size, etc.)"
+    },
+    {
+      "name": "get_database_schema",
+      "description": "View the technical structure of Bear's database (for debugging)"
+    },
+    {
+      "name": "check_bear_status",
+      "description": "Check if Bear app is currently running"
+    },
+    {
+      "name": "verify_database_access",
+      "description": "Verify that the connection to Bear's database is working properly"
+    },
+    {
+      "name": "create_backup",
+      "description": "Create a backup copy of your Bear notes for safekeeping"
+    },
+    {
+      "name": "get_recent_notes",
+      "description": "Show your most recently modified notes"
+    },
+    {
       "name": "search_notes",
-      "description": "Search Bear notes using full-text search"
+      "description": "Find notes by searching their content and titles"
     },
     {
-      "name": "get_note",
-      "description": "Get a specific note by ID or title"
+      "name": "get_note_by_id",
+      "description": "Read a specific note using its unique database ID"
     },
     {
-      "name": "list_notes",
-      "description": "List notes with optional filtering"
+      "name": "get_note_by_title",
+      "description": "Read a specific note by its exact title"
     },
     {
-      "name": "get_tags",
-      "description": "Get all tags or notes with specific tags"
+      "name": "get_all_tags",
+      "description": "View all your tags with usage counts"
+    },
+    {
+      "name": "get_notes_by_tag",
+      "description": "Find all notes that have a specific tag"
+    },
+    {
+      "name": "get_notes_advanced",
+      "description": "Advanced note search with filtering, sorting, and pagination options"
+    },
+    {
+      "name": "get_notes_with_criteria",
+      "description": "Find notes using complex criteria (title/content patterns, tags, dates, etc.)"
+    },
+    {
+      "name": "get_note_analytics",
+      "description": "Get comprehensive analytics and statistics about your notes"
+    },
+    {
+      "name": "get_related_notes",
+      "description": "Find notes related to a specific note based on tags and content"
+    },
+    {
+      "name": "search_notes_fulltext",
+      "description": "Advanced full-text search with relevance scoring and content snippets"
+    },
+    {
+      "name": "get_search_suggestions",
+      "description": "Get auto-complete suggestions for search queries"
+    },
+    {
+      "name": "find_similar_notes",
+      "description": "Find notes similar to given text using content analysis"
+    },
+    {
+      "name": "search_notes_regex",
+      "description": "Search notes using regular expressions for advanced pattern matching"
+    },
+    {
+      "name": "get_tag_hierarchy",
+      "description": "View tag relationships and nested tag structure"
+    },
+    {
+      "name": "get_tag_analytics",
+      "description": "Get detailed statistics about tag usage patterns"
+    },
+    {
+      "name": "analyze_tag_relationships",
+      "description": "Analyze how tags relate to each other and suggest improvements"
+    },
+    {
+      "name": "get_tag_usage_trends",
+      "description": "See how tag usage has changed over time"
+    },
+    {
+      "name": "get_file_attachments",
+      "description": "Find and analyze file attachments in your notes"
+    },
+    {
+      "name": "analyze_note_metadata",
+      "description": "Analyze note structure, links, and content patterns"
+    },
+    {
+      "name": "get_notes_with_metadata",
+      "description": "Find notes with specific characteristics (attachments, links, todos, etc.)"
     },
     {
       "name": "create_note",
-      "description": "Create a new note in Bear"
+      "description": "Create a new note with title, content, and tags"
     },
     {
       "name": "update_note",
-      "description": "Update an existing note"
+      "description": "Edit an existing note's content, title, or tags"
     },
     {
-      "name": "delete_note",
-      "description": "Delete a note from Bear"
-    },
-    {
-      "name": "add_tag",
-      "description": "Add tags to a note"
-    },
-    {
-      "name": "remove_tag",
-      "description": "Remove tags from a note"
+      "name": "duplicate_note",
+      "description": "Create a copy of an existing note"
     },
     {
       "name": "archive_note",
-      "description": "Archive or unarchive a note"
+      "description": "Archive a note to hide it from main view, or unarchive it"
     },
     {
-      "name": "trash_note",
-      "description": "Move a note to trash or restore from trash"
+      "name": "trigger_hashtag_parsing",
+      "description": "Trigger Bear to reparse hashtags in a specific note"
     },
     {
-      "name": "pin_note",
-      "description": "Pin or unpin a note"
-    },
-    {
-      "name": "get_note_stats",
-      "description": "Get statistics about notes"
-    },
-    {
-      "name": "backup_notes",
-      "description": "Create a backup of Bear notes"
-    },
-    {
-      "name": "health_check",
-      "description": "Check the health status of the MCP server"
+      "name": "batch_trigger_hashtag_parsing",
+      "description": "Trigger hashtag parsing for multiple notes at once"
     }
   ],
   "tools_generated": true,
@@ -108,7 +176,7 @@
   ],
   "license": "MIT",
   "compatibility": {
-    "claude_desktop": ">=1.0.0",
+    "claude_desktop": ">=0.11.0",
     "platforms": ["darwin"],
     "runtimes": {
       "node": ">=18.0.0"
