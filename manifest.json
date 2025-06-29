@@ -1,8 +1,8 @@
 {
-  "dxt_version": "0.1",
+  "dxt_version": "0.2",
   "name": "bear-mcp-server",
   "display_name": "Bear Notes",
-  "version": "1.0.0",
+  "version": "1.0.",
   "description": "Connect Claude to your Bear notes - search, read, create, and organize your notes with AI assistance",
   "long_description": "This MCP server lets Claude access and manage your Bear notes directly. Claude can search through your existing notes, read their content, create new notes, organize them with tags, and help you manage your knowledge base. It safely reads from Bear's database and uses Bear's own URL scheme for creating and editing notes, ensuring your data stays secure while giving you powerful AI-assisted note management.",
   "author": {
