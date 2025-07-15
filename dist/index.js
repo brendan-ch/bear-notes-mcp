@@ -4,10 +4,12 @@
  * Copyright (c) 2024 Bear MCP Server
  * MIT License - see LICENSE file for details
  */
+console.error('DEBUG: Starting Bear MCP Server script...');
 import { Server } from '@modelcontextprotocol/sdk/server/index.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { CallToolRequestSchema, ListToolsRequestSchema, } from '@modelcontextprotocol/sdk/types.js';
 import { BearService } from './services/bear-service.js';
+console.error('DEBUG: All imports loaded successfully...');
 /**
  * Bear MCP Server
  * Provides MCP tools for interfacing with Bear's SQLite database
@@ -16,12 +18,16 @@ class BearMCPServer {
     server;
     bearService;
     constructor() {
+        console.error('DEBUG: Creating server instance...');
         this.server = new Server({
             name: 'bear-mcp-server',
             version: '1.0.0',
         });
+        console.error('DEBUG: Creating BearService...');
         this.bearService = new BearService();
+        console.error('DEBUG: Setting up handlers...');
         this.setupHandlers();
+        console.error('DEBUG: Constructor completed');
     }
     setupHandlers() {
         // List available tools
@@ -1893,15 +1899,21 @@ ${topTagsData}`,
         }
     }
     async run() {
+        console.error('DEBUG: Starting server transport...');
         const transport = new StdioServerTransport();
+        console.error('DEBUG: Connecting to transport...');
         await this.server.connect(transport);
+        console.error('DEBUG: Server connected and running...');
         // Server running on stdio (no console output to avoid JSON-RPC interference)
     }
 }
 // Start the server
+console.error('DEBUG: Creating BearMCPServer instance...');
 const server = new BearMCPServer();
-server.run().catch(() => {
-    // Silent error handling to avoid JSON-RPC interference
+console.error('DEBUG: Starting server.run()...');
+server.run().catch((error) => {
+    // Debug output to stderr (won't interfere with JSON-RPC on stdout)
+    console.error('DEBUG: Server startup failed:', error);
     process.exit(1);
 });
 //# sourceMappingURL=index.js.map

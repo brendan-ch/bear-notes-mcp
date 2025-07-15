@@ -139,7 +139,17 @@ export class BearDatabase {
 
       this.db = new sqlite3.Database(this.dbPath, mode, err => {
         if (err) {
-          reject(new BearDatabaseError(`Failed to connect to database: ${err.message}`));
+          // Enhanced error message for permission issues
+          let errorMessage = `Failed to connect to database: ${err.message}`;
+          if (err.message.includes('SQLITE_CANTOPEN') || err.message.includes('no such file') || err.message.includes('permission denied')) {
+            errorMessage += '\n\n🔒 PERMISSION ISSUE: Claude Desktop needs "Full Disk Access" permission to read Bear\'s database.\n' +
+              '📋 Steps to fix:\n' +
+              '   1. Open System Preferences → Privacy & Security → Full Disk Access\n' +
+              '   2. Click "+" and add Claude.app\n' +
+              '   3. Restart Claude Desktop\n' +
+              '   4. Disable and re-enable this extension';
+          }
+          reject(new BearDatabaseError(errorMessage));
         } else {
           // Connected to Bear database
           resolve();

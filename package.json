@@ -7,21 +7,12 @@
   "scripts": {
     "start": "node dist/index.js",
     "build": "tsc",
-    "build:prod": "node scripts/build.cjs",
     "dev": "tsx src/index.ts",
     "test": "jest",
-    "test:watch": "jest --watch",
-    "test:coverage": "jest --coverage",
-    "test:integration": "jest --testPathPattern=integration",
     "lint": "eslint src tests --ext .ts",
-    "lint:fix": "eslint src tests --ext .ts --fix",
-    "format": "prettier --write \"src/**/*.ts\" \"tests/**/*.ts\" \"*.{js,json,md}\"",
-    "format:check": "prettier --check \"src/**/*.ts\" \"tests/**/*.ts\" \"*.{js,json,md}\"",
     "type-check": "tsc --noEmit",
-    "quality": "npm run type-check && npm run lint && npm run format:check && npm run test",
     "clean": "rimraf dist coverage .nyc_output",
-    "prepare": "npm run build",
-    "postinstall": "npm run build"
+    "prepare": "npm run build"
   },
   "keywords": [
     "mcp",
