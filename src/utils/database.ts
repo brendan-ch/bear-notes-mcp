@@ -125,12 +125,66 @@ export class BearDatabase {
   }
 
   /**
-   * Connect to the database with safety checks
+   * Request permission to access Bear's database directory
+   */
+  async requestDatabasePermission(): Promise<boolean> {
+    try {
+      // Check if we can access the directory structure
+      const bearContainerPath = path.join(
+        os.homedir(),
+        'Library/Group Containers/9K33E3U3T4.net.shinyfrog.bear'
+      );
+      
+      // First check if the Bear container directory exists
+      await access(bearContainerPath, constants.R_OK);
+      
+      // Try to access the database file specifically
+      await access(this.dbPath, constants.R_OK);
+      
+      return true; // Access granted
+    } catch (error) {
+      // Open System Preferences to Full Disk Access
+      try {
+        await execAsync('open "x-apple.systempreferences:com.apple.preference.security?Privacy_AllFiles"');
+        
+        throw new BearDatabaseError(
+          '🔒 PERMISSION REQUIRED: Claude needs "Full Disk Access" to read Bear\'s database.\n\n' +
+          '📋 Steps to fix:\n' +
+          '   1. System Preferences → Privacy & Security → Full Disk Access should now be open\n' +
+          '   2. Click the "+" button and add "Claude Desktop" (or find it in the list)\n' +
+          '   3. Enable the checkbox next to Claude Desktop\n' +
+          '   4. Restart Claude Desktop completely\n' +
+          '   5. Try using this extension again\n\n' +
+          '💡 Why this is needed: Bear stores its data in a protected system directory that requires special permission to access.\n' +
+          '🔐 This is safe: The extension only reads your notes, never modifies Bear\'s database directly.'
+        );
+      } catch (systemPrefError) {
+        // Fallback if we can't open system preferences
+        throw new BearDatabaseError(
+          '🔒 PERMISSION REQUIRED: Claude needs "Full Disk Access" to read Bear\'s database.\n\n' +
+          '📋 Manual steps to fix:\n' +
+          '   1. Open System Preferences → Privacy & Security → Full Disk Access\n' +
+          '   2. Click the "+" button and add "Claude Desktop"\n' +
+          '   3. Enable the checkbox next to Claude Desktop\n' +
+          '   4. Restart Claude Desktop completely\n' +
+          '   5. Try using this extension again\n\n' +
+          '💡 Why this is needed: Bear stores its data in a protected system directory.\n' +
+          '🔐 This is safe: The extension only reads your notes, never modifies them.'
+        );
+      }
+    }
+  }
+
+  /**
+   * Connect to the database with safety checks and permission handling
    */
   async connect(readOnly: boolean = true): Promise<void> {
     if (this.db) {
       return; // Already connected
     }
+
+    // First, request permission if needed
+    await this.requestDatabasePermission();
 
     await this.performSafetyChecks(!readOnly);
 
@@ -142,12 +196,12 @@ export class BearDatabase {
           // Enhanced error message for permission issues
           let errorMessage = `Failed to connect to database: ${err.message}`;
           if (err.message.includes('SQLITE_CANTOPEN') || err.message.includes('no such file') || err.message.includes('permission denied')) {
-            errorMessage += '\n\n🔒 PERMISSION ISSUE: Claude Desktop needs "Full Disk Access" permission to read Bear\'s database.\n' +
-              '📋 Steps to fix:\n' +
-              '   1. Open System Preferences → Privacy & Security → Full Disk Access\n' +
-              '   2. Click "+" and add Claude.app\n' +
-              '   3. Restart Claude Desktop\n' +
-              '   4. Disable and re-enable this extension';
+            errorMessage += '\n\n🔒 PERMISSION ISSUE: Claude Desktop still needs "Full Disk Access" permission.\n' +
+              '📋 Please ensure you have:\n' +
+              '   1. Added Claude Desktop to Full Disk Access in System Preferences\n' +
+              '   2. Enabled the checkbox next to Claude Desktop\n' +
+              '   3. Completely restarted Claude Desktop\n' +
+              '   4. If still having issues, try logging out and back in to macOS';
           }
           reject(new BearDatabaseError(errorMessage));
         } else {

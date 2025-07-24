@@ -2,7 +2,7 @@
   "mcpServers": {
     "bear-notes": {
       "command": "node",
-      "args": ["/Users/benjones/Documents/GitHub/bear-notes-mcp/dist/index.js"],
+      "args": ["/path/to/bear-notes-mcp/dist/index.js"],
       "env": {
         "BEAR_DB_PATH": "~/Library/Group Containers/9K33E3U3T4.net.shinyfrog.bear/Application Data/database.sqlite",
         "LOG_LEVEL": "info"

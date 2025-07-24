@@ -6,8 +6,6 @@
  * MIT License - see LICENSE file for details
  */
 
-console.error('DEBUG: Starting Bear MCP Server script...');
-
 import { Server } from '@modelcontextprotocol/sdk/server/index.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import {
@@ -16,8 +14,6 @@ import {
   Tool,
 } from '@modelcontextprotocol/sdk/types.js';
 import { BearService } from './services/bear-service.js';
-
-console.error('DEBUG: All imports loaded successfully...');
 
 // Error types imported for potential use in error handling
 
@@ -189,17 +185,13 @@ class BearMCPServer {
   private bearService: BearService;
 
   constructor() {
-    console.error('DEBUG: Creating server instance...');
     this.server = new Server({
       name: 'bear-mcp-server',
       version: '1.0.0',
     });
 
-    console.error('DEBUG: Creating BearService...');
     this.bearService = new BearService();
-    console.error('DEBUG: Setting up handlers...');
     this.setupHandlers();
-    console.error('DEBUG: Constructor completed');
   }
 
   private setupHandlers(): void {
@@ -2319,21 +2311,15 @@ ${topTagsData}`,
   }
 
   async run(): Promise<void> {
-    console.error('DEBUG: Starting server transport...');
     const transport = new StdioServerTransport();
-    console.error('DEBUG: Connecting to transport...');
     await this.server.connect(transport);
-    console.error('DEBUG: Server connected and running...');
-    // Server running on stdio (no console output to avoid JSON-RPC interference)
+    // Server running on stdio
   }
 }
 
 // Start the server
-console.error('DEBUG: Creating BearMCPServer instance...');
 const server = new BearMCPServer();
-console.error('DEBUG: Starting server.run()...');
 server.run().catch((error) => {
-  // Debug output to stderr (won't interfere with JSON-RPC on stdout)
-  console.error('DEBUG: Server startup failed:', error);
+  console.error('Server startup failed:', error);
   process.exit(1);
 });

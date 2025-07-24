@@ -265,22 +265,106 @@ export class DatabaseService implements IDatabaseService {
   }
 
   /**
-   * Verify database access
+   * Verify database access and return detailed status
    */
-  async verifyAccess(): Promise<void> {
-    const wasConnected = this._isConnected;
-
-    if (!wasConnected) {
-      await this.connect(true); // Read-only connection
-    }
+  async verifyAccess(): Promise<{
+    hasAccess: boolean;
+    error?: string;
+    permissions: {
+      canReadDirectory: boolean;
+      canReadDatabase: boolean;
+      bearInstalled: boolean;
+    };
+  }> {
+    const result: {
+      hasAccess: boolean;
+      error?: string;
+      permissions: {
+        canReadDirectory: boolean;
+        canReadDatabase: boolean;
+        bearInstalled: boolean;
+      };
+    } = {
+      hasAccess: false,
+      permissions: {
+        canReadDirectory: false,
+        canReadDatabase: false,
+        bearInstalled: false,
+      },
+    };
 
     try {
-      // Try to query a basic table to verify access
-      await this.queryOne('SELECT COUNT(*) as count FROM ZSFNOTE LIMIT 1');
-    } finally {
-      if (!wasConnected) {
-        await this.disconnect();
+      // Check if Bear is installed
+      const fs = await import('fs/promises');
+      const path = await import('path');
+      
+      try {
+        await fs.access('/Applications/Bear.app', fs.constants.F_OK);
+        result.permissions.bearInstalled = true;
+      } catch {
+        // Check in other common locations
+        try {
+          await fs.access(path.join(process.env.HOME || '', 'Applications/Bear.app'), fs.constants.F_OK);
+          result.permissions.bearInstalled = true;
+        } catch {
+          result.permissions.bearInstalled = false;
+        }
       }
+
+      // Check directory access
+      const bearContainerPath = path.join(
+        process.env.HOME || '',
+        'Library/Group Containers/9K33E3U3T4.net.shinyfrog.bear'
+      );
+      
+      try {
+        await fs.access(bearContainerPath, fs.constants.R_OK);
+        result.permissions.canReadDirectory = true;
+      } catch {
+        result.permissions.canReadDirectory = false;
+        return {
+          ...result,
+          error: 'Cannot access Bear\'s container directory. Full Disk Access permission required.',
+        };
+      }
+
+      // Check database file access
+      try {
+        await fs.access(this.database['dbPath'], fs.constants.R_OK);
+        result.permissions.canReadDatabase = true;
+      } catch {
+        result.permissions.canReadDatabase = false;
+        return {
+          ...result,
+          error: 'Cannot access Bear\'s database file. Full Disk Access permission required.',
+        };
+      }
+
+      // Try actual database connection
+      const wasConnected = this._isConnected;
+
+      if (!wasConnected) {
+        await this.connect(true); // Read-only connection
+      }
+
+      try {
+        // Try to query a basic table to verify access
+        await this.queryOne('SELECT COUNT(*) as count FROM ZSFNOTE LIMIT 1');
+        result.hasAccess = true;
+      } catch (error) {
+        result.error = error instanceof Error ? error.message : 'Unknown database error';
+      } finally {
+        if (!wasConnected) {
+          await this.disconnect();
+        }
+      }
+
+      return result;
+    } catch (error) {
+      return {
+        ...result,
+        error: error instanceof Error ? error.message : 'Unknown verification error',
+      };
     }
   }
 

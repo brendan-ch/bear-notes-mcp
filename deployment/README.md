@@ -1,11 +1,19 @@
-# Bear Notes MCP Server - Setup Guide
+# Bear MCP Server - Simple Setup
 
-Connect Claude to your Bear notes with this standalone MCP server.
+Connect Claude Desktop to your Bear notes with this standalone MCP server.
 
-## 🚀 Quick Setup
+## Quick Setup
 
-### 1. Copy Configuration
-Copy the configuration from `claude_desktop_config.json` to your Claude Desktop MCP settings:
+### 1. Build the Server
+```bash
+npm install
+npm run build
+```
+
+### 2. Configure Claude Desktop
+
+Add this to your Claude Desktop config file:
+**Location:** `~/Library/Application Support/Claude/claude_desktop_config.json`
 
 ```json
 {
@@ -22,40 +30,40 @@ Copy the configuration from `claude_desktop_config.json` to your Claude Desktop 
 }
 ```
 
-### 2. Update Path
-Replace `/path/to/bear-notes-mcp/dist/index.js` with your actual installation path.
+**⚠️ Important:** Replace `/path/to/bear-notes-mcp` with your actual installation path.
 
-### 3. Restart Claude Desktop
-Restart Claude Desktop to load the new configuration.
+### 3. Grant Permissions
 
-## 📁 Files in This Folder
+1. Open **System Preferences** → **Privacy & Security** → **Full Disk Access**
+2. Click **"+"** and add **Claude Desktop**  
+3. Enable the checkbox
+4. **Restart Claude Desktop**
 
-- **`claude_desktop_config.json`** - Ready-to-use configuration
-- **`INSTALLATION.md`** - Detailed installation guide  
-- **`SETUP.md`** - Quick setup reference
+### 4. Test
 
-## ✅ Why Standalone MCP Server?
+Ask Claude about your Bear notes - it should work!
 
-- **Simple and reliable** - No permission complexity
-- **Direct file system access** - Works with standard macOS permissions
-- **Full control** - Customize environment variables and paths
-- **Universal compatibility** - Works with any MCP client
-- **Proven approach** - Standard MCP server deployment method
+## Why No DXT Package?
 
-## 🔧 Customization
+We removed the DXT packaging approach because:
+- ❌ Complex permission handling
+- ❌ Installation issues  
+- ❌ Packaging errors
+- ❌ Claude Desktop compatibility problems
 
-Edit the `env` section to customize behavior:
+The standalone approach is:
+- ✅ Simple and reliable
+- ✅ Standard MCP server pattern
+- ✅ Direct file system access
+- ✅ Easy to debug and maintain
 
-```json
-"env": {
-  "BEAR_DB_PATH": "~/Library/Group Containers/9K33E3U3T4.net.shinyfrog.bear/Application Data/database.sqlite",
-  "BACKUP_DIR": "~/Documents/MyBearBackups",
-  "LOG_LEVEL": "debug"
-}
-```
+## Troubleshooting
 
-## 🆘 Need Help?
+**Server won't connect:**
+- Check the file path in your configuration
+- Ensure Claude Desktop has Full Disk Access
+- Restart Claude Desktop after changes
 
-- **Installation Guide**: `INSTALLATION.md`
-- **Troubleshooting**: Check the main `docs/` folder
-- **Issues**: https://github.com/bejaminjones/bear-notes-mcp/issues
+**Permission errors:**
+- The server will guide you through permission setup
+- Follow the on-screen instructions

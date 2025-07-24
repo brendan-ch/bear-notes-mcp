@@ -28,7 +28,15 @@ export interface IDatabaseService {
   getDatabaseStats(): Promise<DatabaseStats>;
   getSchema(): Promise<{ name: string; sql: string }[]>;
   checkIntegrity(): Promise<boolean>;
-  verifyAccess(): Promise<void>;
+  verifyAccess(): Promise<{
+    hasAccess: boolean;
+    error?: string;
+    permissions: {
+      canReadDirectory: boolean;
+      canReadDatabase: boolean;
+      bearInstalled: boolean;
+    };
+  }>;
   createBackup(): Promise<string>;
 
   // Bear-specific operations
