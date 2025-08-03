@@ -733,7 +733,7 @@ class BearMCPServer {
             },
             {
                 name: 'trigger_hashtag_parsing',
-                description: 'Trigger Bear to reparse hashtags in a note using sync-safe API',
+                description: 'Trigger Bear to reparse hashtags in a note using sync-safe API. Provide either note_id or note_title.',
                 inputSchema: {
                     type: 'object',
                     properties: {
@@ -746,7 +746,7 @@ class BearMCPServer {
                             description: 'Note title to trigger parsing for (alternative to note_id)',
                         },
                     },
-                    oneOf: [{ required: ['note_id'] }, { required: ['note_title'] }],
+                    required: [],
                 },
             },
             {
